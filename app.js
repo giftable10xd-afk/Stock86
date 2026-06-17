@@ -1,5 +1,6 @@
 // ============================================================
-// STOCK/86 — APP LOGIC
+// STOCK/86 — SHARED APP LOGIC
+// Works on both index.html (grid) and product.html (detail page)
 // ============================================================
 
 const STORAGE_KEY = "stock86_sold_state_v1";
@@ -7,22 +8,32 @@ const STORAGE_KEY = "stock86_sold_state_v1";
 let cart = [];
 let adminMode = false;
 
-// ---------- ICONS (simple line icons, category placeholders) ----------
+// ---------- ICONS ----------
 
 const ICONS = {
-  switch: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="6" height="12" rx="2"/><rect x="16" y="6" width="6" height="12" rx="2"/><rect x="8" y="4" width="8" height="16" rx="1"/><circle cx="5" cy="10" r="0.8" fill="currentColor"/><circle cx="19" cy="14" r="0.8" fill="currentColor"/></svg>`,
-  console: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="18" height="7" rx="2"/><circle cx="7" cy="12.5" r="1"/><circle cx="10" cy="12.5" r="1"/><line x1="15" y1="11" x2="17" y2="11"/><line x1="15" y1="14" x2="17" y2="14"/></svg>`,
+  switch:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="6" height="12" rx="2"/><rect x="16" y="6" width="6" height="12" rx="2"/><rect x="8" y="4" width="8" height="16" rx="1"/><circle cx="5" cy="10" r="0.8" fill="currentColor"/><circle cx="19" cy="14" r="0.8" fill="currentColor"/></svg>`,
+  console:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="9" width="18" height="7" rx="2"/><circle cx="7" cy="12.5" r="1"/><circle cx="10" cy="12.5" r="1"/><line x1="15" y1="11" x2="17" y2="11"/><line x1="15" y1="14" x2="17" y2="14"/></svg>`,
   handheld: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><rect x="7" y="6" width="10" height="8" rx="1"/><circle cx="9" cy="17.5" r="1"/><circle cx="15" cy="17.5" r="1"/></svg>`,
-  game: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>`,
-  laptop: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="11" rx="1"/><path d="M2 19h20l-2-3H4l-2 3z"/></svg>`,
-  sold: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="7" y1="7" x2="17" y2="17"/></svg>`
+  game:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>`,
+  laptop:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="11" rx="1"/><path d="M2 19h20l-2-3H4l-2 3z"/></svg>`,
+  sold:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="7" y1="7" x2="17" y2="17"/></svg>`
 };
 
-// ---------- PERSISTENCE FOR SOLD STATE ----------
+// ---------- DATA HELPERS ----------
 
 function allLists() {
   return [INVENTORY.switches, INVENTORY.games, INVENTORY.consoles, INVENTORY.laptops];
 }
+
+function findItemById(id) {
+  for (const list of allLists()) {
+    const found = list.find(i => i.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+// ---------- SOLD STATE PERSISTENCE ----------
 
 function loadSoldState() {
   try {
@@ -34,27 +45,14 @@ function loadSoldState() {
         if (soldMap.hasOwnProperty(item.id)) item.sold = soldMap[item.id];
       });
     });
-  } catch (e) {
-    console.warn("Could not load sold state:", e);
-  }
+  } catch (e) { console.warn("Could not load sold state:", e); }
 }
 
 function saveSoldState() {
   const soldMap = {};
   allLists().forEach(list => list.forEach(item => { soldMap[item.id] = item.sold; }));
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(soldMap));
-  } catch (e) {
-    console.warn("Could not save sold state:", e);
-  }
-}
-
-function findItemById(id) {
-  for (const list of allLists()) {
-    const found = list.find(i => i.id === id);
-    if (found) return found;
-  }
-  return null;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(soldMap)); }
+  catch (e) { console.warn("Could not save sold state:", e); }
 }
 
 function toggleSold(id) {
@@ -62,25 +60,26 @@ function toggleSold(id) {
   if (!item) return;
   item.sold = !item.sold;
   saveSoldState();
-  renderAll();
+  // Refresh whichever page we're on
+  if (typeof renderAll === "function") renderAll();
+  if (typeof renderProductPage === "function") renderProductPage();
 }
 
-// ---------- RENDERING: PRODUCT CARDS ----------
+// ---------- PRODUCT CARD (index page) ----------
 
-function renderProductCard(item, opts) {
-  opts = opts || {};
+function renderProductCard(item) {
   const soldClass = item.sold ? "is-sold" : "";
   const icon = ICONS[item.icon] || ICONS.console;
 
-  const specsHtml = (item.specs || [])
-    .map(s => `<span class="badge badge-default badge-gray">${s}</span>`)
-    .join("");
+  const mediaHtml = item.image
+    ? `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{innerHTML:'${icon.replace(/'/g, "\\'")}',className:'icon-fallback'}).firstChild)">`
+    : icon;
 
   let priceActionHtml = "";
   if (item.sold) {
     priceActionHtml = `<span class="badge badge-lg badge-danger">Sold</span>`;
   } else {
-    priceActionHtml = `<button class="btn btn-brand btn-sm" onclick="addToCart('${item.id}', event)">Add to cart</button>`;
+    priceActionHtml = `<button class="btn btn-brand btn-sm" onclick="startAddToCart('${item.id}', event)">Add to cart</button>`;
   }
 
   let adminHtml = "";
@@ -90,100 +89,119 @@ function renderProductCard(item, opts) {
     </button>`;
   }
 
-  let addonHtml = "";
-  if (opts.hasControllerAddon && !item.sold) {
-    addonHtml = renderControllerAddonBlock(item.id);
-  }
-
-  const hasDetail = item.description || (item.specs && item.specs.length) || adminHtml || addonHtml;
+  const specsHtml = (item.specs || [])
+    .map(s => `<span class="badge badge-default badge-gray">${s}</span>`)
+    .join("");
 
   return `
     <div class="card ${soldClass}" id="card-${item.id}">
-      <div class="card-media">
-        ${icon}
-        ${item.sold ? `<div class="sold-overlay"><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
-      </div>
+      <a class="card-media-link" href="product.html?id=${item.id}" aria-label="View ${item.name}">
+        <div class="card-media ${item.image ? 'has-photo' : ''}">
+          ${mediaHtml}
+          ${item.sold ? `<div class="sold-overlay"><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
+        </div>
+      </a>
       <div class="card-body">
         <span class="card-sku">${item.id}</span>
-        <h3 class="card-title">${item.name}</h3>
+        <a href="product.html?id=${item.id}" class="card-title-link">
+          <h3 class="card-title">${item.name}</h3>
+        </a>
         ${item.condition ? `<span class="card-condition">${item.condition}</span>` : ""}
+        ${specsHtml ? `<div class="card-specs">${specsHtml}</div>` : ""}
         <div class="card-price-row">
           <span class="card-price"><span class="currency">$</span>${item.price}</span>
           ${priceActionHtml}
         </div>
-        ${hasDetail ? `
-          <button class="detail-toggle" onclick="toggleExpand('${item.id}')" id="toggle-${item.id}">
-            <span>Details</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        ` : ""}
+        ${adminHtml ? `<div class="card-admin">${adminHtml}</div>` : ""}
       </div>
-      ${hasDetail ? `
-        <div class="card-detail" id="detail-${item.id}">
-          ${item.description ? `<p>${item.description}</p>` : ""}
-          <div class="card-specs" style="margin-bottom:12px;">${specsHtml}</div>
-          ${addonHtml}
-          ${adminHtml}
-        </div>
-      ` : ""}
     </div>
   `;
 }
 
-function renderControllerAddonBlock(switchId) {
+// ---------- CONTROLLER ADDON MODAL ----------
+// For Switch products: shown before the item is added to cart.
+// The buyer chooses No controller / Pro / Wired, then the item
+// (+ optional addon) goes into the cart together.
+
+let pendingSwitchId = null;
+
+function startAddToCart(id, evt) {
+  if (evt) evt.stopPropagation();
+  const item = findItemById(id);
+  if (!item || item.sold) return;
+
+  if (item.hasControllerAddon) {
+    // Show the controller choice modal first
+    pendingSwitchId = id;
+    openControllerModal(item);
+  } else {
+    directAddToCart(id);
+  }
+}
+
+function openControllerModal(item) {
   const pro = INVENTORY.controllerAddons.pro;
   const wired = INVENTORY.controllerAddons.wired;
   const editionOptions = pro.editions.map(e => `<option value="${e}">${e}</option>`).join("");
 
-  return `
-    <div class="addon-block">
-      <div class="addon-row">
-        <span class="addon-label">${pro.label} <span class="addon-price">+$${pro.price}</span></span>
-        <div class="addon-controls">
-          <select class="input" id="pro-edition-${switchId}">${editionOptions}</select>
-          <button class="btn btn-tertiary btn-sm" onclick="event.stopPropagation(); addProControllerAddon('${switchId}')">Add</button>
-        </div>
-      </div>
-      <div class="addon-row">
-        <span class="addon-label">${wired.label} <span class="addon-price">+$${wired.price}</span></span>
-        <div class="addon-controls">
-          <button class="btn btn-tertiary btn-sm" onclick="event.stopPropagation(); addWiredControllerAddon('${switchId}')">Add</button>
-        </div>
-      </div>
-    </div>
-  `;
+  document.getElementById("controllerModalItemName").textContent = item.name;
+  document.getElementById("controllerModalProEditions").innerHTML = editionOptions;
+  document.getElementById("controllerModalOverlay").classList.add("open");
+  document.getElementById("controllerModalProPrice").textContent = `+$${pro.price}`;
+  document.getElementById("controllerModalWiredPrice").textContent = `+$${wired.price}`;
 }
 
-function toggleExpand(id) {
-  const detail = document.getElementById(`detail-${id}`);
-  const toggle = document.getElementById(`toggle-${id}`);
-  if (!detail) return;
-  const isOpen = detail.classList.toggle("open");
-  if (toggle) toggle.classList.toggle("open", isOpen);
+function closeControllerModal() {
+  document.getElementById("controllerModalOverlay").classList.remove("open");
+  pendingSwitchId = null;
 }
 
-// ---------- MAIN RENDER ----------
+function confirmControllerChoice(type) {
+  // type: "none" | "pro" | "wired"
+  const id = pendingSwitchId;
+  closeControllerModal();
+  if (!id) return;
 
-function renderAll() {
-  document.getElementById("switchList").innerHTML =
-    INVENTORY.switches.map(i => renderProductCard(i, { hasControllerAddon: true })).join("");
+  const item = findItemById(id);
+  if (!item || item.sold) return;
 
-  document.getElementById("gamesGrid").innerHTML =
-    INVENTORY.games.map(i => renderProductCard(i)).join("");
+  // Always add the main item
+  cart.push({
+    lineId: `${id}-${Date.now()}`,
+    sourceId: id,
+    name: item.name,
+    price: item.price,
+    meta: ""
+  });
 
-  document.getElementById("consoleList").innerHTML =
-    INVENTORY.consoles.map(i => renderProductCard(i)).join("");
+  // Add controller add-on if chosen
+  if (type === "pro") {
+    const editionSelect = document.getElementById("controllerModalProEditions");
+    const edition = editionSelect ? editionSelect.value : "";
+    const pro = INVENTORY.controllerAddons.pro;
+    cart.push({
+      lineId: `addon-pro-${id}-${Date.now()}`,
+      sourceId: `addon-pro-${id}`,
+      name: `Pro Controller — ${edition}`,
+      price: pro.price,
+      meta: `Add-on with ${item.name}`
+    });
+  } else if (type === "wired") {
+    const wired = INVENTORY.controllerAddons.wired;
+    cart.push({
+      lineId: `addon-wired-${id}-${Date.now()}`,
+      sourceId: `addon-wired-${id}`,
+      name: wired.label,
+      price: wired.price,
+      meta: `Add-on with ${item.name}`
+    });
+  }
 
-  document.getElementById("laptopList").innerHTML =
-    INVENTORY.laptops.map(i => renderProductCard(i)).join("");
-
-  document.getElementById("adminBar").classList.toggle("open", adminMode);
+  renderCart();
+  openDrawer();
 }
 
-// ---------- CART ----------
-
-function addToCart(id, evt) {
-  if (evt) evt.stopPropagation();
+function directAddToCart(id) {
   const item = findItemById(id);
   if (!item || item.sold) return;
   cart.push({ lineId: `${id}-${Date.now()}`, sourceId: id, name: item.name, price: item.price, meta: "" });
@@ -191,37 +209,7 @@ function addToCart(id, evt) {
   openDrawer();
 }
 
-function addProControllerAddon(switchId) {
-  const switchItem = findItemById(switchId);
-  if (!switchItem || switchItem.sold) return;
-  const editionSelect = document.getElementById(`pro-edition-${switchId}`);
-  const edition = editionSelect ? editionSelect.value : "";
-  const pro = INVENTORY.controllerAddons.pro;
-  cart.push({
-    lineId: `addon-pro-${switchId}-${Date.now()}`,
-    sourceId: `addon-pro-${switchId}`,
-    name: `Pro Controller — ${edition}`,
-    price: pro.price,
-    meta: `Add-on with ${switchItem.name}`
-  });
-  renderCart();
-  openDrawer();
-}
-
-function addWiredControllerAddon(switchId) {
-  const switchItem = findItemById(switchId);
-  if (!switchItem || switchItem.sold) return;
-  const wired = INVENTORY.controllerAddons.wired;
-  cart.push({
-    lineId: `addon-wired-${switchId}-${Date.now()}`,
-    sourceId: `addon-wired-${switchId}`,
-    name: wired.label,
-    price: wired.price,
-    meta: `Add-on with ${switchItem.name}`
-  });
-  renderCart();
-  openDrawer();
-}
+// ---------- CART ----------
 
 function removeFromCart(lineId) {
   cart = cart.filter(line => line.lineId !== lineId);
@@ -236,6 +224,7 @@ function renderCart() {
   const body = document.getElementById("drawerBody");
   const foot = document.getElementById("drawerFoot");
   const countEl = document.getElementById("cartCount");
+  if (!body) return;
   countEl.textContent = cart.length;
 
   if (cart.length === 0) {
@@ -312,8 +301,7 @@ function buildWhatsAppMessage() {
 
 function sendOrderToWhatsApp() {
   const message = buildWhatsAppMessage();
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-  window.open(url, "_blank");
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
 }
 
 // ---------- ADMIN ----------
@@ -327,7 +315,8 @@ function attemptAdminLogin() {
     adminMode = true;
     hideLoginBox();
     document.getElementById("adminPass").value = "";
-    renderAll();
+    if (typeof renderAll === "function") renderAll();
+    if (typeof renderProductPage === "function") renderProductPage();
   } else {
     alert("Wrong code.");
   }
@@ -335,14 +324,14 @@ function attemptAdminLogin() {
 
 function exitAdmin() {
   adminMode = false;
-  renderAll();
+  if (typeof renderAll === "function") renderAll();
+  if (typeof renderProductPage === "function") renderProductPage();
 }
 
-// ---------- EVENT WIRING ----------
+// ---------- COMMON EVENT WIRING (shared between pages) ----------
 
-document.addEventListener("DOMContentLoaded", () => {
+function wireCommonUI() {
   loadSoldState();
-  renderAll();
   renderCart();
 
   document.getElementById("cartOpenBtn").addEventListener("click", openDrawer);
@@ -361,4 +350,128 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") attemptAdminLogin();
   });
   document.getElementById("adminExitBtn").addEventListener("click", exitAdmin);
-});
+
+  // Controller modal buttons
+  document.getElementById("controllerModalOverlay").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("controllerModalOverlay")) closeControllerModal();
+  });
+}
+
+// ============================================================
+// INDEX PAGE LOGIC
+// ============================================================
+
+// Category filter state: "all" | "switches" | "games" | "consoles" | "laptops"
+let activeCategory = "all";
+
+function setCategory(cat) {
+  activeCategory = cat;
+  // Update tab button states
+  document.querySelectorAll(".cat-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.cat === cat);
+  });
+  renderAll();
+}
+
+function renderAll() {
+  const adminBar = document.getElementById("adminBar");
+  if (adminBar) adminBar.classList.toggle("open", adminMode);
+
+  const show = (sectionId, items, renderFn) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    // Find the wrapping <section> element for show/hide
+    const sectionEl = section.closest("section");
+    const shouldShow = activeCategory === "all" || activeCategory === section.dataset.cat;
+    if (sectionEl) sectionEl.style.display = shouldShow ? "" : "none";
+
+    if (shouldShow) {
+      section.innerHTML = items.map(renderFn).join("");
+      // Update count in section header
+      const countEl = sectionEl && sectionEl.querySelector(".count");
+      if (countEl) {
+        const avail = items.filter(i => !i.sold).length;
+        countEl.textContent = `${avail} of ${items.length} available`;
+      }
+    }
+  };
+
+  show("switchList",  INVENTORY.switches, renderProductCard);
+  show("gamesGrid",   INVENTORY.games,    renderProductCard);
+  show("consoleList", INVENTORY.consoles, renderProductCard);
+  show("laptopList",  INVENTORY.laptops,  renderProductCard);
+}
+
+// ============================================================
+// PRODUCT DETAIL PAGE LOGIC
+// ============================================================
+
+function renderProductPage() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  const container = document.getElementById("productContent");
+  const adminBar = document.getElementById("adminBar");
+
+  if (!container) return;
+  if (adminBar) adminBar.classList.toggle("open", adminMode);
+
+  const item = id ? findItemById(id) : null;
+
+  if (!item) {
+    container.innerHTML = `
+      <div class="not-found">
+        <p>Product not found.</p>
+        <a href="index.html" class="btn btn-brand btn-base">← Back to all listings</a>
+      </div>`;
+    return;
+  }
+
+  // Update page title
+  document.title = `${item.name} — STOCK/86`;
+
+  const icon = ICONS[item.icon] || ICONS.console;
+  const mediaHtml = item.image
+    ? `<img src="${item.image}" alt="${item.name}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{innerHTML:'${icon.replace(/'/g, "\\'")}',className:'icon-fallback large'}).firstChild)">`
+    : icon;
+
+  const specsHtml = (item.specs || [])
+    .map(s => `<span class="badge badge-default badge-gray">${s}</span>`)
+    .join("");
+
+  let actionHtml = "";
+  if (item.sold) {
+    actionHtml = `<span class="badge badge-lg badge-danger" style="font-size:15px;padding:8px 16px;">Sold</span>`;
+  } else {
+    actionHtml = `<button class="btn btn-brand btn-lg" onclick="startAddToCart('${item.id}', event)">Add to cart — $${item.price}</button>`;
+  }
+
+  let adminHtml = "";
+  if (adminMode) {
+    adminHtml = `<button class="admin-item-toggle ${item.sold ? 'is-sold' : ''}" onclick="toggleSold('${item.id}')">
+      ${item.sold ? "Mark available" : "Mark sold"}
+    </button>`;
+  }
+
+  container.innerHTML = `
+    <div class="product-detail-grid">
+      <div class="product-detail-media ${item.image ? 'has-photo' : ''} ${item.sold ? 'is-sold' : ''}">
+        ${mediaHtml}
+        ${item.sold ? `<div class="sold-overlay"><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
+      </div>
+      <div class="product-detail-info">
+        <span class="card-sku">${item.id}</span>
+        <h1 class="product-detail-title">${item.name}</h1>
+        ${item.condition ? `<span class="card-condition" style="font-size:14px;">${item.condition}</span>` : ""}
+        <div class="product-detail-price"><span class="currency">$</span>${item.price}</div>
+        ${item.description ? `<p class="product-detail-desc">${item.description}</p>` : ""}
+        ${specsHtml ? `<div class="card-specs" style="margin-bottom:16px;">${specsHtml}</div>` : ""}
+        <div class="product-detail-actions">
+          ${actionHtml}
+          <a href="index.html" class="btn btn-secondary btn-base">← All listings</a>
+        </div>
+        ${adminHtml ? `<div style="margin-top:12px;">${adminHtml}</div>` : ""}
+      </div>
+    </div>
+  `;
+}
