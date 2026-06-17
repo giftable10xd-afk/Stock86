@@ -72,7 +72,7 @@ function renderProductCard(item) {
   const icon = ICONS[item.icon] || ICONS.console;
 
   const mediaHtml = item.image
-    ? `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{innerHTML:'${icon.replace(/'/g, "\\'")}',className:'icon-fallback'}).firstChild)">`
+    ? `<img src="${item.image}" alt="${item.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">`
     : icon;
 
   let priceActionHtml = "";
@@ -432,7 +432,7 @@ function renderProductPage() {
 
   const icon = ICONS[item.icon] || ICONS.console;
   const mediaHtml = item.image
-    ? `<img src="${item.image}" alt="${item.name}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{innerHTML:'${icon.replace(/'/g, "\\'")}',className:'icon-fallback large'}).firstChild)">`
+    ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">`
     : icon;
 
   const specsHtml = (item.specs || [])
