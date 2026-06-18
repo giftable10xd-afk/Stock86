@@ -68,6 +68,13 @@
   img{max-width:100%; display:block;}
   :focus-visible{outline:none; box-shadow:0 0 0 4px var(--brand-medium); border-radius:var(--radius-default);}
 
+  /* PRESS / POP MICRO-INTERACTION */
+  .btn, .drawer-close, .admin-item-toggle, .admin-toggle,
+  .cart-line-remove, .modal-close-row button, .ctrl-no-thanks{
+    transition:transform 120ms ease, background-color 150ms, color 150ms, border-color 150ms, box-shadow 150ms;
+  }
+  .btn:active, .admin-item-toggle:active{transform:scale(0.94);}
+
   h1,h2,h3,h4{font-weight:600; color:var(--heading);}
   h3{font-size:18px; line-height:1.25;}
 
@@ -93,10 +100,11 @@
     padding:14px 0; gap:16px;
   }
   .brand-mark{display:flex; align-items:baseline; gap:8px;}
-  .brand-mark .name{font-size:20px; font-weight:700; color:var(--white); letter-spacing:-0.3px;}
-  .brand-mark .name .accent{color:var(--brand);}
+  .brand-mark .logo-img{height:34px; width:auto; display:block;}
+  @media(min-width:640px){.brand-mark .logo-img{height:42px;}}
+  @media(min-width:1024px){.brand-mark .logo-img{height:48px;}}
   .brand-mark .tagline{font-size:12px; color:var(--gray); display:none;}
-  @media(min-width:640px){.brand-mark .tagline{display:inline;}}
+  @media(min-width:768px){.brand-mark .tagline{display:inline;}}
   .header-actions{display:flex; align-items:center; gap:8px;}
 
   /* ============================================================
@@ -272,7 +280,7 @@
   /* ============================================================
      CART DRAWER
      ============================================================ */
-  .overlay{position:fixed; inset:0; background:rgba(15,17,17,0.5); z-index:90; display:none;}
+  .overlay{position:fixed; inset:0; background:rgba(10,11,11,0.72); z-index:90; display:none;}
   .overlay.open{display:block;}
   .drawer{
     position:fixed; top:0; right:0; height:100%;
@@ -360,7 +368,7 @@
   <div class="container">
     <div class="topbar">
       <a class="brand-mark" href="index.html">
-        <span class="name">STOCK<span class="accent">/86</span></span>
+        <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86">
         <span class="tagline">Used gaming hardware · Beirut</span>
       </a>
       <div class="header-actions">
