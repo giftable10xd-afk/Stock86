@@ -369,6 +369,11 @@ function renderCart() {
   const total    = subtotal + DELIVERY_FEE;
   document.getElementById("subtotalVal").textContent = `$${subtotal}`;
   document.getElementById("totalVal").textContent    = `$${total}`;
+  // Sync both modal totals
+  const modalTotal    = document.getElementById("modalTotal");
+  const modalTotalCOD = document.getElementById("modalTotalCOD");
+  if (modalTotal)    modalTotal.textContent    = `$${total}`;
+  if (modalTotalCOD) modalTotalCOD.textContent = `$${total}`;
 
   // Whish logo row (index.html cart has it, product.html might not)
   const whishRow = document.getElementById("whishLogoRow");
@@ -392,7 +397,30 @@ function openCheckout() {
   if (cart.length === 0) return;
   const total = cartSubtotal() + DELIVERY_FEE;
   document.getElementById("modalTotal").textContent = `$${total}`;
+  // Reset to Whish by default
+  selectPaymentMethod("whish");
   document.getElementById("modalOverlay").classList.add("open");
+}
+
+function selectPaymentMethod(method) {
+  const whishBtn = document.getElementById("payMethodWhish");
+  const codBtn   = document.getElementById("payMethodCOD");
+  const whishSection = document.getElementById("whishPaySection");
+  const codSection   = document.getElementById("codPaySection");
+  if (!whishBtn) return;
+
+  if (method === "whish") {
+    whishBtn.classList.add("active");
+    codBtn.classList.remove("active");
+    whishSection.style.display = "";
+    codSection.style.display   = "none";
+  } else {
+    codBtn.classList.add("active");
+    whishBtn.classList.remove("active");
+    whishSection.style.display = "none";
+    codSection.style.display   = "";
+  }
+  whishBtn.dataset.selected = method === "whish" ? "true" : "false";
 }
 function closeCheckout() {
   document.getElementById("modalOverlay").classList.remove("open");
@@ -403,6 +431,9 @@ function buildWhatsAppMessage() {
   const address = document.getElementById("custAddress").value.trim();
   const subtotal = cartSubtotal();
   const total    = subtotal + DELIVERY_FEE;
+
+  const whishBtn = document.getElementById("payMethodWhish");
+  const isCOD = whishBtn && whishBtn.dataset.selected !== "true";
 
   let lines = [];
   lines.push("Order from STOCK/86 website:");
@@ -415,7 +446,10 @@ function buildWhatsAppMessage() {
   lines.push(`Delivery: $${DELIVERY_FEE}`);
   lines.push(`Total: $${total}`);
   lines.push("");
-  lines.push("I have sent payment via Whish Money and attached the screenshot.");
+  lines.push(`Payment method: ${isCOD ? "Cash on Delivery" : "Whish Money"}`);
+  if (!isCOD) {
+    lines.push("I have sent payment via Whish Money and attached the screenshot.");
+  }
   lines.push("");
   if (name)    lines.push(`Name: ${name}`);
   if (address) lines.push(`Address: ${address}`);

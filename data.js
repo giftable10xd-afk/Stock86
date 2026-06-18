@@ -12,7 +12,7 @@ const INVENTORY = {
     {
       id: "SW-01",
       name: "Nintendo Switch (Modded) — 512GB",
-      price: 200,
+      price: 205,
       condition: "Good",
       sold: false,
       icon: "switch",
@@ -24,7 +24,7 @@ const INVENTORY = {
     {
       id: "SW-02",
       name: "Nintendo Switch (Modded) — 256GB",
-      price: 200,
+      price: 205,
       condition: "Excellent",
       sold: false,
       icon: "switch",
@@ -36,7 +36,7 @@ const INVENTORY = {
     {
       id: "SW-03",
       name: "Nintendo Switch OLED",
-      price: 220,
+      price: 225,
       condition: "Like New",
       sold: false,
       icon: "switch",
@@ -53,12 +53,12 @@ const INVENTORY = {
   controllerAddons: {
     pro: {
       label: "Pro Controller",
-      price: 15,
+      price: 20,
       editions: ["Super Smash Bros Edition", "Tears of the Kingdom Edition", "Splatoon Edition"]
     },
     wired: {
       label: "Wired / third-party wireless controller",
-      price: 10,
+      price: 15,
       editions: null
     }
   },
@@ -110,7 +110,7 @@ const INVENTORY = {
     {
       id: "HC-01",
       name: "AYANEO AIR Pro — 1TB",
-      price: 400,
+      price: 405,
       condition: "Like New",
       sold: false,
       icon: "handheld",
@@ -121,7 +121,7 @@ const INVENTORY = {
     {
       id: "HC-02",
       name: "ASUS ROG Ally — Z1 Extreme",
-      price: 450,
+      price: 455,
       condition: "Like New",
       sold: false,
       icon: "handheld",
@@ -132,7 +132,7 @@ const INVENTORY = {
     {
       id: "HC-03",
       name: "Xbox One S — Fortnite Edition",
-      price: 140,
+      price: 145,
       condition: "Excellent",
       sold: false,
       icon: "console",
@@ -143,7 +143,7 @@ const INVENTORY = {
     {
       id: "HC-04",
       name: "Xbox Series S",
-      price: 200,
+      price: 205,
       condition: "Like New",
       sold: false,
       icon: "console",
@@ -154,7 +154,7 @@ const INVENTORY = {
     {
       id: "CON-WIIU1",
       name: "Nintendo Wii U (Modded) — 256GB",
-      price: 110,
+      price: 115,
       condition: "Excellent",
       sold: false,
       icon: "console",
@@ -165,7 +165,7 @@ const INVENTORY = {
     {
       id: "CON-PSP1K",
       name: "Sony PSP-1000 (Custom Modded)",
-      price: 60,
+      price: 65,
       condition: "Good",
       sold: false,
       icon: "console",
@@ -182,7 +182,7 @@ const INVENTORY = {
     {
       id: "LP-01",
       name: "MacBook Pro (2014)",
-      price: 100,
+      price: 105,
       condition: "Good",
       sold: false,
       icon: "laptop",
@@ -197,5 +197,5 @@ const INVENTORY = {
 // SITE CONFIG
 // ----------------------------------------------------------
 const WHATSAPP_NUMBER = "9617655382" + "9"; // +961 76 553 829
-const DELIVERY_FEE    = 10;
+const DELIVERY_FEE    = 5;
 const ADMIN_CODE      = "stock86";

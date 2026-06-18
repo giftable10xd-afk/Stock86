@@ -440,6 +440,20 @@
   .login-box{position:fixed; bottom:56px; left:16px; background:var(--neutral-primary-soft); border:1px solid var(--border-default); border-radius:var(--radius-base); box-shadow:var(--shadow-md); padding:14px; z-index:160; display:none; flex-direction:column; gap:8px; width:220px;}
   .login-box.open{display:flex;}
 
+  /* Payment method tabs */
+  .pay-method-tabs{display:flex; gap:8px; margin-bottom:18px;}
+  .pay-method-tab{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+    font-family:"NintendoSwitchUI",sans-serif; font-size:13px; font-weight:500;
+    padding:9px 10px; border-radius:var(--radius-base);
+    border:1px solid var(--border-default); background:var(--neutral-secondary-soft);
+    color:var(--body); cursor:pointer;
+    transition:background 150ms ease, border-color 150ms ease, color 150ms ease, transform 120ms ease;
+  }
+  .pay-method-tab:active{transform:scale(0.96);}
+  .pay-method-tab.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
+  .pay-method-tab:not(.active):hover{background:var(--neutral-tertiary-medium); border-color:var(--border-default-strong);}
+
   @media(prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
 </style>
 </head>
@@ -524,29 +538,68 @@
 <!-- CHECKOUT MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" role="dialog" aria-label="Checkout">
-    <div class="modal-whish-head">
-      <img src="assets/whish-logo.png" alt="Whish Money" onerror="this.style.display='none'">
-      <h3>Pay with Whish Money</h3>
+
+    <!-- Payment method tabs -->
+    <div class="pay-method-tabs">
+      <button class="pay-method-tab active" id="payMethodWhish" data-selected="true" onclick="selectPaymentMethod('whish')">
+        <img src="assets/whish-logo.png" alt="" onerror="this.style.display='none'" style="height:18px;vertical-align:middle;margin-right:6px;">
+        Whish Money
+      </button>
+      <button class="pay-method-tab" id="payMethodCOD" onclick="selectPaymentMethod('cod')">
+        💵 Cash on Delivery
+      </button>
     </div>
-    <p class="modal-sub">Scan the code below, send the exact total, then confirm on WhatsApp.</p>
-    <div class="qr-box">
-      <img src="assets/whish-qr.jpg" alt="Whish Money payment QR code">
+
+    <!-- WHISH section -->
+    <div id="whishPaySection">
+      <div class="modal-whish-head">
+        <img src="assets/whish-logo.png" alt="Whish Money" onerror="this.style.display='none'">
+        <h3>Pay with Whish Money</h3>
+      </div>
+      <p class="modal-sub">Scan the code below, send the exact total, then confirm on WhatsApp.</p>
+      <div class="qr-box">
+        <img src="assets/whish-qr.jpg" alt="Whish Money payment QR code">
+      </div>
+      <div class="modal-total" id="modalTotal">$0</div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <p>Open Whish Money and scan the QR code above. Send the exact total shown.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <p>Take a screenshot of the completed payment.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <p>Add your name and address below, then tap the WhatsApp button — your order goes straight to us.</p>
+        </div>
+      </div>
     </div>
-    <div class="modal-total" id="modalTotal">$0</div>
-    <div class="steps">
-      <div class="step">
-        <span class="step-num">1</span>
-        <p>Open Whish Money and scan the QR code above. Send the exact total shown.</p>
+
+    <!-- COD section -->
+    <div id="codPaySection" style="display:none;">
+      <div class="modal-whish-head">
+        <h3>💵 Cash on Delivery</h3>
       </div>
-      <div class="step">
-        <span class="step-num">2</span>
-        <p>Take a screenshot of the completed payment.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">3</span>
-        <p>Add your name and address below, then tap the WhatsApp button — your order goes straight to us.</p>
+      <p class="modal-sub">Pay in cash when your order arrives. Enter your details below and confirm on WhatsApp.</p>
+      <div class="modal-total" id="modalTotalCOD">$0</div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <p>Fill in your name and delivery address below.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <p>Tap the WhatsApp button to send your order. We'll confirm delivery details with you.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <p>Pay the exact total in cash when the order is delivered to your door.</p>
+        </div>
       </div>
     </div>
+
     <div class="modal-form">
       <div>
         <label class="input-label" for="custName">Full name</label>
