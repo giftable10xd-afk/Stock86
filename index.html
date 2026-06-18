@@ -199,10 +199,10 @@
     appearance:none;
     pointer-events:auto;
     touch-action:manipulation;
-    position:relative;
-    z-index:5;
     -webkit-user-select:text;
     user-select:text;
+    position:relative;
+    z-index:5;
   }
   .header-search-input::placeholder{color:rgba(255,255,255,0.4);}
   .header-search-input:focus{outline:none; background:rgba(255,255,255,0.2); border-color:var(--brand);}
@@ -647,17 +647,22 @@
     padding:24px 0;
     gap:12px;
   }
-  .footer-left{display:flex; align-items:center; gap:6px;}
-  .footer-center{text-align:center;}
-  .footer-right{display:flex; align-items:center; justify-content:flex-end;}
+  .footer-col-left{display:flex; align-items:center; gap:6px;}
+  .footer-col-center{display:flex; justify-content:center;}
+  .footer-col-right{display:flex; justify-content:flex-end;}
   footer p{font-size:12px; color:var(--gray);}
   .footer-logo{height:32px; width:auto; display:block; opacity:0.85;}
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
   .admin-toggle:hover{color:var(--gray);}
   .footer-slogan{
-    font-size:12px; font-weight:700; color:var(--gray);
-    font-family:"NintendoSwitchUI",sans-serif;
-    letter-spacing:0.4px;
+    font-size:12px; font-weight:700; color:var(--gray); font-family:"NintendoSwitchUI",sans-serif;
+    letter-spacing:0.4px; text-align:center;
+  }
+  @media(max-width:600px){
+    .footer-inner{ grid-template-columns:1fr 1fr; grid-template-rows:auto auto; }
+    .footer-col-left{ grid-column:1; grid-row:1; }
+    .footer-col-right{ grid-column:2; grid-row:1; }
+    .footer-col-center{ grid-column:1/-1; grid-row:2; }
   }
   .inquiry-wa-btn{
     display:inline-flex; align-items:center; gap:8px;
@@ -672,15 +677,6 @@
   }
   .inquiry-wa-btn:hover{background:#1FB855;}
   .inquiry-wa-btn:active{transform:scale(0.95);}
-  @media(max-width:600px){
-    .footer-inner{
-      grid-template-columns:1fr 1fr;
-      grid-template-rows:auto auto;
-    }
-    .footer-left{grid-column:1; grid-row:1;}
-    .footer-right{grid-column:2; grid-row:1;}
-    .footer-center{grid-column:1/-1; grid-row:2; text-align:center;}
-  }
 
   /* ============================================================
      CART DRAWER
@@ -1057,17 +1053,17 @@
 <footer>
   <div class="container">
     <div class="footer-inner">
-      <div class="footer-left">
+      <div class="footer-col-left">
         <a href="index.html" style="display:flex;align-items:center;">
           <img class="footer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
                onerror="this.style.display='none'">
         </a>
         <button class="admin-toggle" id="adminToggleBtn" aria-label="Admin">·</button>
       </div>
-      <div class="footer-center">
+      <div class="footer-col-center">
         <span class="footer-slogan">Checked by hand. Shipped with care.</span>
       </div>
-      <div class="footer-right">
+      <div class="footer-col-right">
         <a class="inquiry-wa-btn" href="https://wa.me/96176553829?text=Hi%20STOCK%2F86%2C%20I%20have%20an%20inquiry%20about%20your%20listings." target="_blank" rel="noopener" aria-label="Send an inquiry on WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17" style="flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.533 5.855L.057 23.6a.5.5 0 0 0 .613.612l5.794-1.466A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 0 1-5.012-1.375l-.36-.214-3.724.942.981-3.635-.234-.374A9.784 9.784 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
           Inquiry
@@ -1284,11 +1280,11 @@
   const priceRange  = document.getElementById("priceRange");
   const priceValEl  = document.getElementById("priceVal");
 
-  function triggerSearch() { renderAll(); }
-  searchInput.addEventListener("input",          triggerSearch);
-  searchInput.addEventListener("compositionend", triggerSearch);
-  searchInput.addEventListener("keyup",          triggerSearch);
-  searchInput.addEventListener("change",         triggerSearch);
+  function _doSearch() { renderAll(); }
+  searchInput.addEventListener("input",          _doSearch);
+  searchInput.addEventListener("keyup",          _doSearch);
+  searchInput.addEventListener("compositionend", _doSearch);
+  searchInput.addEventListener("change",         _doSearch);
   priceRange.addEventListener("input", () => {
     const v = parseInt(priceRange.value);
     priceValEl.textContent = v >= 500 ? "$500+" : `$${v}`;
@@ -1296,15 +1292,8 @@
   });
 
   // Expose filter values for app.js renderAll
-  function getSearchQuery() {
-    const el = document.getElementById("searchInput");
-    return el ? el.value.trim().toLowerCase() : "";
-  }
-  function getMaxPrice() {
-    const el = document.getElementById("priceRange");
-    const v = el ? parseInt(el.value) : 500;
-    return v >= 500 ? Infinity : v;
-  }
+  function getSearchQuery() { var el = document.getElementById("searchInput"); return el ? el.value.trim().toLowerCase() : ""; }
+  function getMaxPrice()    { return parseInt(priceRange.value) >= 500 ? Infinity : parseInt(priceRange.value); }
 
   // ── Boot ───────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
