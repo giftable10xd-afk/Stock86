@@ -154,7 +154,7 @@ const INVENTORY = {
     {
       id: "CON-PSP1K",
       name: "Sony PSP-1000 (Custom Modded)",
-      price: 120,
+      price: 60,
       condition: "Good",
       sold: false,
       icon: "console",
