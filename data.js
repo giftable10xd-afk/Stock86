@@ -150,6 +150,22 @@ const INVENTORY = {
       image: "assets/xboxseriess.jpg",
       description: "512GB digital-only Xbox Series S, includes one controller.",
       specs: ["512GB digital-only", "1 controller included", "No original box"]
+    },
+    {
+      id: "CON-PSP1K",
+      name: "Sony PSP-1000 (Custom Modded)",
+      price: 120,
+      condition: "Good",
+      sold: false,
+      icon: "console",
+      image: "assets/psp1000.jpg",
+      description: "Classic PSP-1000 fully unlocked with custom firmware. Perfectly tuned for retro enthusiasts and native playback.",
+      specs: [
+        "64GB High-Speed Memory Card loaded",
+        "Full PS1 (PlayStation 1) game compatibility",
+        "Custom VSH Menu enabled (Unlock full 333 MHz performance)",
+        "Tested buttons, clean screen, and strong battery life"
+      ]
     }
   ],
 
