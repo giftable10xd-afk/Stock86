@@ -159,13 +159,8 @@ const INVENTORY = {
       sold: false,
       icon: "console",
       image: "assets/psp1000.jpg",
-      description: "Classic PSP-1000 fully unlocked with custom firmware. Perfectly tuned for retro enthusiasts and native playback.",
-      specs: [
-        "64GB High-Speed Memory Card loaded",
-        "Full PS1 (PlayStation 1) game compatibility",
-        "Custom VSH Menu enabled (Unlock full 333 MHz performance)",
-        "Tested buttons, clean screen, and strong battery life"
-      ]
+      description: "PSP-1000 with custom firmware, 64GB card loaded, full PS1 support.",
+      specs: ["64GB memory card", "PS1 compatible", "Custom firmware (CFW)", "333 MHz unlocked", "Clean + tested"]
     }
   ],
 
