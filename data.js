@@ -98,8 +98,8 @@ const INVENTORY = {
       sold: false,
       icon: "game",
       image: "assets/hogwartslegacy.jpg",
-      description: "Physical Switch cartridge, like-new condition.",
-      specs: ["Switch cartridge"]
+      description: "Physical Switch cartridge. Clean, tested, working.",
+      specs: ["Switch cartridge", "Tested"]
     }
   ],
 
