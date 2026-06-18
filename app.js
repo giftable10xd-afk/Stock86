@@ -3,7 +3,8 @@
 // Works on both index.html (grid) and product.html (detail page)
 // ============================================================
 
-const STORAGE_KEY = "stock86_sold_state_v1";
+const STORAGE_KEY      = "stock86_sold_state_v1";
+const CART_STORAGE_KEY = "stock86_cart_v1";
 
 let cart = [];
 let adminMode = false;
@@ -64,6 +65,21 @@ function toggleSold(id) {
   if (typeof renderProductPage === "function") renderProductPage();
 }
 
+// ---------- CART PERSISTENCE ----------
+
+function saveCartState() {
+  try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); }
+  catch (e) { console.warn("Could not save cart:", e); }
+}
+
+function loadCartState() {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return;
+    cart = JSON.parse(raw) || [];
+  } catch (e) { console.warn("Could not load cart:", e); }
+}
+
 // ---------- PRODUCT CARD (index page) ----------
 
 function renderProductCard(item) {
@@ -93,7 +109,6 @@ function renderProductCard(item) {
     .map(s => `<span class="badge badge-default badge-gray">${s}</span>`)
     .join("");
 
-  // Condition shown on card ONLY for non-game categories
   const showConditionOnCard = item.icon !== "game" && item.condition;
 
   return `
@@ -121,7 +136,7 @@ function renderProductCard(item) {
   `;
 }
 
-// ---------- CONTROLLER ADDON MODAL ----------
+// ---------- CONTROLLER + GAME ADDON MODAL ----------
 
 let pendingSwitchId = null;
 
@@ -130,24 +145,69 @@ function startAddToCart(id, evt) {
   const item = findItemById(id);
   if (!item || item.sold) return;
 
+  // Enforce max 1 of each item
+  if (cart.some(l => l.sourceId === id)) {
+    showMaxOneToast();
+    openDrawer();
+    return;
+  }
+
   if (item.hasControllerAddon) {
     pendingSwitchId = id;
-    openControllerModal(item);
+    openSwitchAddonModal(item);
   } else {
     directAddToCart(id);
   }
 }
 
-function openControllerModal(item) {
-  const pro = INVENTORY.controllerAddons.pro;
+function showMaxOneToast() {
+  let toast = document.getElementById("maxOneToast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "maxOneToast";
+    toast.style.cssText = `
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      background:var(--dark); color:var(--white);
+      font-family:"NintendoSwitchUI",sans-serif; font-size:13px; font-weight:500;
+      padding:10px 18px; border-radius:var(--radius-base);
+      box-shadow:var(--shadow-lg); z-index:9999;
+      pointer-events:none; opacity:0; transition:opacity 200ms ease;
+      white-space:nowrap;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = "Only 1 of each item allowed";
+  toast.style.opacity = "1";
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => { toast.style.opacity = "0"; }, 2200);
+}
+
+// ---------- SWITCH ADDON MODAL (controllers + games) ----------
+
+function openSwitchAddonModal(item) {
+  const pro   = INVENTORY.controllerAddons.pro;
   const wired = INVENTORY.controllerAddons.wired;
   const editionOptions = pro.editions.map(e => `<option value="${e}">${e}</option>`).join("");
 
   document.getElementById("controllerModalItemName").textContent = item.name;
   document.getElementById("controllerModalProEditions").innerHTML = editionOptions;
-  document.getElementById("controllerModalOverlay").classList.add("open");
-  document.getElementById("controllerModalProPrice").textContent = `+$${pro.price}`;
+  document.getElementById("controllerModalProPrice").textContent  = `+$${pro.price}`;
   document.getElementById("controllerModalWiredPrice").textContent = `+$${wired.price}`;
+
+  // Populate game add-ons section
+  const gamesSection = document.getElementById("controllerModalGamesSection");
+  if (gamesSection) {
+    const availableGames = INVENTORY.games.filter(g => !g.sold);
+    gamesSection.innerHTML = availableGames.map(g => `
+      <label class="game-addon-row">
+        <input type="checkbox" class="game-addon-check" value="${g.id}" data-price="${g.price}" data-name="${g.name}">
+        <span class="game-addon-label">${g.name}</span>
+        <span class="game-addon-price">+$${g.price}</span>
+      </label>
+    `).join("");
+  }
+
+  document.getElementById("controllerModalOverlay").classList.add("open");
 }
 
 function closeControllerModal() {
@@ -163,12 +223,7 @@ function confirmControllerChoice(type) {
   const item = findItemById(id);
   if (!item || item.sold) return;
 
-  // Enforce max 1 of each item
-  if (cart.some(l => l.sourceId === id)) {
-    openDrawer();
-    return;
-  }
-
+  // Main Switch item
   cart.push({
     lineId: `${id}-${Date.now()}`,
     sourceId: id,
@@ -177,6 +232,7 @@ function confirmControllerChoice(type) {
     meta: ""
   });
 
+  // Controller add-on
   if (type === "pro") {
     const editionSelect = document.getElementById("controllerModalProEditions");
     const edition = editionSelect ? editionSelect.value : "";
@@ -199,6 +255,19 @@ function confirmControllerChoice(type) {
     });
   }
 
+  // Game add-ons
+  const checked = document.querySelectorAll(".game-addon-check:checked");
+  checked.forEach(cb => {
+    cart.push({
+      lineId: `addon-game-${cb.value}-${Date.now()}`,
+      sourceId: `addon-game-${cb.value}`,
+      name: cb.dataset.name,
+      price: parseInt(cb.dataset.price),
+      meta: `Game add-on with ${item.name}`
+    });
+  });
+
+  saveCartState();
   renderCart();
   updateAddToCartButtons();
   openDrawer();
@@ -207,12 +276,13 @@ function confirmControllerChoice(type) {
 function directAddToCart(id) {
   const item = findItemById(id);
   if (!item || item.sold) return;
-  // Enforce max 1 of each item
   if (cart.some(l => l.sourceId === id)) {
+    showMaxOneToast();
     openDrawer();
     return;
   }
   cart.push({ lineId: `${id}-${Date.now()}`, sourceId: id, name: item.name, price: item.price, meta: "" });
+  saveCartState();
   renderCart();
   updateAddToCartButtons();
   openDrawer();
@@ -222,11 +292,16 @@ function directAddToCart(id) {
 
 function removeFromCart(lineId) {
   cart = cart.filter(line => line.lineId !== lineId);
+  saveCartState();
   renderCart();
   updateAddToCartButtons();
 }
 
-// Update all "Add to cart" buttons on the page to reflect in-cart state
+function cartSubtotal() {
+  return cart.reduce((sum, line) => sum + line.price, 0);
+}
+
+// Update all "Add to cart" / "In cart" buttons to reflect cart state
 function updateAddToCartButtons() {
   const inCartIds = new Set(cart.map(l => l.sourceId));
   document.querySelectorAll("[data-cart-id]").forEach(btn => {
@@ -241,23 +316,35 @@ function updateAddToCartButtons() {
       btn.style.opacity = "";
     }
   });
-}
 
-function cartSubtotal() {
-  return cart.reduce((sum, line) => sum + line.price, 0);
+  // product.html detail action button
+  const detailBtn = document.getElementById("detailAddBtn");
+  if (detailBtn) {
+    const pid = detailBtn.dataset.cartId;
+    if (pid && inCartIds.has(pid)) {
+      detailBtn.innerHTML = `<span class="qty-pill">1</span> ✓ In cart`;
+      detailBtn.disabled = true;
+      detailBtn.style.opacity = "0.75";
+    } else if (pid) {
+      const item = findItemById(pid);
+      detailBtn.innerHTML = `<span class="qty-pill">+</span> Add to cart — $${item ? item.price : ""}`;
+      detailBtn.disabled = false;
+      detailBtn.style.opacity = "";
+    }
+  }
 }
 
 function renderCart() {
-  const body = document.getElementById("drawerBody");
-  const foot = document.getElementById("drawerFoot");
+  const body    = document.getElementById("drawerBody");
+  const foot    = document.getElementById("drawerFoot");
   const countEl = document.getElementById("cartCount");
   if (!body) return;
-  // Count only main items (not add-ons) for the badge
-  const mainItems = cart.filter(l => !l.sourceId.startsWith("addon-"));
-  countEl.textContent = cart.length;
-  countEl.style.display = cart.length === 0 ? "none" : "flex";
 
-  if (cart.length === 0) {
+  const total_items = cart.length;
+  countEl.textContent    = total_items;
+  countEl.style.display  = total_items === 0 ? "none" : "flex";
+
+  if (total_items === 0) {
     body.innerHTML = `<div class="drawer-empty">Your cart is empty.<br>Browse the inventory and add something.</div>`;
     foot.style.display = "none";
     return;
@@ -279,9 +366,13 @@ function renderCart() {
 
   foot.style.display = "block";
   const subtotal = cartSubtotal();
-  const total = subtotal + DELIVERY_FEE;
+  const total    = subtotal + DELIVERY_FEE;
   document.getElementById("subtotalVal").textContent = `$${subtotal}`;
-  document.getElementById("totalVal").textContent = `$${total}`;
+  document.getElementById("totalVal").textContent    = `$${total}`;
+
+  // Whish logo row (index.html cart has it, product.html might not)
+  const whishRow = document.getElementById("whishLogoRow");
+  if (whishRow) whishRow.style.display = "flex";
 }
 
 // ---------- DRAWER ----------
@@ -308,10 +399,10 @@ function closeCheckout() {
 }
 
 function buildWhatsAppMessage() {
-  const name = document.getElementById("custName").value.trim();
+  const name    = document.getElementById("custName").value.trim();
   const address = document.getElementById("custAddress").value.trim();
   const subtotal = cartSubtotal();
-  const total = subtotal + DELIVERY_FEE;
+  const total    = subtotal + DELIVERY_FEE;
 
   let lines = [];
   lines.push("Order from STOCK/86 website:");
@@ -326,7 +417,7 @@ function buildWhatsAppMessage() {
   lines.push("");
   lines.push("I have sent payment via Whish Money and attached the screenshot.");
   lines.push("");
-  if (name) lines.push(`Name: ${name}`);
+  if (name)    lines.push(`Name: ${name}`);
   if (address) lines.push(`Address: ${address}`);
 
   return encodeURIComponent(lines.join("\n"));
@@ -365,6 +456,7 @@ function exitAdmin() {
 
 function wireCommonUI() {
   loadSoldState();
+  loadCartState();   // ← restore cart from localStorage
   renderCart();
 
   document.getElementById("cartOpenBtn").addEventListener("click", openDrawer);
@@ -403,16 +495,15 @@ function setCategory(cat) {
   renderAll();
 }
 
-// Score an item against a search query — higher = more relevant
 function searchScore(item, query) {
   if (!query) return 1;
-  const name = (item.name || "").toLowerCase();
-  const id   = (item.id || "").toLowerCase();
-  const desc = (item.description || "").toLowerCase();
+  const name  = (item.name  || "").toLowerCase();
+  const id    = (item.id    || "").toLowerCase();
+  const desc  = (item.description || "").toLowerCase();
   const specs = (item.specs || []).join(" ").toLowerCase();
 
-  if (name.includes(query))  return 3;
-  if (id.includes(query))    return 2;
+  if (name.includes(query))               return 3;
+  if (id.includes(query))                 return 2;
   if (desc.includes(query) || specs.includes(query)) return 1;
   return 0;
 }
@@ -424,7 +515,6 @@ function renderAll() {
   const query    = (typeof getSearchQuery === "function") ? getSearchQuery() : "";
   const maxPrice = (typeof getMaxPrice    === "function") ? getMaxPrice()    : Infinity;
 
-  // Category definitions in default display order
   const SECTIONS = [
     { key: "switches", items: INVENTORY.switches,  gridId: "switchList",  sectionId: "section-switches", renderFn: renderProductCard },
     { key: "games",    items: INVENTORY.games,      gridId: "gamesGrid",   sectionId: "section-games",    renderFn: renderProductCard },
@@ -432,8 +522,6 @@ function renderAll() {
     { key: "laptops",  items: INVENTORY.laptops,    gridId: "laptopList",  sectionId: "section-laptops",  renderFn: renderProductCard },
   ];
 
-  // When there's a search query, score each section by its best item score
-  // so the most relevant category floats to the top of the DOM.
   let orderedSections = [...SECTIONS];
   if (query) {
     orderedSections = orderedSections.map(sec => {
@@ -442,8 +530,6 @@ function renderAll() {
     }).sort((a, b) => b.bestScore - a.bestScore);
   }
 
-  // Reorder sections in DOM to match search relevance
-  const mainEl = document.querySelector("main") || document.body;
   const sectionEls = {};
   SECTIONS.forEach(sec => {
     const el = document.getElementById(sec.sectionId);
@@ -451,7 +537,6 @@ function renderAll() {
   });
 
   if (query) {
-    // Find a reference node to insert before (first of the original sections)
     const firstSection = document.getElementById(SECTIONS[0].sectionId);
     if (firstSection && firstSection.parentNode) {
       orderedSections.forEach(sec => {
@@ -460,7 +545,6 @@ function renderAll() {
       });
     }
   } else {
-    // Restore original order
     const firstSection = document.getElementById(SECTIONS[0].sectionId);
     if (firstSection && firstSection.parentNode) {
       SECTIONS.forEach(sec => {
@@ -470,19 +554,16 @@ function renderAll() {
     }
   }
 
-  // Render each section
   orderedSections.forEach(sec => {
     const gridEl    = document.getElementById(sec.gridId);
     const sectionEl = document.getElementById(sec.sectionId);
     if (!gridEl) return;
 
-    // Category filter
     if (activeCategory !== "all" && activeCategory !== sec.key) {
       if (sectionEl) sectionEl.style.display = "none";
       return;
     }
 
-    // Search + price filter
     const filtered = sec.items.filter(item => {
       const matchPrice  = item.price <= maxPrice;
       const score       = searchScore(item, query);
@@ -510,7 +591,6 @@ function renderAll() {
     }
   });
 
-  // Refresh button states after any re-render
   if (typeof updateAddToCartButtons === "function") updateAddToCartButtons();
 }
 
@@ -519,10 +599,10 @@ function renderAll() {
 // ============================================================
 
 function renderProductPage() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+  const params    = new URLSearchParams(window.location.search);
+  const id        = params.get("id");
   const container = document.getElementById("productContent");
-  const adminBar = document.getElementById("adminBar");
+  const adminBar  = document.getElementById("adminBar");
 
   if (!container) return;
   if (adminBar) adminBar.classList.toggle("open", adminMode);
@@ -549,11 +629,28 @@ function renderProductPage() {
     .map(s => `<span class="badge badge-default badge-gray">${s}</span>`)
     .join("");
 
+  // Condition: hide for games (icon === "game")
+  const conditionHtml = (item.condition && item.icon !== "game")
+    ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition} Condition</span>`
+    : "";
+
+  const inCart = cart.some(l => l.sourceId === item.id);
+
   let actionHtml = "";
   if (item.sold) {
     actionHtml = `<span class="badge badge-lg badge-danger" style="font-size:15px;padding:8px 16px;">Sold</span>`;
   } else {
-    actionHtml = `<button class="btn btn-brand btn-lg" onclick="startAddToCart('${item.id}', event)">Add to cart — $${item.price}</button>`;
+    actionHtml = `
+      <button
+        class="btn btn-brand btn-lg"
+        id="detailAddBtn"
+        data-cart-id="${item.id}"
+        onclick="startAddToCart('${item.id}', event)"
+        ${inCart ? 'disabled style="opacity:0.75;"' : ""}
+      >
+        <span class="qty-pill">${inCart ? "1" : "+"}</span>
+        ${inCart ? "In cart" : `Add to cart — $${item.price}`}
+      </button>`;
   }
 
   let adminHtml = "";
@@ -562,11 +659,6 @@ function renderProductPage() {
       ${item.sold ? "Mark available" : "Mark sold"}
     </button>`;
   }
-
-  // Condition shown on product detail page (always, including games)
-  const conditionHtml = item.condition
-    ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition} Condition</span>`
-    : "";
 
   container.innerHTML = `
     <div class="product-detail-grid">

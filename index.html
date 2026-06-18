@@ -191,7 +191,7 @@
     border-radius:var(--radius-base);
     color:var(--white);
     font-family:"NintendoSwitchUI", sans-serif;
-    font-size:16px; /* 16px prevents iOS auto-zoom */
+    font-size:16px;
     padding:10px 10px 10px 34px;
     transition:background 150ms ease, border-color 150ms ease;
     -webkit-appearance:none;
@@ -217,9 +217,8 @@
   }
   .filter-toggle-btn:hover{background:rgba(255,255,255,0.18);}
   .filter-toggle-btn:active{transform:scale(0.93);}
-  /* Hide "Filter" text on small screens — icon only */
   .filter-btn-label{ display:none; }
-  @media(min-width:480px){ .filter-btn-label{ display:inline; } }
+  @media(min-width:500px){ .filter-btn-label{ display:inline; } }
   .filter-toggle-btn.active{
     background:var(--brand);
     border-color:var(--brand);
@@ -230,7 +229,27 @@
   /* Header right-side: cart button */
   .header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0;}
   .cart-btn-label{ display:none; }
-  @media(min-width:480px){ .cart-btn-label{ display:inline; } }
+  @media(min-width:500px){ .cart-btn-label{ display:inline; } }
+
+  .cart-count{
+    background:var(--danger); color:var(--white);
+    font-size:11px; font-weight:600;
+    min-width:18px; height:18px;
+    border-radius:var(--radius-full);
+    display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+    border:2px solid var(--dark);
+    position:absolute; top:-8px; right:-8px;
+  }
+  .cart-qty-badge{
+    background:var(--neutral-secondary-medium);
+    border:1px solid var(--border-default);
+    color:var(--heading); font-size:11px; font-weight:700;
+    min-width:20px; height:20px;
+    border-radius:var(--radius-default);
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:0 5px; flex-shrink:0;
+  }
 
   /* Filter panel — slides down under the topbar */
   .filter-panel{
@@ -454,17 +473,6 @@
     border:2px solid var(--dark);
     position:absolute; top:-8px; right:-8px;
   }
-  .cart-qty-badge{
-    background:var(--neutral-secondary-medium);
-    border:1px solid var(--border-default);
-    color:var(--heading);
-    font-size:11px; font-weight:700;
-    min-width:20px; height:20px;
-    border-radius:var(--radius-default);
-    display:inline-flex; align-items:center; justify-content:center;
-    padding:0 5px;
-    flex-shrink:0;
-  }
 
   /* ============================================================
      HERO BAND
@@ -633,20 +641,20 @@
   .footer-logo{height:32px; width:auto; display:block; opacity:0.85;}
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
   .admin-toggle:hover{color:var(--gray);}
-
-  /* Inquiry WhatsApp button */
+  .footer-slogan{
+    font-size:12px; color:var(--gray); font-family:"NintendoSwitchUI",sans-serif;
+    letter-spacing:0.4px; text-align:center; flex:1;
+  }
   .inquiry-wa-btn{
     display:inline-flex; align-items:center; gap:8px;
     background:#25D366; color:#0a2a14;
     font-family:"NintendoSwitchUI", sans-serif;
     font-size:13px; font-weight:600;
-    padding:9px 16px;
-    border-radius:var(--radius-base);
-    border:none; cursor:pointer;
-    text-decoration:none;
+    padding:9px 16px; border-radius:var(--radius-base);
+    border:none; cursor:pointer; text-decoration:none;
     box-shadow:var(--shadow-xs);
     transition:background 150ms ease, transform 120ms ease;
-    white-space:nowrap;
+    white-space:nowrap; flex-shrink:0;
   }
   .inquiry-wa-btn:hover{background:#1FB855;}
   .inquiry-wa-btn:active{transform:scale(0.95);}
@@ -779,6 +787,22 @@
     transition:color 150ms ease;
   }
   .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
+
+  /* Game add-on rows inside Switch modal */
+  .ctrl-games-section{ margin-bottom:10px; }
+  .ctrl-games-title{ font-size:13px; font-weight:600; color:var(--heading); margin-bottom:8px; }
+  .ctrl-games-subtitle{ font-size:12px; color:var(--body-subtle); margin-bottom:10px; }
+  .game-addon-row{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 12px;
+    border:1px solid var(--border-default); border-radius:var(--radius-default);
+    margin-bottom:6px; cursor:pointer;
+    transition:background 120ms ease, border-color 120ms ease;
+  }
+  .game-addon-row:hover{ background:var(--neutral-secondary-soft); border-color:var(--border-default-strong); }
+  .game-addon-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex-shrink:0; }
+  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"NintendoSwitchUI",sans-serif; }
+  .game-addon-price{ font-size:12px; font-weight:600; color:var(--fg-brand-strong); white-space:nowrap; }
 
   /* ============================================================
      ADMIN BAR + LOGIN
@@ -1014,9 +1038,9 @@
         <img class="footer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
              onerror="this.style.display='none'">
       </a>
-      <!-- Inquiry WhatsApp button -->
+      <span class="footer-slogan">Checked by hand. Shipped with care.</span>
       <a class="inquiry-wa-btn" href="https://wa.me/96176553829?text=Hi%20STOCK%2F86%2C%20I%20have%20an%20inquiry%20about%20your%20listings." target="_blank" rel="noopener" aria-label="Send an inquiry on WhatsApp">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.533 5.855L.057 23.6a.5.5 0 0 0 .613.612l5.794-1.466A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 0 1-5.012-1.375l-.36-.214-3.724.942.981-3.635-.234-.374A9.784 9.784 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17" style="flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.533 5.855L.057 23.6a.5.5 0 0 0 .613.612l5.794-1.466A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.808 9.808 0 0 1-5.012-1.375l-.36-.214-3.724.942.981-3.635-.234-.374A9.784 9.784 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
         Inquiry
       </a>
       <button class="admin-toggle" id="adminToggleBtn" aria-label="Admin">·</button>
@@ -1114,6 +1138,14 @@
         <button class="btn btn-brand btn-sm" onclick="confirmControllerChoice('wired')">Add + order</button>
       </div>
     </div>
+
+    <!-- GAME ADD-ONS -->
+    <div class="ctrl-games-section">
+      <div class="ctrl-games-title">Add a game?</div>
+      <div class="ctrl-games-subtitle">Pick any — each adds to your total.</div>
+      <div id="controllerModalGamesSection"></div>
+    </div>
+
     <button class="ctrl-no-thanks" onclick="confirmControllerChoice('none')">No thanks — just the console</button>
   </div>
 </div>

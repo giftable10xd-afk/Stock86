@@ -1,36 +1,12 @@
 // ============================================================
 // STOCK/86 — INVENTORY DATA
 // ============================================================
-// HOW TO ADD A NEW ITEM:
-//
-//   1. Find the right category below (switches / games / consoles / laptops)
-//   2. Copy one of the existing blocks in that category
-//   3. Paste it at the end of the list (before the closing ] )
-//   4. Change EVERY field — especially give it a brand-new unique id
-//   5. Upload the photo into the "assets" folder on GitHub
-//   6. Save and push — Netlify will rebuild in ~30 seconds
-//
-// IDs: use the same prefix already in use for that category
-//   switches  → SW-01, SW-02, …  next would be SW-04
-//   games     → GM-01, GM-02, …  next would be GM-04
-//   consoles  → HC-01, HC-02, …  next would be HC-05
-//   laptops   → LP-01, LP-02, …  next would be LP-02
-//
-// PHOTOS: upload a photo into /assets on GitHub. The filename goes in
-// the "image" field (e.g. "assets/switchscratched.jpg"). If the file
-// is missing the card shows an icon instead — nothing breaks.
-//
-// SOLD: setting sold:true grays out the card. You can also toggle it
-// live from admin mode on the site without touching this file.
-// ============================================================
 
 const INVENTORY = {
 
   // ----------------------------------------------------------
   // NINTENDO SWITCH
-  // ----------------------------------------------------------
-  // hasControllerAddon:true  →  before adding to cart the buyer is
-  // asked whether they want to add a controller. Set false to skip.
+  // hasControllerAddon:true → shows the controller + game add-on modal
   // ----------------------------------------------------------
   switches: [
     {
@@ -41,7 +17,7 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switchscratched.jpg",
-      description: "Modded Nintendo Switch with 512GB of storage. Comes with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
+      description: "Modded Nintendo Switch with 512GB of storage. Comes complete with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
       specs: ["512GB modded", "Dock + all accessories", "AC charger included", "Case included", "Free bag — gift"],
       hasControllerAddon: true
     },
@@ -53,7 +29,7 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switchlikenewmodded.jpg",
-      description: "Modded Nintendo Switch with 256GB of storage. Comes with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
+      description: "Modded Nintendo Switch with 256GB of storage. Comes complete with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
       specs: ["256GB modded", "Dock + all accessories", "AC charger included", "Case included", "Free bag — gift"],
       hasControllerAddon: true
     },
@@ -72,7 +48,7 @@ const INVENTORY = {
   ],
 
   // ----------------------------------------------------------
-  // CONTROLLER ADD-ONS (only offered alongside Switch purchases)
+  // CONTROLLER ADD-ONS
   // ----------------------------------------------------------
   controllerAddons: {
     pro: {
@@ -89,7 +65,7 @@ const INVENTORY = {
 
   // ----------------------------------------------------------
   // SWITCH GAMES
-  // NOTE: condition field exists but is intentionally NOT shown on cards
+  // condition is intentionally null — not shown anywhere for games
   // ----------------------------------------------------------
   games: [
     {
@@ -196,14 +172,8 @@ const INVENTORY = {
 };
 
 // ----------------------------------------------------------
-// SITE CONFIG — edit these when your details change
+// SITE CONFIG
 // ----------------------------------------------------------
-
-// Your WhatsApp number (international format, no + or spaces)
 const WHATSAPP_NUMBER = "9617655382" + "9"; // +961 76 553 829
-
-// Flat delivery fee added at checkout
-const DELIVERY_FEE = 10;
-
-// Admin unlock code — change this to whatever you want
-const ADMIN_CODE = "stock86";
+const DELIVERY_FEE    = 10;
+const ADMIN_CODE      = "stock86";
