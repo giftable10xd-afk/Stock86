@@ -159,8 +159,8 @@ const INVENTORY = {
       sold: false,
       icon: "console",
       image: "assets/psp1000.jpg",
-      description: "PSP-1000 with custom firmware, 64GB card loaded, full PS1 support.",
-      specs: ["64GB memory card", "PS1 compatible", "Custom firmware (CFW)", "333 MHz unlocked", "Clean + tested"]
+      description: "Modded PSP-1000 with custom firmware and 64GB card.",
+      specs: ["64GB card loaded", "Custom firmware", "PS1 support", "Clean + tested"]
     }
   ],
 
