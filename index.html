@@ -642,7 +642,7 @@
   footer{background:var(--dark);}
   .footer-inner{
     display:grid;
-    grid-template-columns:1fr auto 1fr;
+    grid-template-columns:1fr 1fr 1fr;
     align-items:center;
     padding:24px 0;
     gap:12px;
@@ -1301,6 +1301,15 @@
     renderAll();
     updateAddToCartButtons();
     updateNavActive("all");
+  });
+
+  // Re-sync cart when user navigates back from product.html (browser back button restores from cache)
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) {
+      loadCartState();
+      renderCart();
+      updateAddToCartButtons();
+    }
   });
 </script>
 </body>
