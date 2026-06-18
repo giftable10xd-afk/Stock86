@@ -397,8 +397,8 @@ function openCheckout() {
   if (cart.length === 0) return;
   const total = cartSubtotal() + DELIVERY_FEE;
   document.getElementById("modalTotal").textContent = `$${total}`;
-  // Reset to Whish by default
-  selectPaymentMethod("whish");
+  // Default to Cash on Delivery
+  selectPaymentMethod("cod");
   document.getElementById("modalOverlay").classList.add("open");
 }
 
@@ -447,9 +447,6 @@ function buildWhatsAppMessage() {
   lines.push(`Total: $${total}`);
   lines.push("");
   lines.push(`Payment method: ${isCOD ? "Cash on Delivery" : "Whish Money"}`);
-  if (!isCOD) {
-    lines.push("I have sent payment via Whish Money and attached the screenshot.");
-  }
   lines.push("");
   if (name)    lines.push(`Name: ${name}`);
   if (address) lines.push(`Address: ${address}`);
