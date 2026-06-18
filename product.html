@@ -13,9 +13,6 @@
     font-display: swap;
   }
 
-  /* ============================================================
-     DESIGN TOKENS (same as index.html)
-     ============================================================ */
   :root{
     --neutral-primary-soft:#FFFFFF;
     --neutral-secondary-soft:#F7F8F8;
@@ -73,40 +70,33 @@
   a{color:inherit; text-decoration:none;}
   img{max-width:100%; display:block;}
   :focus-visible{outline:none; box-shadow:0 0 0 4px var(--brand-medium); border-radius:var(--radius-default);}
-
-  h1,h2,h3,h4{font-weight:600; color:var(--heading);}
+  h1,h2,h3,h4{font-weight:600; color:var(--heading); font-family:"NintendoSwitchUI", sans-serif;}
   h3{font-size:18px; line-height:1.25;}
-
   .container{max-width:1440px; margin:0 auto; padding:0 16px;}
 
   /* ============================================================
-     HEADER (shared with index)
+     HEADER
      ============================================================ */
   .header{
     background:var(--dark);
     background-image:url("assets/wallpaper.jpg");
-    background-size:cover;
-    background-position:center;
+    background-size:cover; background-position:center;
     position:relative; overflow:hidden;
   }
   .header::before{
     content:"";
     position:absolute; inset:0;
-    background:rgba(10,12,18,0.62);
+    background:rgba(6,8,14,0.78);
     pointer-events:none; z-index:1;
   }
-  /* header-pattern no longer used but kept for compat */
-  .header-pattern{ display:none; }
   .topbar{
     position:relative; z-index:3;
     display:flex; align-items:center; justify-content:space-between;
     padding:14px 0; gap:16px;
   }
-  .brand-mark{display:flex; align-items:center; gap:10px;}
-  .brand-mark .name{font-size:20px; font-weight:700; color:var(--white); letter-spacing:-0.3px;}
-  .brand-mark .name .accent{color:var(--brand);}
-  .brand-mark .tagline{font-size:12px; color:var(--gray); display:none;}
-  @media(min-width:640px){.brand-mark .tagline{display:inline;}}
+  /* Logo only — no text */
+  .brand-mark{display:flex; align-items:center;}
+  .brand-mark .logo-img{height:44px; width:auto; display:block; filter:brightness(1.05);}
   .header-actions{display:flex; align-items:center; gap:8px;}
 
   /* ============================================================
@@ -117,9 +107,10 @@
     font-family:"NintendoSwitchUI", sans-serif; font-weight:500;
     border-radius:var(--radius-base); border:1px solid transparent;
     box-shadow:var(--shadow-xs); cursor:pointer;
-    transition:background-color 150ms, color 150ms, border-color 150ms;
+    transition:background-color 150ms, color 150ms, border-color 150ms, transform 120ms ease;
     white-space:nowrap;
   }
+  .btn:active{transform:scale(0.93); box-shadow:none;}
   .btn-base{font-size:13px; padding:8px 14px;}
   .btn-sm{font-size:12px; padding:6px 12px;}
   .btn-lg{font-size:15px; padding:12px 20px;}
@@ -145,7 +136,7 @@
   .badge{
     display:inline-flex; align-items:center; gap:4px;
     border:1px solid; border-radius:var(--radius-default);
-    font-weight:500; white-space:nowrap;
+    font-weight:500; white-space:nowrap; font-family:"NintendoSwitchUI", sans-serif;
   }
   .badge-default{font-size:11px; padding:2px 6px;}
   .badge-lg{font-size:12px; padding:3px 8px;}
@@ -154,33 +145,36 @@
   .badge-danger{background:var(--danger-soft); border-color:var(--border-danger-subtle); color:var(--danger-strong);}
 
   /* ============================================================
+     CONDITION BADGE
+     ============================================================ */
+  .card-condition-badge{
+    display:inline-flex; align-items:center;
+    font-size:12px; font-weight:600;
+    padding:3px 10px;
+    border-radius:var(--radius-full);
+    border:1px solid;
+    font-family:"NintendoSwitchUI", sans-serif;
+    letter-spacing:0.2px;
+    width:fit-content;
+  }
+  .condition-good{background:#FFF7ED; border-color:#FED7AA; color:#92400E;}
+  .condition-excellent{background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;}
+  .condition-like-new{background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);}
+
+  /* ============================================================
      PRODUCT DETAIL PAGE LAYOUT
      ============================================================ */
   .detail-section{padding:32px 0 48px;}
   @media(min-width:768px){.detail-section{padding:40px 0 64px;}}
 
-  .breadcrumb{
-    font-size:13px; color:var(--body-subtle); margin-bottom:24px;
-  }
+  .breadcrumb{font-size:13px; color:var(--body-subtle); margin-bottom:24px;}
   .breadcrumb a{color:var(--fg-brand);}
   .breadcrumb a:hover{text-decoration:underline;}
   .breadcrumb span{margin:0 6px;}
 
-  .product-detail-grid{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:32px;
-  }
-  @media(min-width:768px){
-    .product-detail-grid{
-      grid-template-columns:1fr 1fr;
-      gap:48px;
-      align-items:start;
-    }
-  }
-  @media(min-width:1024px){
-    .product-detail-grid{grid-template-columns:55% 1fr;}
-  }
+  .product-detail-grid{display:grid; grid-template-columns:1fr; gap:32px;}
+  @media(min-width:768px){.product-detail-grid{grid-template-columns:1fr 1fr; gap:48px; align-items:start;}}
+  @media(min-width:1024px){.product-detail-grid{grid-template-columns:55% 1fr;}}
 
   .product-detail-media{
     background:var(--neutral-secondary-soft);
@@ -192,22 +186,15 @@
     color:var(--neutral-quaternary);
   }
   .product-detail-media svg{width:80px; height:80px;}
-  .product-detail-media.has-photo img{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
+  .product-detail-media.has-photo img{width:100%; height:100%; object-fit:cover; display:block;}
   .product-detail-media.is-sold .sold-overlay{
-    position:absolute; inset:0;
-    background:rgba(255,255,255,0.55);
+    position:absolute; inset:0; background:rgba(255,255,255,0.55);
     display:flex; align-items:center; justify-content:center;
   }
-  .icon-fallback.large{width:80px; height:80px;}
 
-  .product-detail-info{
-    display:flex; flex-direction:column; gap:10px;
-  }
+  .product-detail-info{display:flex; flex-direction:column; gap:10px;}
 
   .card-sku{font-size:11px; color:var(--body-subtle); font-weight:500; letter-spacing:0.3px;}
-  .card-condition{font-size:13px; color:var(--body-subtle);}
 
   .product-detail-title{
     font-size:22px; font-weight:700; color:var(--heading);
@@ -215,38 +202,25 @@
   }
   @media(min-width:768px){.product-detail-title{font-size:26px;}}
 
-  .product-detail-price{
-    font-size:32px; font-weight:700; color:var(--heading);
-    margin:4px 0;
-  }
+  .product-detail-price{font-size:32px; font-weight:700; color:var(--heading); margin:4px 0;}
   .product-detail-price .currency{font-size:18px; font-weight:600; margin-right:2px;}
 
   .product-detail-desc{
     font-size:14px; color:var(--body); line-height:1.7;
-    border-top:1px solid var(--border-light);
-    padding-top:12px;
-    margin-top:4px;
+    border-top:1px solid var(--border-light); padding-top:12px; margin-top:4px;
   }
 
   .card-specs{display:flex; flex-wrap:wrap; gap:6px;}
 
-  .product-detail-actions{
-    display:flex; flex-direction:column; gap:10px;
-    margin-top:8px;
-  }
-  @media(min-width:480px){
-    .product-detail-actions{flex-direction:row; flex-wrap:wrap;}
-  }
+  .product-detail-actions{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+  @media(min-width:480px){.product-detail-actions{flex-direction:row; flex-wrap:wrap;}}
   .product-detail-actions .btn{flex:1; justify-content:center;}
   @media(min-width:480px){
     .product-detail-actions .btn-brand{flex:1 1 auto;}
     .product-detail-actions .btn-secondary{flex:0 0 auto;}
   }
 
-  .not-found{
-    text-align:center; padding:80px 20px;
-    display:flex; flex-direction:column; align-items:center; gap:16px;
-  }
+  .not-found{text-align:center; padding:80px 20px; display:flex; flex-direction:column; align-items:center; gap:16px;}
   .not-found p{font-size:16px; color:var(--body-subtle);}
 
   /* ============================================================
@@ -254,10 +228,8 @@
      ============================================================ */
   select.input,input.input,textarea.input{
     display:block; width:100%;
-    border-radius:var(--radius-base);
-    border:1px solid var(--border-default-medium);
-    background:var(--neutral-secondary-medium);
-    box-shadow:var(--shadow-2xs);
+    border-radius:var(--radius-base); border:1px solid var(--border-default-medium);
+    background:var(--neutral-secondary-medium); box-shadow:var(--shadow-2xs);
     font-size:13px; color:var(--heading); padding:8px 10px;
     transition:all 200ms; font-family:"NintendoSwitchUI", sans-serif;
   }
@@ -271,11 +243,9 @@
      FOOTER
      ============================================================ */
   footer{background:var(--dark);}
-  .footer-inner{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:24px 0; flex-wrap:wrap; gap:12px;
-  }
+  .footer-inner{display:flex; align-items:center; justify-content:space-between; padding:24px 0; flex-wrap:wrap; gap:12px;}
   footer p{font-size:12px; color:var(--gray);}
+  .footer-logo{height:32px; width:auto; display:block; opacity:0.85;}
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
   .admin-toggle:hover{color:var(--gray);}
 
@@ -285,10 +255,8 @@
   .overlay{position:fixed; inset:0; background:rgba(15,17,17,0.5); z-index:90; display:none;}
   .overlay.open{display:block;}
   .drawer{
-    position:fixed; top:0; right:0; height:100%;
-    width:min(420px,100%);
-    background:var(--neutral-primary-soft);
-    border-left:1px solid var(--border-default);
+    position:fixed; top:0; right:0; height:100%; width:min(420px,100%);
+    background:var(--neutral-primary-soft); border-left:1px solid var(--border-default);
     box-shadow:var(--shadow-lg); z-index:100;
     transform:translateX(100%); transition:transform 250ms ease;
     display:flex; flex-direction:column;
@@ -296,8 +264,14 @@
   .drawer.open{transform:translateX(0);}
   .drawer-head{padding:16px 20px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between;}
   .drawer-head h3{font-size:18px;}
-  .drawer-close{background:none; border:none; color:var(--body); font-size:20px; cursor:pointer; line-height:1; width:32px; height:32px; border-radius:var(--radius-default); display:flex; align-items:center; justify-content:center;}
+  .drawer-close{
+    background:none; border:none; color:var(--body); font-size:20px; cursor:pointer; line-height:1;
+    width:32px; height:32px; border-radius:var(--radius-default);
+    display:flex; align-items:center; justify-content:center;
+    transition:background 150ms ease, transform 120ms ease;
+  }
   .drawer-close:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  .drawer-close:active{transform:scale(0.9);}
   .drawer-body{flex:1; overflow-y:auto; padding:8px 20px;}
   .drawer-empty{color:var(--body-subtle); font-size:13px; text-align:center; padding:60px 20px;}
   .cart-line{display:flex; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid var(--border-light);}
@@ -334,9 +308,15 @@
   .step-num{background:var(--brand); color:var(--dark-strong); width:20px; height:20px; border-radius:var(--radius-full); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;}
   .step p{font-size:13px; color:var(--body); line-height:1.5;}
   .modal-form{display:flex; flex-direction:column; gap:12px; margin-bottom:16px;}
-  .wa-btn{display:flex; align-items:center; justify-content:center; gap:8px; background:#25D366; color:var(--dark-strong); font-weight:600; padding:12px; border-radius:var(--radius-base); border:1px solid transparent; cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs); transition:background-color 150ms ease; font-family:"NintendoSwitchUI",sans-serif;}
+  .wa-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    background:#25D366; color:var(--dark-strong); font-weight:600;
+    padding:12px; border-radius:var(--radius-base); border:1px solid transparent;
+    cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs);
+    transition:background-color 150ms ease, transform 120ms ease; font-family:"NintendoSwitchUI",sans-serif;
+  }
   .wa-btn:hover{background:#1FB855;}
-  .wa-btn:active{transform:scale(0.98);}
+  .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
   .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"NintendoSwitchUI",sans-serif;}
@@ -369,8 +349,14 @@
      ============================================================ */
   .admin-bar{position:fixed; bottom:0; left:0; right:0; background:var(--brand); color:var(--dark-strong); z-index:150; display:none; padding:10px 16px; align-items:center; justify-content:space-between; font-size:13px; font-weight:500; flex-wrap:wrap; gap:10px; box-shadow:var(--shadow-lg);}
   .admin-bar.open{display:flex;}
-  .admin-item-toggle{background:var(--neutral-primary-soft); border:1px solid var(--border-default-medium); color:var(--body); font-size:11px; font-weight:500; padding:5px 10px; border-radius:var(--radius-default); cursor:pointer;}
+  .admin-item-toggle{
+    background:var(--neutral-primary-soft); border:1px solid var(--border-default-medium);
+    color:var(--body); font-size:11px; font-weight:500; padding:5px 10px;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
+    transition:background 150ms ease, transform 120ms ease;
+  }
   .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  .admin-item-toggle:active{transform:scale(0.95);}
   .admin-item-toggle.is-sold{background:var(--danger); color:var(--white); border-color:transparent;}
   .admin-item-toggle.is-sold:hover{background:var(--danger-strong);}
   .login-box{position:fixed; bottom:56px; left:16px; background:var(--neutral-primary-soft); border:1px solid var(--border-default); border-radius:var(--radius-base); box-shadow:var(--shadow-md); padding:14px; z-index:160; display:none; flex-direction:column; gap:8px; width:220px;}
@@ -382,14 +368,12 @@
 <body>
 
 <header class="header">
-  <div class="header-pattern" aria-hidden="true"></div>
   <div class="container">
     <div class="topbar">
-      <a class="brand-mark" href="index.html">
-        <img style="height:24px;width:auto;display:block;" src="assets/stock86-logo.png" alt=""
+      <!-- Logo only — no text -->
+      <a class="brand-mark" href="index.html" aria-label="STOCK/86 home">
+        <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86"
              onerror="this.style.display='none'">
-        <span class="name">STOCK<span class="accent">/86</span></span>
-        <span class="tagline">Used gaming hardware · Koura</span>
       </a>
       <div class="header-actions">
         <button class="btn btn-base cart-btn btn-ghost" id="cartOpenBtn" aria-label="Open cart">
@@ -419,7 +403,10 @@
 <footer>
   <div class="container">
     <div class="footer-inner">
-      <p>STOCK/86 — listings updated by hand, no two units are exactly alike.</p>
+      <a href="index.html" style="display:flex;align-items:center;">
+        <img class="footer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
+             onerror="this.style.display='none'">
+      </a>
       <button class="admin-toggle" id="adminToggleBtn" aria-label="Admin">·</button>
     </div>
   </div>
@@ -479,7 +466,6 @@
     </div>
     <button class="wa-btn" id="waSendBtn">
       <img src="assets/whatsapp-logo.png" alt="" onerror="this.style.display='none'">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none;" id="waFallbackIcon"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.85.5 3.58 1.41 5.06L2 22l5.25-1.5a9.85 9.85 0 0 0 4.79 1.23h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.89.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.46c0-4.53 3.69-8.22 8.24-8.22 4.55 0 8.24 3.69 8.24 8.22 0 4.53-3.7 8.24-8.24 8.24z"/></svg>
       Send order on WhatsApp
     </button>
     <div class="modal-close-row">
@@ -536,7 +522,6 @@
     wireCommonUI();
     renderProductPage();
 
-    // Update breadcrumb after render
     const params = new URLSearchParams(window.location.search);
     const item = findItemById(params.get("id"));
     if (item) document.getElementById("breadcrumbName").textContent = item.name;

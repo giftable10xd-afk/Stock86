@@ -60,7 +60,6 @@ function toggleSold(id) {
   if (!item) return;
   item.sold = !item.sold;
   saveSoldState();
-  // Refresh whichever page we're on
   if (typeof renderAll === "function") renderAll();
   if (typeof renderProductPage === "function") renderProductPage();
 }
@@ -93,6 +92,9 @@ function renderProductCard(item) {
     .map(s => `<span class="badge badge-default badge-gray">${s}</span>`)
     .join("");
 
+  // Condition shown on card ONLY for non-game categories
+  const showConditionOnCard = item.icon !== "game" && item.condition;
+
   return `
     <div class="card ${soldClass}" id="card-${item.id}">
       <a class="card-media-link" href="product.html?id=${item.id}" aria-label="View ${item.name}">
@@ -106,7 +108,7 @@ function renderProductCard(item) {
         <a href="product.html?id=${item.id}" class="card-title-link">
           <h3 class="card-title">${item.name}</h3>
         </a>
-        <!-- condition intentionally hidden from cards -->
+        ${showConditionOnCard ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition}</span>` : ""}
         ${specsHtml ? `<div class="card-specs">${specsHtml}</div>` : ""}
         <div class="card-price-row">
           <span class="card-price"><span class="currency">$</span>${item.price}</span>
@@ -119,9 +121,6 @@ function renderProductCard(item) {
 }
 
 // ---------- CONTROLLER ADDON MODAL ----------
-// For Switch products: shown before the item is added to cart.
-// The buyer chooses No controller / Pro / Wired, then the item
-// (+ optional addon) goes into the cart together.
 
 let pendingSwitchId = null;
 
@@ -131,7 +130,6 @@ function startAddToCart(id, evt) {
   if (!item || item.sold) return;
 
   if (item.hasControllerAddon) {
-    // Show the controller choice modal first
     pendingSwitchId = id;
     openControllerModal(item);
   } else {
@@ -157,7 +155,6 @@ function closeControllerModal() {
 }
 
 function confirmControllerChoice(type) {
-  // type: "none" | "pro" | "wired"
   const id = pendingSwitchId;
   closeControllerModal();
   if (!id) return;
@@ -165,7 +162,6 @@ function confirmControllerChoice(type) {
   const item = findItemById(id);
   if (!item || item.sold) return;
 
-  // Always add the main item
   cart.push({
     lineId: `${id}-${Date.now()}`,
     sourceId: id,
@@ -174,7 +170,6 @@ function confirmControllerChoice(type) {
     meta: ""
   });
 
-  // Add controller add-on if chosen
   if (type === "pro") {
     const editionSelect = document.getElementById("controllerModalProEditions");
     const edition = editionSelect ? editionSelect.value : "";
@@ -328,7 +323,7 @@ function exitAdmin() {
   if (typeof renderProductPage === "function") renderProductPage();
 }
 
-// ---------- COMMON EVENT WIRING (shared between pages) ----------
+// ---------- COMMON EVENT WIRING ----------
 
 function wireCommonUI() {
   loadSoldState();
@@ -351,7 +346,6 @@ function wireCommonUI() {
   });
   document.getElementById("adminExitBtn").addEventListener("click", exitAdmin);
 
-  // Controller modal buttons
   document.getElementById("controllerModalOverlay").addEventListener("click", (e) => {
     if (e.target === document.getElementById("controllerModalOverlay")) closeControllerModal();
   });
@@ -361,68 +355,122 @@ function wireCommonUI() {
 // INDEX PAGE LOGIC
 // ============================================================
 
-// Category filter state: "all" | "switches" | "games" | "consoles" | "laptops"
 let activeCategory = "all";
 
 function setCategory(cat) {
   activeCategory = cat;
-  // Update tab button states
   document.querySelectorAll(".cat-tab").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.cat === cat);
   });
   renderAll();
 }
 
+// Score an item against a search query — higher = more relevant
+function searchScore(item, query) {
+  if (!query) return 1;
+  const name = (item.name || "").toLowerCase();
+  const id   = (item.id || "").toLowerCase();
+  const desc = (item.description || "").toLowerCase();
+  const specs = (item.specs || []).join(" ").toLowerCase();
+
+  if (name.includes(query))  return 3;
+  if (id.includes(query))    return 2;
+  if (desc.includes(query) || specs.includes(query)) return 1;
+  return 0;
+}
+
 function renderAll() {
   const adminBar = document.getElementById("adminBar");
   if (adminBar) adminBar.classList.toggle("open", adminMode);
 
-  // Search + price filter helpers (defined in index.html inline script; safe fallbacks)
   const query    = (typeof getSearchQuery === "function") ? getSearchQuery() : "";
   const maxPrice = (typeof getMaxPrice    === "function") ? getMaxPrice()    : Infinity;
 
-  function filterItems(items, cat) {
-    // Category filter
-    if (activeCategory !== "all" && activeCategory !== cat) return null; // null = hide section
-    // Apply search + price
-    return items.filter(item => {
-      const matchPrice  = item.price <= maxPrice;
-      const haystack    = [item.name, item.id, ...(item.specs || []), item.description || ""].join(" ").toLowerCase();
-      const matchSearch = !query || haystack.includes(query);
-      return matchPrice && matchSearch;
-    });
+  // Category definitions in default display order
+  const SECTIONS = [
+    { key: "switches", items: INVENTORY.switches,  gridId: "switchList",  sectionId: "section-switches", renderFn: renderProductCard },
+    { key: "games",    items: INVENTORY.games,      gridId: "gamesGrid",   sectionId: "section-games",    renderFn: renderProductCard },
+    { key: "consoles", items: INVENTORY.consoles,   gridId: "consoleList", sectionId: "section-consoles", renderFn: renderProductCard },
+    { key: "laptops",  items: INVENTORY.laptops,    gridId: "laptopList",  sectionId: "section-laptops",  renderFn: renderProductCard },
+  ];
+
+  // When there's a search query, score each section by its best item score
+  // so the most relevant category floats to the top of the DOM.
+  let orderedSections = [...SECTIONS];
+  if (query) {
+    orderedSections = orderedSections.map(sec => {
+      const bestScore = sec.items.reduce((best, item) => Math.max(best, searchScore(item, query)), 0);
+      return { ...sec, bestScore };
+    }).sort((a, b) => b.bestScore - a.bestScore);
   }
 
-  const show = (sectionId, sectionWrapId, items, cat, renderFn) => {
-    const gridEl    = document.getElementById(sectionId);
-    const sectionEl = document.getElementById(sectionWrapId) || (gridEl && gridEl.closest("section"));
+  // Reorder sections in DOM to match search relevance
+  const mainEl = document.querySelector("main") || document.body;
+  const sectionEls = {};
+  SECTIONS.forEach(sec => {
+    const el = document.getElementById(sec.sectionId);
+    if (el) sectionEls[sec.key] = el;
+  });
+
+  if (query) {
+    // Find a reference node to insert before (first of the original sections)
+    const firstSection = document.getElementById(SECTIONS[0].sectionId);
+    if (firstSection && firstSection.parentNode) {
+      orderedSections.forEach(sec => {
+        const el = sectionEls[sec.key];
+        if (el) firstSection.parentNode.insertBefore(el, firstSection);
+      });
+    }
+  } else {
+    // Restore original order
+    const firstSection = document.getElementById(SECTIONS[0].sectionId);
+    if (firstSection && firstSection.parentNode) {
+      SECTIONS.forEach(sec => {
+        const el = sectionEls[sec.key];
+        if (el) firstSection.parentNode.appendChild(el);
+      });
+    }
+  }
+
+  // Render each section
+  orderedSections.forEach(sec => {
+    const gridEl    = document.getElementById(sec.gridId);
+    const sectionEl = document.getElementById(sec.sectionId);
     if (!gridEl) return;
 
-    const filtered = filterItems(items, cat);
-    if (filtered === null) {
+    // Category filter
+    if (activeCategory !== "all" && activeCategory !== sec.key) {
       if (sectionEl) sectionEl.style.display = "none";
       return;
     }
+
+    // Search + price filter
+    const filtered = sec.items.filter(item => {
+      const matchPrice  = item.price <= maxPrice;
+      const score       = searchScore(item, query);
+      const matchSearch = !query || score > 0;
+      return matchPrice && matchSearch;
+    });
+
+    if (filtered.length === 0 && query) {
+      if (sectionEl) sectionEl.style.display = "none";
+      return;
+    }
+
     if (sectionEl) sectionEl.style.display = "";
 
     if (filtered.length === 0) {
       gridEl.innerHTML = `<div class="no-results">No listings match your search.</div>`;
     } else {
-      gridEl.innerHTML = filtered.map(renderFn).join("");
+      gridEl.innerHTML = filtered.map(sec.renderFn).join("");
     }
 
-    // Update count
     const countEl = sectionEl && sectionEl.querySelector(".count");
     if (countEl) {
       const avail = filtered.filter(i => !i.sold).length;
       countEl.textContent = `${avail} of ${filtered.length} available`;
     }
-  };
-
-  show("switchList",  "section-switches", INVENTORY.switches, "switches", renderProductCard);
-  show("gamesGrid",   "section-games",    INVENTORY.games,    "games",    renderProductCard);
-  show("consoleList", "section-consoles", INVENTORY.consoles, "consoles", renderProductCard);
-  show("laptopList",  "section-laptops",  INVENTORY.laptops,  "laptops",  renderProductCard);
+  });
 }
 
 // ============================================================
@@ -449,7 +497,6 @@ function renderProductPage() {
     return;
   }
 
-  // Update page title
   document.title = `${item.name} — STOCK/86`;
 
   const icon = ICONS[item.icon] || ICONS.console;
@@ -475,6 +522,11 @@ function renderProductPage() {
     </button>`;
   }
 
+  // Condition shown on product detail page (always, including games)
+  const conditionHtml = item.condition
+    ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition} Condition</span>`
+    : "";
+
   container.innerHTML = `
     <div class="product-detail-grid">
       <div class="product-detail-media ${item.image ? 'has-photo' : ''} ${item.sold ? 'is-sold' : ''}">
@@ -484,7 +536,7 @@ function renderProductPage() {
       <div class="product-detail-info">
         <span class="card-sku">${item.id}</span>
         <h1 class="product-detail-title">${item.name}</h1>
-        ${item.condition ? `<span class="card-condition" style="font-size:14px;">${item.condition}</span>` : ""}
+        ${conditionHtml}
         <div class="product-detail-price"><span class="currency">$</span>${item.price}</div>
         ${item.description ? `<p class="product-detail-desc">${item.description}</p>` : ""}
         ${specsHtml ? `<div class="card-specs" style="margin-bottom:16px;">${specsHtml}</div>` : ""}

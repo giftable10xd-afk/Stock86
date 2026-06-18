@@ -37,7 +37,7 @@ const INVENTORY = {
       id: "SW-01",
       name: "Nintendo Switch (Modded) — 512GB",
       price: 200,
-      condition: "Good — light scratches",
+      condition: "Good",
       sold: false,
       icon: "switch",
       image: "assets/switchscratched.jpg",
@@ -49,7 +49,7 @@ const INVENTORY = {
       id: "SW-02",
       name: "Nintendo Switch (Modded) — 256GB",
       price: 200,
-      condition: "Like new",
+      condition: "Excellent",
       sold: false,
       icon: "switch",
       image: "assets/switchlikenewmodded.jpg",
@@ -61,7 +61,7 @@ const INVENTORY = {
       id: "SW-03",
       name: "Nintendo Switch OLED",
       price: 220,
-      condition: "Like new — original box",
+      condition: "Like New",
       sold: false,
       icon: "switch",
       image: "assets/switcholed.jpg",
@@ -69,20 +69,6 @@ const INVENTORY = {
       specs: ["Original box", "25 games preloaded", "2× 64GB cards (128GB)", "Free bag — gift"],
       hasControllerAddon: true
     }
-
-    // ---- TEMPLATE: copy this block to add a new Switch ----
-    // ,{
-    //   id: "SW-04",
-    //   name: "Nintendo Switch Lite — Blue",
-    //   price: 120,
-    //   condition: "Good — minor wear",
-    //   sold: false,
-    //   icon: "switch",
-    //   image: "assets/switchliteblue.jpg",
-    //   description: "Write a description here.",
-    //   specs: ["Spec 1", "Spec 2"],
-    //   hasControllerAddon: false   // Lite can't use Pro controllers
-    // }
   ],
 
   // ----------------------------------------------------------
@@ -103,13 +89,14 @@ const INVENTORY = {
 
   // ----------------------------------------------------------
   // SWITCH GAMES
+  // NOTE: condition field exists but is intentionally NOT shown on cards
   // ----------------------------------------------------------
   games: [
     {
       id: "GM-01",
       name: "Plants vs. Zombies",
       price: 20,
-      condition: "Good",
+      condition: null,
       sold: false,
       icon: "game",
       image: "assets/plantsvszombies.jpg",
@@ -120,7 +107,7 @@ const INVENTORY = {
       id: "GM-02",
       name: "Naruto Shippuden: Ultimate Ninja Storm 4",
       price: 20,
-      condition: "Good",
+      condition: null,
       sold: false,
       icon: "game",
       image: "assets/narutostorm4.jpg",
@@ -131,26 +118,13 @@ const INVENTORY = {
       id: "GM-03",
       name: "Hogwarts Legacy",
       price: 20,
-      condition: "Like new",
+      condition: null,
       sold: false,
       icon: "game",
       image: "assets/hogwartslegacy.jpg",
       description: "Physical Switch cartridge, like-new condition.",
-      specs: ["Switch cartridge", "Like new"]
+      specs: ["Switch cartridge"]
     }
-
-    // ---- TEMPLATE: copy this block to add a new game ----
-    // ,{
-    //   id: "GM-04",
-    //   name: "Mario Kart 8 Deluxe",
-    //   price: 20,
-    //   condition: "Good",
-    //   sold: false,
-    //   icon: "game",
-    //   image: "assets/mariokart8.jpg",
-    //   description: "Physical Switch cartridge. Clean, tested, working.",
-    //   specs: ["Switch cartridge", "Tested"]
-    // }
   ],
 
   // ----------------------------------------------------------
@@ -161,7 +135,7 @@ const INVENTORY = {
       id: "HC-01",
       name: "AYANEO AIR Pro — 1TB",
       price: 400,
-      condition: "Like new — original box",
+      condition: "Like New",
       sold: false,
       icon: "handheld",
       image: "assets/ayaneoair.jpg",
@@ -172,7 +146,7 @@ const INVENTORY = {
       id: "HC-02",
       name: "ASUS ROG Ally — Z1 Extreme",
       price: 450,
-      condition: "Like new — original box",
+      condition: "Like New",
       sold: false,
       icon: "handheld",
       image: "assets/rogally.jpg",
@@ -183,7 +157,7 @@ const INVENTORY = {
       id: "HC-03",
       name: "Xbox One S — Fortnite Edition",
       price: 140,
-      condition: "Like new — no original box",
+      condition: "Excellent",
       sold: false,
       icon: "console",
       image: "assets/xboxonesfortnite.jpg",
@@ -194,26 +168,13 @@ const INVENTORY = {
       id: "HC-04",
       name: "Xbox Series S",
       price: 200,
-      condition: "Like new — no original box",
+      condition: "Like New",
       sold: false,
       icon: "console",
       image: "assets/xboxseriess.jpg",
       description: "512GB digital-only Xbox Series S, includes one controller.",
       specs: ["512GB digital-only", "1 controller included", "No original box"]
     }
-
-    // ---- TEMPLATE: copy this block to add a new console/handheld ----
-    // ,{
-    //   id: "HC-05",
-    //   name: "Steam Deck — 512GB",
-    //   price: 380,
-    //   condition: "Like new",
-    //   sold: false,
-    //   icon: "handheld",   // use "handheld" for portables, "console" for home consoles
-    //   image: "assets/steamdeck.jpg",
-    //   description: "Write a description here.",
-    //   specs: ["512GB", "SteamOS", "Charger included"]
-    // }
   ],
 
   // ----------------------------------------------------------
@@ -224,26 +185,13 @@ const INVENTORY = {
       id: "LP-01",
       name: "MacBook Pro (2014)",
       price: 100,
-      condition: "Good — works perfectly",
+      condition: "Good",
       sold: false,
       icon: "laptop",
       image: "assets/macbookpro2014.jpg",
       description: "2014 MacBook Pro, fully functional with no issues. Good cosmetic condition.",
       specs: ["8GB RAM", "256GB SSD", "Works perfectly"]
     }
-
-    // ---- TEMPLATE: copy this block to add a new laptop ----
-    // ,{
-    //   id: "LP-02",
-    //   name: "Dell XPS 13 (2020)",
-    //   price: 350,
-    //   condition: "Good",
-    //   sold: false,
-    //   icon: "laptop",
-    //   image: "assets/dellxps13.jpg",
-    //   description: "Write a description here.",
-    //   specs: ["16GB RAM", "512GB SSD", "Charger included"]
-    // }
   ]
 };
 

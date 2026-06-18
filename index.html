@@ -95,7 +95,6 @@
   h3{font-size:18px; line-height:1.25;}
   @media(min-width:768px){h1{font-size:30px;} h2{font-size:24px;} h3{font-size:22px;}}
   @media(min-width:1024px){h1{font-size:36px;} h2{font-size:28px;} h3{font-size:24px;}}
-
   p.lead{font-size:18px; font-weight:400; color:var(--body); line-height:1.6; max-width:42ch;}
 
   /* ============================================================
@@ -110,11 +109,8 @@
 
   .section-head{
     margin-bottom:24px;
-    display:flex;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:16px;
-    flex-wrap:wrap;
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
   }
   @media(min-width:768px){.section-head{margin-bottom:32px;}}
   .section-head .count{font-size:13px; color:var(--body-subtle); font-weight:500;}
@@ -130,86 +126,245 @@
     position:relative;
     overflow:hidden;
   }
-  /* Dark overlay so text stays readable over any wallpaper */
+  /* Darkened overlay on wallpaper */
   .header::before{
     content:"";
     position:absolute; inset:0;
-    background:rgba(10,12,18,0.62);
+    background:rgba(6,8,14,0.78);
     pointer-events:none;
     z-index:1;
   }
 
+  /* ============================================================
+     TOPBAR — hamburger LEFT, logo center-left, cart RIGHT
+     ============================================================ */
   .topbar{
     position:relative; z-index:3;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:14px 0; gap:16px;
+    display:flex; align-items:center;
+    padding:14px 0; gap:12px;
   }
-  .brand-mark{display:flex; align-items:center; gap:10px;}
-  .brand-mark .logo-img{height:28px; width:auto; display:block;}
-  .brand-mark .name{font-size:20px; font-weight:700; color:var(--white); letter-spacing:-0.3px; font-family:"NintendoSwitchUI", sans-serif;}
-  .brand-mark .name .accent{color:var(--brand);}
-  .brand-mark .tagline{font-size:12px; color:var(--gray); display:none;}
-  @media(min-width:640px){.brand-mark .tagline{display:inline;}}
-  .header-actions{display:flex; align-items:center; gap:8px;}
 
-  /* ============================================================
-     HAMBURGER MENU NAV
-     ============================================================ */
+  /* Hamburger — leftmost element */
   .hamburger-btn{
     background:rgba(255,255,255,0.1);
     border:1px solid rgba(255,255,255,0.2);
     border-radius:var(--radius-default);
     color:var(--white);
-    width:40px; height:40px;
+    width:42px; height:42px;
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
-    transition:background 150ms ease;
+    transition:background 150ms ease, transform 120ms ease;
     flex-shrink:0;
     z-index:3; position:relative;
   }
   .hamburger-btn:hover{background:rgba(255,255,255,0.18);}
+  .hamburger-btn:active{transform:scale(0.92);}
   .hamburger-btn svg{width:20px; height:20px;}
 
-  /* Slide-down nav panel */
-  .nav-panel{
+  /* Logo — only the image, no text */
+  .brand-mark{
+    display:flex; align-items:center; gap:0;
+    text-decoration:none;
+    flex-shrink:0;
+  }
+  .brand-mark .logo-img{
+    height:44px;
+    width:auto;
+    display:block;
+    filter:brightness(1.05);
+  }
+
+  /* Search input in header (next to logo) */
+  .header-search-wrap{
+    flex:1;
+    min-width:0;
+    position:relative;
+  }
+  .header-search-wrap svg{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
+  }
+  .header-search-input{
+    width:100%;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:var(--radius-base);
+    color:var(--white);
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:13px;
+    padding:10px 10px 10px 34px;
+    transition:background 150ms ease, border-color 150ms ease;
+  }
+  .header-search-input::placeholder{color:rgba(255,255,255,0.4);}
+  .header-search-input:focus{outline:none; background:rgba(255,255,255,0.2); border-color:var(--brand);}
+
+  /* Filter button — next to search */
+  .filter-toggle-btn{
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:var(--radius-base);
+    color:rgba(255,255,255,0.85);
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:13px; font-weight:500;
+    padding:9px 14px;
+    display:flex; align-items:center; gap:6px;
+    cursor:pointer;
+    white-space:nowrap;
+    flex-shrink:0;
+    transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
+  }
+  .filter-toggle-btn:hover{background:rgba(255,255,255,0.18);}
+  .filter-toggle-btn:active{transform:scale(0.93);}
+  .filter-toggle-btn.active{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:var(--dark-strong);
+  }
+  .filter-toggle-btn svg{width:14px; height:14px; flex-shrink:0;}
+
+  /* Header right-side: cart button */
+  .header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+
+  /* Filter panel — slides down under the topbar */
+  .filter-panel{
     position:relative; z-index:2;
     overflow:hidden;
     max-height:0;
     opacity:0;
-    transition:max-height 280ms cubic-bezier(0.215,0.61,0.355,1),
+    transition:max-height 260ms cubic-bezier(0.215,0.61,0.355,1),
                 opacity 200ms cubic-bezier(0.25,0.46,0.45,0.94);
   }
-  .nav-panel.open{
-    max-height:400px;
+  .filter-panel.open{
+    max-height:120px;
     opacity:1;
   }
-  .nav-inner{
-    padding:12px 0 20px;
+  .filter-panel-inner{
+    padding:10px 0 18px;
     display:flex;
-    flex-direction:column;
-    gap:4px;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .price-filter-label{
+    font-size:12px;
+    color:var(--gray);
+    font-family:"NintendoSwitchUI", sans-serif;
+    white-space:nowrap;
+  }
+  .price-range{
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    background:rgba(255,255,255,0.2);
+    border-radius:var(--radius-full);
+    outline:none;
+    cursor:pointer;
+    accent-color:var(--brand);
+    width:160px;
+    transition:transform 150ms ease;
+  }
+  .price-range::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:18px; height:18px;
+    border-radius:50%;
+    background:var(--brand);
+    cursor:pointer;
+    box-shadow:0 1px 3px rgba(0,0,0,0.3);
+    transition:transform 150ms ease;
+  }
+  .price-range::-webkit-slider-thumb:hover{transform:scale(1.2);}
+  .price-val{
+    font-size:13px;
+    color:var(--white);
+    font-family:"NintendoSwitchUI", sans-serif;
+    white-space:nowrap;
+    min-width:44px;
+    font-weight:600;
   }
 
-  /* Top-level nav item */
-  .nav-item{
-    position:relative;
+  /* ============================================================
+     LEFT SIDE DRAWER NAV
+     ============================================================ */
+
+  /* Backdrop */
+  .nav-backdrop{
+    position:fixed; inset:0;
+    background:rgba(6,8,14,0.55);
+    z-index:200;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 250ms ease;
   }
+  .nav-backdrop.open{
+    opacity:1;
+    pointer-events:all;
+  }
+
+  /* Drawer panel */
+  .nav-drawer{
+    position:fixed; top:0; left:0; bottom:0;
+    width:min(300px,85vw);
+    background:var(--dark);
+    border-right:1px solid rgba(255,255,255,0.1);
+    z-index:210;
+    transform:translateX(-100%);
+    transition:transform 280ms cubic-bezier(0.215,0.61,0.355,1);
+    display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .nav-drawer.open{
+    transform:translateX(0);
+  }
+
+  /* Drawer header */
+  .nav-drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    flex-shrink:0;
+  }
+  .nav-drawer-logo{
+    height:36px; width:auto; display:block;
+  }
+  .nav-drawer-close{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:var(--radius-default);
+    color:var(--white);
+    width:34px; height:34px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; line-height:1;
+    transition:background 150ms ease, transform 120ms ease;
+  }
+  .nav-drawer-close:hover{background:rgba(255,255,255,0.15);}
+  .nav-drawer-close:active{transform:scale(0.9);}
+
+  /* Drawer body */
+  .nav-drawer-body{
+    flex:1; overflow-y:auto;
+    padding:12px 14px 24px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+
+  /* Nav items */
+  .nav-item{ position:relative; }
+
   .nav-btn{
     display:flex; align-items:center; gap:10px;
     width:100%;
-    background:rgba(255,255,255,0.07);
-    border:1px solid rgba(255,255,255,0.12);
-    color:var(--gray);
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    color:rgba(255,255,255,0.7);
     font-family:"NintendoSwitchUI", sans-serif;
-    font-size:14px;
-    font-weight:500;
-    padding:10px 16px;
+    font-size:14px; font-weight:500;
+    padding:11px 14px;
     border-radius:var(--radius-base);
     cursor:pointer;
     text-align:left;
-    transition:background 150ms ease, color 150ms ease, border-color 150ms ease;
+    transition:background 150ms ease, color 150ms ease, border-color 150ms ease, transform 120ms ease;
   }
-  .nav-btn:hover{background:rgba(255,255,255,0.14); color:var(--white);}
+  .nav-btn:hover{background:rgba(255,255,255,0.13); color:var(--white);}
+  .nav-btn:active{transform:scale(0.97);}
   .nav-btn.active{
     background:var(--brand);
     border-color:var(--brand);
@@ -223,7 +378,7 @@
   }
   .nav-btn.open .chevron{transform:rotate(180deg);}
 
-  /* Sub-items (Switch Games under Nintendo Switch) */
+  /* Sub-items */
   .nav-sub{
     overflow:hidden;
     max-height:0;
@@ -232,10 +387,7 @@
                 opacity 180ms cubic-bezier(0.25,0.46,0.45,0.94);
     padding-left:20px;
   }
-  .nav-sub.open{
-    max-height:200px;
-    opacity:1;
-  }
+  .nav-sub.open{ max-height:200px; opacity:1; }
   .nav-sub-btn{
     display:flex; align-items:center; gap:8px;
     width:100%;
@@ -243,101 +395,20 @@
     border:1px solid rgba(255,255,255,0.08);
     color:rgba(255,255,255,0.55);
     font-family:"NintendoSwitchUI", sans-serif;
-    font-size:13px;
-    font-weight:500;
-    padding:8px 14px;
+    font-size:13px; font-weight:500;
+    padding:9px 14px;
     border-radius:var(--radius-base);
     cursor:pointer;
     text-align:left;
     margin-top:4px;
-    transition:background 150ms ease, color 150ms ease, border-color 150ms ease;
+    transition:background 150ms ease, color 150ms ease, transform 120ms ease;
   }
   .nav-sub-btn:hover{background:rgba(255,255,255,0.1); color:var(--white);}
+  .nav-sub-btn:active{transform:scale(0.97);}
   .nav-sub-btn.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
 
   /* ============================================================
-     SEARCH + FILTER BAR
-     ============================================================ */
-  .search-filter-bar{
-    position:relative; z-index:2;
-    padding:0 0 20px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    align-items:flex-end;
-  }
-  .search-wrap{
-    position:relative;
-    flex:1;
-    min-width:180px;
-  }
-  .search-wrap svg{
-    position:absolute; left:10px; top:50%; transform:translateY(-50%);
-    width:16px; height:16px; color:var(--gray); pointer-events:none;
-  }
-  .search-input{
-    width:100%;
-    background:rgba(255,255,255,0.12);
-    border:1px solid rgba(255,255,255,0.2);
-    border-radius:var(--radius-base);
-    color:var(--white);
-    font-family:"NintendoSwitchUI", sans-serif;
-    font-size:13px;
-    padding:9px 10px 9px 34px;
-    transition:background 150ms ease, border-color 150ms ease;
-  }
-  .search-input::placeholder{color:rgba(255,255,255,0.4);}
-  .search-input:focus{outline:none; background:rgba(255,255,255,0.18); border-color:var(--brand);}
-
-  .price-filter{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    min-width:160px;
-  }
-  .price-filter-label{
-    font-size:11px;
-    color:var(--gray);
-    font-family:"NintendoSwitchUI", sans-serif;
-    white-space:nowrap;
-  }
-  .price-filter-row{
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .price-range{
-    -webkit-appearance:none;
-    appearance:none;
-    height:4px;
-    background:rgba(255,255,255,0.2);
-    border-radius:var(--radius-full);
-    outline:none;
-    cursor:pointer;
-    accent-color:var(--brand);
-    width:120px;
-  }
-  .price-range::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:16px; height:16px;
-    border-radius:50%;
-    background:var(--brand);
-    cursor:pointer;
-    box-shadow:0 1px 3px rgba(0,0,0,0.3);
-    transition:transform 150ms ease;
-  }
-  .price-range::-webkit-slider-thumb:hover{transform:scale(1.2);}
-  .price-val{
-    font-size:12px;
-    color:var(--white);
-    font-family:"NintendoSwitchUI", sans-serif;
-    white-space:nowrap;
-    min-width:36px;
-    font-weight:600;
-  }
-
-  /* ============================================================
-     BUTTONS
+     BUTTONS — global press animation
      ============================================================ */
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
@@ -346,10 +417,12 @@
     border:1px solid transparent;
     box-shadow:var(--shadow-xs);
     cursor:pointer;
-    transition:background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+    transition:background-color 150ms ease, color 150ms ease,
+                border-color 150ms ease, transform 120ms ease,
+                box-shadow 150ms ease;
     white-space:nowrap;
   }
-  .btn:active{transform:scale(0.97);}
+  .btn:active{transform:scale(0.93); box-shadow:none;}
   .btn-base{font-size:13px; padding:8px 14px;}
   .btn-sm{font-size:12px; padding:6px 12px;}
   .btn-lg{font-size:14px; padding:10px 16px;}
@@ -378,8 +451,8 @@
   /* ============================================================
      HERO BAND
      ============================================================ */
-  .hero{position:relative; z-index:2; padding:32px 0 24px;}
-  @media(min-width:1024px){.hero{padding:40px 0 20px;}}
+  .hero{position:relative; z-index:2; padding:28px 0 20px;}
+  @media(min-width:1024px){.hero{padding:36px 0 18px;}}
   .hero h1{color:var(--white); max-width:14ch;}
   .hero p.lead{color:rgba(255,255,255,0.7); margin-bottom:20px;}
   .hero-badges{display:flex; flex-wrap:wrap; gap:8px;}
@@ -401,9 +474,30 @@
   .badge-danger{background:var(--danger-soft); border-color:var(--border-danger-subtle); color:var(--danger-strong);}
   .badge-success{background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);}
   .badge-dark{background:var(--dark); border-color:transparent; color:var(--white);}
-
-  /* Badge with logo image */
   .badge-logo{height:14px; width:auto; display:block;}
+
+  /* ============================================================
+     CONDITION BADGE (on cards and detail page)
+     ============================================================ */
+  .card-condition-badge{
+    display:inline-flex; align-items:center;
+    font-size:11px; font-weight:600;
+    padding:2px 8px;
+    border-radius:var(--radius-full);
+    border:1px solid;
+    font-family:"NintendoSwitchUI", sans-serif;
+    letter-spacing:0.2px;
+    width:fit-content;
+  }
+  .condition-good{
+    background:#FFF7ED; border-color:#FED7AA; color:#92400E;
+  }
+  .condition-excellent{
+    background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;
+  }
+  .condition-like-new{
+    background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);
+  }
 
   /* ============================================================
      PRODUCT GRID + CARDS
@@ -421,10 +515,12 @@
     display:flex; flex-direction:column; overflow:hidden;
     transition:box-shadow 200ms ease, transform 200ms cubic-bezier(0.215,0.61,0.355,1);
     will-change:transform;
+    cursor:pointer;
   }
   @media(hover:hover) and (pointer:fine){
-    .card:hover{box-shadow:var(--shadow-md); transform:translateY(-2px);}
+    .card:hover{box-shadow:var(--shadow-md); transform:translateY(-3px);}
   }
+  .card:active{transform:scale(0.97) translateY(0) !important; box-shadow:var(--shadow-2xs) !important;}
 
   .card-media-link{display:block;}
   .card-media{
@@ -438,11 +534,11 @@
   .card-media svg{width:56px; height:56px;}
   .card-media.has-photo img{
     width:100%; height:100%; object-fit:cover; display:block;
-    transition:transform 250ms cubic-bezier(0.215,0.61,0.355,1);
+    transition:transform 280ms cubic-bezier(0.215,0.61,0.355,1);
     will-change:transform;
   }
   @media(hover:hover) and (pointer:fine){
-    .card:hover .card-media.has-photo img{transform:scale(1.04);}
+    .card:hover .card-media.has-photo img{transform:scale(1.05);}
   }
   .icon-fallback{width:56px; height:56px;}
   .card.is-sold .card-media{background:var(--neutral-tertiary-soft);}
@@ -454,10 +550,8 @@
 
   .card-body{padding:12px 16px 16px; display:flex; flex-direction:column; gap:6px; flex:1;}
   .card-sku{font-size:11px; color:var(--body-subtle); font-weight:500; letter-spacing:0.3px;}
-
   .card-title-link:hover .card-title{color:var(--fg-brand);}
   .card-title{font-size:14px; font-weight:600; color:var(--heading); line-height:1.35; transition:color 150ms ease; font-family:"NintendoSwitchUI", sans-serif;}
-
   .card-specs{display:flex; flex-wrap:wrap; gap:5px; margin:2px 0;}
 
   .card-price-row{
@@ -466,17 +560,12 @@
   }
   .card-price{font-size:20px; font-weight:700; color:var(--heading); font-family:"NintendoSwitchUI", sans-serif;}
   .card-price .currency{font-size:13px; font-weight:600; margin-right:1px;}
-
   .card.is-sold .card-title,.card.is-sold .card-price{color:var(--body-subtle);}
   .card-admin{margin-top:8px;}
 
-  /* No results state */
   .no-results{
-    grid-column:1/-1;
-    padding:40px 20px;
-    text-align:center;
-    color:var(--body-subtle);
-    font-size:14px;
+    grid-column:1/-1; padding:40px 20px;
+    text-align:center; color:var(--body-subtle); font-size:14px;
   }
 
   /* ============================================================
@@ -508,8 +597,7 @@
     background:var(--neutral-primary-soft);
     border:1px solid var(--border-default);
     border-radius:var(--radius-base);
-    box-shadow:var(--shadow-2xs);
-    padding:20px;
+    box-shadow:var(--shadow-2xs); padding:20px;
   }
   .info-card .badge{margin-bottom:10px;}
   .info-card p{font-size:14px; color:var(--body); line-height:1.6;}
@@ -524,7 +612,7 @@
     padding:24px 0; flex-wrap:wrap; gap:12px;
   }
   footer p{font-size:12px; color:var(--gray);}
-  .footer-logo{height:20px; width:auto; display:block; opacity:0.7;}
+  .footer-logo{height:32px; width:auto; display:block; opacity:0.85;}
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
   .admin-toggle:hover{color:var(--gray);}
 
@@ -538,24 +626,22 @@
     width:min(420px,100%);
     background:var(--neutral-primary-soft);
     border-left:1px solid var(--border-default);
-    box-shadow:var(--shadow-lg);
-    z-index:100;
+    box-shadow:var(--shadow-lg); z-index:100;
     transform:translateX(100%);
     transition:transform 250ms cubic-bezier(0.215,0.61,0.355,1);
-    display:flex; flex-direction:column;
-    will-change:transform;
+    display:flex; flex-direction:column; will-change:transform;
   }
   .drawer.open{transform:translateX(0);}
   .drawer-head{padding:16px 20px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between;}
   .drawer-head h3{font-size:18px;}
   .drawer-close{
-    background:none; border:none; color:var(--body);
-    font-size:20px; cursor:pointer; line-height:1;
+    background:none; border:none; color:var(--body); font-size:20px; cursor:pointer; line-height:1;
     width:32px; height:32px; border-radius:var(--radius-default);
     display:flex; align-items:center; justify-content:center;
-    transition:background 150ms ease;
+    transition:background 150ms ease, transform 120ms ease;
   }
   .drawer-close:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  .drawer-close:active{transform:scale(0.9);}
   .drawer-body{flex:1; overflow-y:auto; padding:8px 20px;}
   .drawer-empty{color:var(--body-subtle); font-size:13px; text-align:center; padding:60px 20px;}
   .cart-line{display:flex; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid var(--border-light);}
@@ -567,15 +653,10 @@
   .drawer-foot{border-top:1px solid var(--border-default); padding:16px 20px 20px;}
   .drawer-row{display:flex; justify-content:space-between; font-size:13px; color:var(--body); margin-bottom:8px;}
   .drawer-row.total{color:var(--heading); font-weight:700; font-size:16px; margin-top:8px; padding-top:8px; border-top:1px solid var(--border-light);}
-
-  /* Whish logo in drawer */
   .whish-logo-row{
-    display:flex; align-items:center; gap:8px;
-    margin-bottom:12px;
+    display:flex; align-items:center; gap:8px; margin-bottom:12px;
     padding:10px 12px;
-    background:var(--brand-softer);
-    border:1px solid var(--border-brand-subtle);
-    border-radius:var(--radius-default);
+    background:var(--brand-softer); border:1px solid var(--border-brand-subtle); border-radius:var(--radius-default);
   }
   .whish-logo-row img{height:18px; width:auto;}
   .whish-logo-row span{font-size:12px; color:var(--fg-brand-strong); font-weight:500;}
@@ -592,28 +673,19 @@
   .modal{
     background:var(--neutral-primary-soft);
     border:1px solid var(--border-default);
-    border-radius:var(--radius-base);
-    box-shadow:var(--shadow-lg);
+    border-radius:var(--radius-base); box-shadow:var(--shadow-lg);
     max-width:460px; width:100%; padding:24px;
-    transform:scale(0.97);
-    opacity:0;
+    transform:scale(0.97); opacity:0;
     transition:transform 220ms cubic-bezier(0.215,0.61,0.355,1), opacity 200ms ease-out;
   }
   .modal-overlay.open .modal{transform:scale(1); opacity:1;}
   .modal h3{margin-bottom:6px;}
   .modal-sub{font-size:13px; color:var(--body-subtle); margin-bottom:20px;}
-
-  /* Whish logo in modal header */
-  .modal-whish-head{
-    display:flex; align-items:center; gap:10px; margin-bottom:6px;
-  }
+  .modal-whish-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
   .modal-whish-head img{height:22px; width:auto;}
-
   .qr-box{
-    background:var(--neutral-secondary-soft);
-    border:1px solid var(--border-light);
-    border-radius:var(--radius-default);
-    padding:16px; display:flex; justify-content:center; margin-bottom:16px;
+    background:var(--neutral-secondary-soft); border:1px solid var(--border-light);
+    border-radius:var(--radius-default); padding:16px; display:flex; justify-content:center; margin-bottom:16px;
   }
   .qr-box img{width:180px; height:180px;}
   .modal-total{text-align:center; font-size:24px; font-weight:700; color:var(--fg-brand-strong); margin-bottom:18px; font-family:"NintendoSwitchUI", sans-serif;}
@@ -631,14 +703,12 @@
     display:flex; align-items:center; justify-content:center; gap:8px;
     background:#25D366; color:var(--dark-strong); font-weight:600;
     padding:12px; border-radius:var(--radius-base); border:1px solid transparent;
-    cursor:pointer; font-size:14px; width:100%;
-    box-shadow:var(--shadow-xs);
-    transition:background-color 150ms ease;
+    cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs);
+    transition:background-color 150ms ease, transform 120ms ease;
     font-family:"NintendoSwitchUI", sans-serif;
   }
   .wa-btn:hover{background:#1FB855;}
-  .wa-btn:active{transform:scale(0.98);}
-  /* WhatsApp logo in wa-btn */
+  .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
   .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;}
@@ -649,41 +719,29 @@
      ============================================================ */
   .ctrl-modal-overlay{
     position:fixed; inset:0; background:rgba(15,17,17,0.65);
-    z-index:300; display:none; align-items:center; justify-content:center;
-    padding:20px;
+    z-index:300; display:none; align-items:center; justify-content:center; padding:20px;
   }
   .ctrl-modal-overlay.open{display:flex;}
   .ctrl-modal{
-    background:var(--neutral-primary-soft);
-    border:1px solid var(--border-default);
-    border-radius:var(--radius-base);
-    box-shadow:var(--shadow-lg);
+    background:var(--neutral-primary-soft); border:1px solid var(--border-default);
+    border-radius:var(--radius-base); box-shadow:var(--shadow-lg);
     max-width:440px; width:100%; padding:24px;
-    transform:scale(0.96);
-    opacity:0;
+    transform:scale(0.96); opacity:0;
     transition:transform 220ms cubic-bezier(0.215,0.61,0.355,1), opacity 200ms ease-out;
   }
   .ctrl-modal-overlay.open .ctrl-modal{transform:scale(1); opacity:1;}
   .ctrl-modal h3{margin-bottom:4px;}
   .ctrl-modal-sub{font-size:13px; color:var(--body-subtle); margin-bottom:20px;}
-  .ctrl-option{
-    border:1px solid var(--border-default);
-    border-radius:var(--radius-base);
-    padding:14px 16px;
-    margin-bottom:10px;
-  }
-  .ctrl-option-head{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    margin-bottom:8px;
-  }
+  .ctrl-option{border:1px solid var(--border-default); border-radius:var(--radius-base); padding:14px 16px; margin-bottom:10px;}
+  .ctrl-option-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;}
   .ctrl-option-label{font-size:14px; font-weight:600; color:var(--heading);}
   .ctrl-option-price{font-size:13px; font-weight:600; color:var(--fg-brand-strong);}
   .ctrl-option-body{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .ctrl-no-thanks{
     width:100%; text-align:center; padding:10px;
-    background:none; border:none; color:var(--body-subtle);
-    font-size:13px; cursor:pointer; margin-top:4px;
+    background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; margin-top:4px;
     font-family:"NintendoSwitchUI", sans-serif;
+    transition:color 150ms ease;
   }
   .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
 
@@ -691,31 +749,25 @@
      ADMIN BAR + LOGIN
      ============================================================ */
   .admin-bar{
-    position:fixed; bottom:0; left:0; right:0;
-    background:var(--brand); color:var(--dark-strong);
-    z-index:150; display:none;
-    padding:10px 16px; align-items:center; justify-content:space-between;
-    font-size:13px; font-weight:500; flex-wrap:wrap; gap:10px;
-    box-shadow:var(--shadow-lg);
+    position:fixed; bottom:0; left:0; right:0; background:var(--brand); color:var(--dark-strong);
+    z-index:150; display:none; padding:10px 16px; align-items:center; justify-content:space-between;
+    font-size:13px; font-weight:500; flex-wrap:wrap; gap:10px; box-shadow:var(--shadow-lg);
   }
   .admin-bar.open{display:flex;}
   .admin-item-toggle{
-    background:var(--neutral-primary-soft);
-    border:1px solid var(--border-default-medium);
-    color:var(--body); font-size:11px; font-weight:500;
-    padding:5px 10px; border-radius:var(--radius-default); cursor:pointer;
-    font-family:"NintendoSwitchUI", sans-serif;
+    background:var(--neutral-primary-soft); border:1px solid var(--border-default-medium);
+    color:var(--body); font-size:11px; font-weight:500; padding:5px 10px;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
+    transition:background 150ms ease, transform 120ms ease;
   }
   .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  .admin-item-toggle:active{transform:scale(0.95);}
   .admin-item-toggle.is-sold{background:var(--danger); color:var(--white); border-color:transparent;}
   .admin-item-toggle.is-sold:hover{background:var(--danger-strong);}
   .login-box{
-    position:fixed; bottom:56px; left:16px;
-    background:var(--neutral-primary-soft);
-    border:1px solid var(--border-default);
-    border-radius:var(--radius-base);
-    box-shadow:var(--shadow-md);
-    padding:14px; z-index:160;
+    position:fixed; bottom:56px; left:16px; background:var(--neutral-primary-soft);
+    border:1px solid var(--border-default); border-radius:var(--radius-base);
+    box-shadow:var(--shadow-md); padding:14px; z-index:160;
     display:none; flex-direction:column; gap:8px; width:220px;
   }
   .login-box.open{display:flex;}
@@ -727,30 +779,108 @@
 </head>
 <body>
 
+<!-- NAV BACKDROP -->
+<div class="nav-backdrop" id="navBackdrop"></div>
+
+<!-- LEFT SIDE NAV DRAWER -->
+<nav class="nav-drawer" id="navDrawer" aria-label="Filter by category">
+  <div class="nav-drawer-head">
+    <img class="nav-drawer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
+         onerror="this.style.display='none'">
+    <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="nav-drawer-body">
+    <!-- All listings -->
+    <div class="nav-item">
+      <button class="nav-btn active" data-cat="all" id="navAll">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        All listings
+      </button>
+    </div>
+
+    <!-- Nintendo Switch + sub-item Switch Games -->
+    <div class="nav-item">
+      <button class="nav-btn" data-cat="switches" id="navSwitches">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="6" height="12" rx="2"/><rect x="16" y="6" width="6" height="12" rx="2"/><rect x="8" y="4" width="8" height="16" rx="1"/></svg>
+        Nintendo Switch
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="nav-sub" id="navSwitchSub">
+        <button class="nav-sub-btn" data-cat="games" id="navGames">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Switch Games
+        </button>
+      </div>
+    </div>
+
+    <!-- Handhelds & Consoles -->
+    <div class="nav-item">
+      <button class="nav-btn" data-cat="consoles" id="navConsoles">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><rect x="7" y="6" width="10" height="8" rx="1"/></svg>
+        Handhelds &amp; Consoles
+      </button>
+    </div>
+
+    <!-- Laptops -->
+    <div class="nav-item">
+      <button class="nav-btn" data-cat="laptops" id="navLaptops">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="11" rx="1"/><path d="M2 19h20l-2-3H4l-2 3z"/></svg>
+        Laptops
+      </button>
+    </div>
+  </div>
+</nav>
+
 <header class="header">
   <div class="container">
+
+    <!-- TOPBAR: [hamburger] [logo] [search] [filter btn] [cart] -->
     <div class="topbar">
-      <!-- Brand: logo image (drop assets/stock86-logo.png) + text fallback -->
-      <div class="brand-mark">
-        <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86 logo"
-             onerror="this.style.display='none'">
-        <span class="name">STOCK<span class="accent">/86</span></span>
-        <span class="tagline">Used gaming hardware · Koura</span>
+      <!-- Hamburger — LEFT -->
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- Logo image only — no text -->
+      <a class="brand-mark" href="index.html" aria-label="STOCK/86 home">
+        <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86">
+      </a>
+
+      <!-- Search bar -->
+      <div class="header-search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input class="header-search-input" type="search" id="searchInput" placeholder="Search listings…" autocomplete="off">
       </div>
+
+      <!-- Filter button -->
+      <button class="filter-toggle-btn" id="filterToggleBtn" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+        </svg>
+        Filter
+      </button>
+
+      <!-- Cart -->
       <div class="header-actions">
         <button class="btn btn-base cart-btn btn-ghost" id="cartOpenBtn" aria-label="Open cart">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           Cart
           <span class="cart-count" id="cartCount">0</span>
         </button>
-        <!-- Hamburger -->
-        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" aria-expanded="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
+      </div>
+    </div>
+
+    <!-- FILTER PANEL — slides down when filter button pressed -->
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-panel-inner">
+        <span class="price-filter-label">Max price: <span id="priceVal">$500+</span></span>
+        <input class="price-range" type="range" id="priceRange" min="0" max="500" value="500" step="10">
       </div>
     </div>
 
@@ -759,148 +889,81 @@
       <h1>Used consoles &amp; handhelds, checked by hand</h1>
       <p class="lead">Modded Switches, handheld PCs, and last-gen consoles — each listing is the actual unit, actual condition. Pay first via Whish Money, then it ships.</p>
       <div class="hero-badges">
-        <!-- Whish logo badge -->
         <span class="badge badge-lg badge-brand">
-          <img class="badge-logo" src="assets/whish-logo.png" alt="Whish"
-               onerror="this.style.display='none'">
+          <img class="badge-logo" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
           Pay via Whish Money — in advance
         </span>
-        <!-- WhatsApp logo badge -->
         <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">
-          <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp"
-               onerror="this.style.display='none'">
+          <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
           Orders confirmed on WhatsApp
         </span>
         <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $10 — all of Lebanon</span>
       </div>
     </div>
 
-    <!-- HAMBURGER NAV PANEL -->
-    <nav class="nav-panel" id="navPanel" aria-label="Filter by category">
-      <div class="nav-inner">
-        <!-- All listings -->
-        <div class="nav-item">
-          <button class="nav-btn active" data-cat="all" id="navAll">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            All listings
-          </button>
-        </div>
-
-        <!-- Nintendo Switch + sub-item Switch Games -->
-        <div class="nav-item">
-          <button class="nav-btn" data-cat="switches" id="navSwitches">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="6" height="12" rx="2"/><rect x="16" y="6" width="6" height="12" rx="2"/><rect x="8" y="4" width="8" height="16" rx="1"/></svg>
-            Nintendo Switch
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <!-- Sub-item -->
-          <div class="nav-sub" id="navSwitchSub">
-            <button class="nav-sub-btn" data-cat="games" id="navGames">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-              Switch Games
-            </button>
-          </div>
-        </div>
-
-        <!-- Handhelds & Consoles -->
-        <div class="nav-item">
-          <button class="nav-btn" data-cat="consoles" id="navConsoles">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><rect x="7" y="6" width="10" height="8" rx="1"/></svg>
-            Handhelds &amp; Consoles
-          </button>
-        </div>
-
-        <!-- Laptops -->
-        <div class="nav-item">
-          <button class="nav-btn" data-cat="laptops" id="navLaptops">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="11" rx="1"/><path d="M2 19h20l-2-3H4l-2 3z"/></svg>
-            Laptops
-          </button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- SEARCH + PRICE FILTER BAR -->
-    <div class="search-filter-bar">
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        <input class="search-input" type="search" id="searchInput" placeholder="Search listings…" autocomplete="off">
-      </div>
-      <div class="price-filter">
-        <span class="price-filter-label">Max price: <span id="priceVal">$500+</span></span>
-        <div class="price-filter-row">
-          <input class="price-range" type="range" id="priceRange" min="0" max="500" value="500" step="10">
-        </div>
-      </div>
-    </div>
-
   </div>
 </header>
 
-<!-- NINTENDO SWITCH -->
-<section class="section bg-soft" id="section-switches">
-  <div class="container">
-    <div class="section-head">
-      <h2>Nintendo Switch</h2>
-      <span class="count"></span>
+<main>
+  <!-- NINTENDO SWITCH -->
+  <section class="section bg-soft" id="section-switches">
+    <div class="container">
+      <div class="section-head">
+        <h2>Nintendo Switch</h2>
+        <span class="count"></span>
+      </div>
+      <div class="product-grid" id="switchList" data-cat="switches"></div>
     </div>
-    <div class="product-grid" id="switchList" data-cat="switches"></div>
-  </div>
-</section>
+  </section>
 
-<!-- SWITCH GAMES -->
-<section class="section bg-secondary" id="section-games">
-  <div class="container">
-    <div class="section-head">
-      <h2>Switch Games</h2>
-      <span class="count"></span>
+  <!-- SWITCH GAMES -->
+  <section class="section bg-secondary" id="section-games">
+    <div class="container">
+      <div class="section-head">
+        <h2>Switch Games</h2>
+        <span class="count"></span>
+      </div>
+      <div class="product-grid cols-4" id="gamesGrid" data-cat="games"></div>
     </div>
-    <div class="product-grid cols-4" id="gamesGrid" data-cat="games"></div>
-  </div>
-</section>
+  </section>
 
-<!-- HANDHELDS / CONSOLES -->
-<section class="section bg-soft" id="section-consoles">
-  <div class="container">
-    <div class="section-head">
-      <h2>Handhelds &amp; Consoles</h2>
-      <span class="count"></span>
+  <!-- HANDHELDS / CONSOLES -->
+  <section class="section bg-soft" id="section-consoles">
+    <div class="container">
+      <div class="section-head">
+        <h2>Handhelds &amp; Consoles</h2>
+        <span class="count"></span>
+      </div>
+      <div class="product-grid" id="consoleList" data-cat="consoles"></div>
     </div>
-    <div class="product-grid" id="consoleList" data-cat="consoles"></div>
-  </div>
-</section>
+  </section>
 
-<!-- LAPTOPS -->
-<section class="section bg-secondary" id="section-laptops">
-  <div class="container">
-    <div class="section-head">
-      <h2>Laptops</h2>
-      <span class="count"></span>
+  <!-- LAPTOPS -->
+  <section class="section bg-secondary" id="section-laptops">
+    <div class="container">
+      <div class="section-head">
+        <h2>Laptops</h2>
+        <span class="count"></span>
+      </div>
+      <div class="product-grid" id="laptopList" data-cat="laptops"></div>
     </div>
-    <div class="product-grid" id="laptopList" data-cat="laptops"></div>
-  </div>
-</section>
+  </section>
+</main>
 
 <!-- PAYMENT / DELIVERY INFO -->
 <section class="section bg-soft">
   <div class="container">
     <div class="info-grid">
       <div class="info-card">
-        <!-- Whish logo in info card -->
         <span class="badge badge-lg badge-brand">
-          <img class="badge-logo" src="assets/whish-logo.png" alt="Whish"
-               onerror="this.style.display='none'">
+          <img class="badge-logo" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
           How payment works
         </span>
         <p><strong>No cash on delivery.</strong> Every order is paid in full before shipping, using the Whish Money QR code shown at checkout. Once payment is sent, the order screenshot goes to WhatsApp and the order ships.</p>
       </div>
       <div class="info-card">
-        <!-- WhatsApp logo in info card -->
         <span class="badge badge-lg badge-gray">
-          <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp"
-               onerror="this.style.display='none'">
+          <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
           Delivery
         </span>
         <p>Flat <strong>$10 delivery fee</strong> anywhere in Lebanon, added automatically at checkout. Orders ship once payment is confirmed.</p>
@@ -912,12 +975,10 @@
 <footer>
   <div class="container">
     <div class="footer-inner">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <!-- STOCK/86 logo in footer -->
+      <a href="index.html" style="display:flex;align-items:center;">
         <img class="footer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
              onerror="this.style.display='none'">
-        <p>STOCK/86 — listings updated by hand, no two units are exactly alike.</p>
-      </div>
+      </a>
       <button class="admin-toggle" id="adminToggleBtn" aria-label="Admin">·</button>
     </div>
   </div>
@@ -932,7 +993,6 @@
   </div>
   <div class="drawer-body" id="drawerBody"></div>
   <div class="drawer-foot" id="drawerFoot" style="display:none;">
-    <!-- Whish reminder in cart footer -->
     <div class="whish-logo-row">
       <img src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
       <span>Payment via Whish Money</span>
@@ -981,8 +1041,7 @@
       </div>
     </div>
     <button class="wa-btn" id="waSendBtn">
-      <!-- WhatsApp logo in send button -->
-      <img src="assets/whatsapp-logo.png" alt="" onerror="this.outerHTML='<svg width=18 height=18 viewBox=\'0 0 24 24\' fill=\'currentColor\'><path d=\'M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.85.5 3.58 1.41 5.06L2 22l5.25-1.5a9.85 9.85 0 0 0 4.79 1.23h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.89.83-3.04-.2-.31a8.18 8.18 0 0 1-1.26-4.46c0-4.53 3.69-8.22 8.24-8.22 4.55 0 8.24 3.69 8.24 8.22 0 4.53-3.7 8.24-8.24 8.24z\'/></svg>'">
+      <img src="assets/whatsapp-logo.png" alt="" onerror="this.style.display='none'">
       Send order on WhatsApp
     </button>
     <div class="modal-close-row">
@@ -996,7 +1055,6 @@
   <div class="ctrl-modal" role="dialog" aria-label="Add a controller?">
     <h3>Add a controller?</h3>
     <p class="ctrl-modal-sub">Adding: <strong id="controllerModalItemName"></strong></p>
-
     <div class="ctrl-option">
       <div class="ctrl-option-head">
         <span class="ctrl-option-label">Pro Controller</span>
@@ -1007,7 +1065,6 @@
         <button class="btn btn-brand btn-sm" onclick="confirmControllerChoice('pro')">Add + order</button>
       </div>
     </div>
-
     <div class="ctrl-option">
       <div class="ctrl-option-head">
         <span class="ctrl-option-label">Wired / third-party wireless</span>
@@ -1017,7 +1074,6 @@
         <button class="btn btn-brand btn-sm" onclick="confirmControllerChoice('wired')">Add + order</button>
       </div>
     </div>
-
     <button class="ctrl-no-thanks" onclick="confirmControllerChoice('none')">No thanks — just the console</button>
   </div>
 </div>
@@ -1038,25 +1094,26 @@
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
-  // ── Hamburger nav ──────────────────────────────────────────
-  const hamburgerBtn = document.getElementById("hamburgerBtn");
-  const navPanel     = document.getElementById("navPanel");
+  // ── Nav drawer (LEFT side) ─────────────────────────────────
+  const hamburgerBtn  = document.getElementById("hamburgerBtn");
+  const navDrawer     = document.getElementById("navDrawer");
+  const navBackdrop   = document.getElementById("navBackdrop");
+  const navDrawerClose= document.getElementById("navDrawerClose");
 
-  function toggleNav() {
-    const isOpen = navPanel.classList.toggle("open");
-    hamburgerBtn.setAttribute("aria-expanded", isOpen);
+  function openNav() {
+    navDrawer.classList.add("open");
+    navBackdrop.classList.add("open");
+    hamburgerBtn.setAttribute("aria-expanded", "true");
   }
-  hamburgerBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleNav();
-  });
-  // Close nav on outside click
-  document.addEventListener("click", (e) => {
-    if (!navPanel.contains(e.target) && e.target !== hamburgerBtn) {
-      navPanel.classList.remove("open");
-      hamburgerBtn.setAttribute("aria-expanded", "false");
-    }
-  });
+  function closeNav() {
+    navDrawer.classList.remove("open");
+    navBackdrop.classList.remove("open");
+    hamburgerBtn.setAttribute("aria-expanded", "false");
+  }
+
+  hamburgerBtn.addEventListener("click", (e) => { e.stopPropagation(); openNav(); });
+  navDrawerClose.addEventListener("click", closeNav);
+  navBackdrop.addEventListener("click", closeNav);
 
   // ── Nav buttons ────────────────────────────────────────────
   const NAV_BUTTONS = {
@@ -1069,50 +1126,57 @@
   const switchSub = document.getElementById("navSwitchSub");
 
   function updateNavActive(cat) {
-    // Clear all
     Object.values(NAV_BUTTONS).forEach(b => b && b.classList.remove("active"));
     NAV_BUTTONS[cat] && NAV_BUTTONS[cat].classList.add("active");
   }
 
   NAV_BUTTONS.all.addEventListener("click", () => {
-    setCategory("all");
+    setCategory("all"); updateNavActive("all");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
-    navPanel.classList.remove("open");
+    closeNav();
   });
 
   NAV_BUTTONS.switches.addEventListener("click", () => {
-    // Toggle sub-menu
     const subOpen = switchSub.classList.toggle("open");
     NAV_BUTTONS.switches.classList.toggle("open", subOpen);
-    setCategory("switches");
-    updateNavActive("switches");
-    if (!subOpen) navPanel.classList.remove("open");
+    setCategory("switches"); updateNavActive("switches");
   });
 
   NAV_BUTTONS.games.addEventListener("click", () => {
-    setCategory("games");
-    updateNavActive("games");
-    navPanel.classList.remove("open");
+    setCategory("games"); updateNavActive("games");
+    closeNav();
   });
 
   NAV_BUTTONS.consoles.addEventListener("click", () => {
-    setCategory("consoles");
+    setCategory("consoles"); updateNavActive("consoles");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
-    navPanel.classList.remove("open");
+    closeNav();
   });
 
   NAV_BUTTONS.laptops.addEventListener("click", () => {
-    setCategory("laptops");
+    setCategory("laptops"); updateNavActive("laptops");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
-    navPanel.classList.remove("open");
+    closeNav();
   });
 
-  // Override setCategory to also update nav UI
-  const _origSetCat = setCategory;
-  // Wrap after DOMContentLoaded
+  // ── Filter toggle button ───────────────────────────────────
+  const filterToggleBtn = document.getElementById("filterToggleBtn");
+  const filterPanel     = document.getElementById("filterPanel");
+
+  filterToggleBtn.addEventListener("click", () => {
+    const isOpen = filterPanel.classList.toggle("open");
+    filterToggleBtn.classList.toggle("active", isOpen);
+    filterToggleBtn.setAttribute("aria-expanded", isOpen);
+    if (!isOpen) {
+      // Reset price filter when closing
+      priceRange.value = 500;
+      priceValEl.textContent = "$500+";
+      renderAll();
+    }
+  });
 
   // ── Search + price filter ──────────────────────────────────
   const searchInput = document.getElementById("searchInput");
@@ -1126,7 +1190,7 @@
     renderAll();
   });
 
-  // Expose filter values for app.js renderAll to pick up
+  // Expose filter values for app.js renderAll
   function getSearchQuery() { return searchInput.value.trim().toLowerCase(); }
   function getMaxPrice()    { return parseInt(priceRange.value) >= 500 ? Infinity : parseInt(priceRange.value); }
 
