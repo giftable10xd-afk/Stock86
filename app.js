@@ -106,7 +106,7 @@ function renderProductCard(item) {
         <a href="product.html?id=${item.id}" class="card-title-link">
           <h3 class="card-title">${item.name}</h3>
         </a>
-        ${item.condition ? `<span class="card-condition">${item.condition}</span>` : ""}
+        <!-- condition intentionally hidden from cards -->
         ${specsHtml ? `<div class="card-specs">${specsHtml}</div>` : ""}
         <div class="card-price-row">
           <span class="card-price"><span class="currency">$</span>${item.price}</span>
@@ -377,30 +377,52 @@ function renderAll() {
   const adminBar = document.getElementById("adminBar");
   if (adminBar) adminBar.classList.toggle("open", adminMode);
 
-  const show = (sectionId, items, renderFn) => {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
+  // Search + price filter helpers (defined in index.html inline script; safe fallbacks)
+  const query    = (typeof getSearchQuery === "function") ? getSearchQuery() : "";
+  const maxPrice = (typeof getMaxPrice    === "function") ? getMaxPrice()    : Infinity;
 
-    // Find the wrapping <section> element for show/hide
-    const sectionEl = section.closest("section");
-    const shouldShow = activeCategory === "all" || activeCategory === section.dataset.cat;
-    if (sectionEl) sectionEl.style.display = shouldShow ? "" : "none";
+  function filterItems(items, cat) {
+    // Category filter
+    if (activeCategory !== "all" && activeCategory !== cat) return null; // null = hide section
+    // Apply search + price
+    return items.filter(item => {
+      const matchPrice  = item.price <= maxPrice;
+      const haystack    = [item.name, item.id, ...(item.specs || []), item.description || ""].join(" ").toLowerCase();
+      const matchSearch = !query || haystack.includes(query);
+      return matchPrice && matchSearch;
+    });
+  }
 
-    if (shouldShow) {
-      section.innerHTML = items.map(renderFn).join("");
-      // Update count in section header
-      const countEl = sectionEl && sectionEl.querySelector(".count");
-      if (countEl) {
-        const avail = items.filter(i => !i.sold).length;
-        countEl.textContent = `${avail} of ${items.length} available`;
-      }
+  const show = (sectionId, sectionWrapId, items, cat, renderFn) => {
+    const gridEl    = document.getElementById(sectionId);
+    const sectionEl = document.getElementById(sectionWrapId) || (gridEl && gridEl.closest("section"));
+    if (!gridEl) return;
+
+    const filtered = filterItems(items, cat);
+    if (filtered === null) {
+      if (sectionEl) sectionEl.style.display = "none";
+      return;
+    }
+    if (sectionEl) sectionEl.style.display = "";
+
+    if (filtered.length === 0) {
+      gridEl.innerHTML = `<div class="no-results">No listings match your search.</div>`;
+    } else {
+      gridEl.innerHTML = filtered.map(renderFn).join("");
+    }
+
+    // Update count
+    const countEl = sectionEl && sectionEl.querySelector(".count");
+    if (countEl) {
+      const avail = filtered.filter(i => !i.sold).length;
+      countEl.textContent = `${avail} of ${filtered.length} available`;
     }
   };
 
-  show("switchList",  INVENTORY.switches, renderProductCard);
-  show("gamesGrid",   INVENTORY.games,    renderProductCard);
-  show("consoleList", INVENTORY.consoles, renderProductCard);
-  show("laptopList",  INVENTORY.laptops,  renderProductCard);
+  show("switchList",  "section-switches", INVENTORY.switches, "switches", renderProductCard);
+  show("gamesGrid",   "section-games",    INVENTORY.games,    "games",    renderProductCard);
+  show("consoleList", "section-consoles", INVENTORY.consoles, "consoles", renderProductCard);
+  show("laptopList",  "section-laptops",  INVENTORY.laptops,  "laptops",  renderProductCard);
 }
 
 // ============================================================

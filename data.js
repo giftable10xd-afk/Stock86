@@ -161,12 +161,12 @@ const INVENTORY = {
       id: "HC-01",
       name: "AYANEO AIR Pro — 1TB",
       price: 400,
-      condition: "Like new",
+      condition: "Like new — original box",
       sold: false,
       icon: "handheld",
       image: "assets/ayaneoair.jpg",
       description: "6-inch AMOLED screen, AMD Ryzen 7 series APU. A handheld gaming PC running Windows.",
-      specs: ["1TB storage", "6\" AMOLED screen", "AMD Ryzen 7 series APU", "Charger + manual included"]
+      specs: ["1TB storage", "6\" AMOLED screen", "AMD Ryzen 7 series APU", "Original box", "Charger + manual included"]
     },
     {
       id: "HC-02",
