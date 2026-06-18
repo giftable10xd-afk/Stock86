@@ -631,7 +631,7 @@ function renderProductPage() {
 
   // Condition: hide for games (icon === "game")
   const conditionHtml = (item.condition && item.icon !== "game")
-    ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition} Condition</span>`
+    ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition}</span>`
     : "";
 
   const inCart = cart.some(l => l.sourceId === item.id);
