@@ -78,7 +78,8 @@ function renderProductCard(item) {
   if (item.sold) {
     priceActionHtml = `<span class="badge badge-lg badge-danger">Sold</span>`;
   } else {
-    priceActionHtml = `<button class="btn btn-brand btn-sm" onclick="startAddToCart('${item.id}', event)">Add to cart</button>`;
+    const inCart = cart.some(l => l.sourceId === item.id);
+    priceActionHtml = `<button class="btn btn-brand btn-sm" data-cart-id="${item.id}" onclick="startAddToCart('${item.id}', event)"${inCart ? ' disabled style="opacity:0.7;"' : ""}>${inCart ? "✓ In cart" : "Add to cart"}</button>`;
   }
 
   let adminHtml = "";
@@ -162,6 +163,12 @@ function confirmControllerChoice(type) {
   const item = findItemById(id);
   if (!item || item.sold) return;
 
+  // Enforce max 1 of each item
+  if (cart.some(l => l.sourceId === id)) {
+    openDrawer();
+    return;
+  }
+
   cart.push({
     lineId: `${id}-${Date.now()}`,
     sourceId: id,
@@ -193,14 +200,21 @@ function confirmControllerChoice(type) {
   }
 
   renderCart();
+  updateAddToCartButtons();
   openDrawer();
 }
 
 function directAddToCart(id) {
   const item = findItemById(id);
   if (!item || item.sold) return;
+  // Enforce max 1 of each item
+  if (cart.some(l => l.sourceId === id)) {
+    openDrawer();
+    return;
+  }
   cart.push({ lineId: `${id}-${Date.now()}`, sourceId: id, name: item.name, price: item.price, meta: "" });
   renderCart();
+  updateAddToCartButtons();
   openDrawer();
 }
 
@@ -209,6 +223,24 @@ function directAddToCart(id) {
 function removeFromCart(lineId) {
   cart = cart.filter(line => line.lineId !== lineId);
   renderCart();
+  updateAddToCartButtons();
+}
+
+// Update all "Add to cart" buttons on the page to reflect in-cart state
+function updateAddToCartButtons() {
+  const inCartIds = new Set(cart.map(l => l.sourceId));
+  document.querySelectorAll("[data-cart-id]").forEach(btn => {
+    const id = btn.dataset.cartId;
+    if (inCartIds.has(id)) {
+      btn.textContent = "✓ In cart";
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+    } else {
+      btn.textContent = "Add to cart";
+      btn.disabled = false;
+      btn.style.opacity = "";
+    }
+  });
 }
 
 function cartSubtotal() {
@@ -220,7 +252,10 @@ function renderCart() {
   const foot = document.getElementById("drawerFoot");
   const countEl = document.getElementById("cartCount");
   if (!body) return;
+  // Count only main items (not add-ons) for the badge
+  const mainItems = cart.filter(l => !l.sourceId.startsWith("addon-"));
   countEl.textContent = cart.length;
+  countEl.style.display = cart.length === 0 ? "none" : "flex";
 
   if (cart.length === 0) {
     body.innerHTML = `<div class="drawer-empty">Your cart is empty.<br>Browse the inventory and add something.</div>`;
@@ -230,8 +265,11 @@ function renderCart() {
 
   body.innerHTML = cart.map(line => `
     <div class="cart-line">
-      <div>
-        <div class="cart-line-name">${line.name}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="cart-qty-badge">1</span>
+          <div class="cart-line-name">${line.name}</div>
+        </div>
         ${line.meta ? `<div class="cart-line-meta">${line.meta}</div>` : ""}
         <button class="cart-line-remove" onclick="removeFromCart('${line.lineId}')">Remove</button>
       </div>
@@ -471,6 +509,9 @@ function renderAll() {
       countEl.textContent = `${avail} of ${filtered.length} available`;
     }
   });
+
+  // Refresh button states after any re-render
+  if (typeof updateAddToCartButtons === "function") updateAddToCartButtons();
 }
 
 // ============================================================

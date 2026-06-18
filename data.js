@@ -41,8 +41,8 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switchscratched.jpg",
-      description: "Modded Nintendo Switch with 512GB of storage. Comes with a carrying case and a free bag included as a gift.",
-      specs: ["512GB modded", "Case included", "Free bag — gift"],
+      description: "Modded Nintendo Switch with 512GB of storage. Comes with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
+      specs: ["512GB modded", "Dock + all accessories", "AC charger included", "Case included", "Free bag — gift"],
       hasControllerAddon: true
     },
     {
@@ -53,8 +53,8 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switchlikenewmodded.jpg",
-      description: "Modded Nintendo Switch with 256GB of storage. Comes with a carrying case and a free bag included as a gift.",
-      specs: ["256GB modded", "Case included", "Free bag — gift"],
+      description: "Modded Nintendo Switch with 256GB of storage. Comes with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
+      specs: ["256GB modded", "Dock + all accessories", "AC charger included", "Case included", "Free bag — gift"],
       hasControllerAddon: true
     },
     {
@@ -65,8 +65,8 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switcholed.jpg",
-      description: "Nintendo Switch OLED in like-new condition, with its original box, a carrying case, and a free bag. Comes preloaded with 25 games split across two 64GB memory cards.",
-      specs: ["Original box", "25 games preloaded", "2× 64GB cards (128GB)", "Free bag — gift"],
+      description: "Nintendo Switch OLED in like-new condition, with its original box and all accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag. Comes preloaded with 25 games split across two 64GB memory cards.",
+      specs: ["Original box", "Dock + all accessories", "AC charger included", "25 games preloaded", "2× 64GB cards (128GB)", "Free bag — gift"],
       hasControllerAddon: true
     }
   ],
