@@ -152,6 +152,17 @@ const INVENTORY = {
       specs: ["512GB digital-only", "1 controller included", "No original box"]
     },
     {
+      id: "CON-WIIU1",
+      name: "Nintendo Wii U (Modded) — 256GB",
+      price: 110,
+      condition: "Excellent",
+      sold: false,
+      icon: "console",
+      image: "assets/wiiu.jpg",
+      description: "Modded Wii U with 256GB storage and custom firmware.",
+      specs: ["256GB modded", "Custom firmware", "Clean + tested"]
+    },
+    {
       id: "CON-PSP1K",
       name: "Sony PSP-1000 (Custom Modded)",
       price: 60,
