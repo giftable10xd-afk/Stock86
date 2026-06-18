@@ -355,28 +355,6 @@ function wireCommonUI() {
   document.getElementById("controllerModalOverlay").addEventListener("click", (e) => {
     if (e.target === document.getElementById("controllerModalOverlay")) closeControllerModal();
   });
-
-  // Hamburger / side menu (index page only)
-  const menuOpenBtn = document.getElementById("menuOpenBtn");
-  if (menuOpenBtn) {
-    menuOpenBtn.addEventListener("click", openSideMenu);
-    document.getElementById("sideMenuCloseBtn").addEventListener("click", closeSideMenu);
-    document.getElementById("sideMenuOverlay").addEventListener("click", closeSideMenu);
-  }
-
-  // Search input (index page only)
-  const searchInput = document.getElementById("searchInput");
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => onSearchInput(e.target.value));
-  }
-
-  // Filter panel (index page only)
-  const filterToggleBtn = document.getElementById("filterToggleBtn");
-  if (filterToggleBtn) {
-    filterToggleBtn.addEventListener("click", toggleFilterPanel);
-    document.getElementById("filterSlider").addEventListener("input", (e) => onFilterSliderInput(e.target.value));
-    document.getElementById("filterClearBtn").addEventListener("click", clearFilter);
-  }
 }
 
 // ============================================================
@@ -385,179 +363,45 @@ function wireCommonUI() {
 
 // Category filter state: "all" | "switches" | "games" | "consoles" | "laptops"
 let activeCategory = "all";
-let searchQuery = "";
-let maxPriceFilter = null; // null = no filter applied
-
-const SECTION_META = [
-  { sectionId: "sectionSwitches", gridId: "switchList",  cat: "switches", items: () => INVENTORY.switches },
-  { sectionId: "sectionGames",    gridId: "gamesGrid",    cat: "games",    items: () => INVENTORY.games },
-  { sectionId: "sectionConsoles", gridId: "consoleList",  cat: "consoles", items: () => INVENTORY.consoles },
-  { sectionId: "sectionLaptops",  gridId: "laptopList",   cat: "laptops",  items: () => INVENTORY.laptops }
-];
 
 function setCategory(cat) {
   activeCategory = cat;
-  // Update side menu link states
-  document.querySelectorAll(".side-menu-link").forEach(btn => {
+  // Update tab button states
+  document.querySelectorAll(".cat-tab").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.cat === cat);
   });
-  closeSideMenu();
   renderAll();
 }
-
-// ---- search matching helpers ----
-
-function itemMatchesQuery(item, query) {
-  if (!query) return true;
-  const haystack = [
-    item.name,
-    item.id,
-    item.condition || "",
-    ...(item.specs || [])
-  ].join(" ").toLowerCase();
-  return haystack.includes(query);
-}
-
-function sectionMatchScore(meta, query) {
-  if (!query) return 0;
-  const items = meta.items();
-  let score = 0;
-  items.forEach(item => {
-    const name = item.name.toLowerCase();
-    if (name.includes(query)) score += 2;       // direct name match
-    else if (itemMatchesQuery(item, query)) score += 1; // spec/condition/id match
-  });
-  return score;
-}
-
-function applyFilters(items) {
-  const q = searchQuery.trim().toLowerCase();
-  return items.filter(item => {
-    if (q && !itemMatchesQuery(item, q)) return false;
-    if (maxPriceFilter !== null && item.price > maxPriceFilter) return false;
-    return true;
-  });
-}
-
-function onSearchInput(value) {
-  searchQuery = value;
-  renderAll();
-}
-
-// ---- filter panel (price) ----
-
-function toggleFilterPanel() {
-  const panel = document.getElementById("filterPanel");
-  const btn = document.getElementById("filterToggleBtn");
-  const willOpen = !panel.classList.contains("open");
-  panel.classList.toggle("open", willOpen);
-  btn.classList.toggle("active", willOpen || maxPriceFilter !== null);
-}
-
-function onFilterSliderInput(value) {
-  maxPriceFilter = parseInt(value, 10);
-  document.getElementById("filterRangeVal").textContent = `$${maxPriceFilter}`;
-  document.getElementById("filterToggleBtn").classList.add("active");
-  renderAll();
-}
-
-function clearFilter() {
-  maxPriceFilter = null;
-  const slider = document.getElementById("filterSlider");
-  slider.value = slider.max;
-  document.getElementById("filterRangeVal").textContent = `$${slider.max}`;
-  document.getElementById("filterToggleBtn").classList.remove("active");
-  renderAll();
-}
-
-// ---- main render ----
 
 function renderAll() {
   const adminBar = document.getElementById("adminBar");
   if (adminBar) adminBar.classList.toggle("open", adminMode);
 
-  const q = searchQuery.trim().toLowerCase();
-  let visibleCount = 0;
+  const show = (sectionId, items, renderFn) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
 
-  // Render each section's grid + count, track relevance score for ordering
-  const ranked = SECTION_META.map(meta => {
-    const sectionEl = document.getElementById(meta.sectionId);
-    const gridEl = document.getElementById(meta.gridId);
-    if (!sectionEl || !gridEl) return { ...meta, sectionEl: null, score: -1, shouldShow: false };
-
-    const categoryMatches = activeCategory === "all" || activeCategory === meta.cat;
-    const allItems = meta.items();
-    const filtered = applyFilters(allItems);
-    const shouldShow = categoryMatches && (!q || filtered.length > 0);
+    // Find the wrapping <section> element for show/hide
+    const sectionEl = section.closest("section");
+    const shouldShow = activeCategory === "all" || activeCategory === section.dataset.cat;
+    if (sectionEl) sectionEl.style.display = shouldShow ? "" : "none";
 
     if (shouldShow) {
-      gridEl.innerHTML = filtered.length
-        ? filtered.map(renderProductCard).join("")
-        : `<div class="no-results">No matches in this category.</div>`;
-      visibleCount += filtered.length;
-
-      const countEl = sectionEl.querySelector(".count");
+      section.innerHTML = items.map(renderFn).join("");
+      // Update count in section header
+      const countEl = sectionEl && sectionEl.querySelector(".count");
       if (countEl) {
-        const avail = filtered.filter(i => !i.sold).length;
-        countEl.textContent = q || maxPriceFilter !== null
-          ? `${filtered.length} match${filtered.length === 1 ? "" : "es"}`
-          : `${avail} of ${allItems.length} available`;
+        const avail = items.filter(i => !i.sold).length;
+        countEl.textContent = `${avail} of ${items.length} available`;
       }
     }
+  };
 
-    sectionEl.style.display = shouldShow ? "" : "none";
-    const score = sectionMatchScore(meta, q);
-    return { ...meta, sectionEl, score, shouldShow };
-  });
-
-  // Reorder sections by relevance when searching, so e.g. "mac" brings
-  // Laptops to the top because MacBook lives there — even though the
-  // Laptops section is otherwise last in the page.
-  const root = document.getElementById("sectionsRoot");
-  if (root) {
-    const ordered = q
-      ? [...ranked].sort((a, b) => b.score - a.score)
-      : ranked;
-    ordered.forEach(meta => {
-      if (meta.sectionEl) root.appendChild(meta.sectionEl);
-    });
-    // Re-stripe alternating backgrounds based on final visual order
-    let stripeIndex = 0;
-    ordered.forEach(meta => {
-      if (!meta.sectionEl || !meta.shouldShow) return;
-      meta.sectionEl.classList.remove("bg-soft", "bg-secondary");
-      meta.sectionEl.classList.add(stripeIndex % 2 === 0 ? "bg-soft" : "bg-secondary");
-      stripeIndex++;
-    });
-  }
-
-  // Global "nothing found anywhere" message
-  let globalEmpty = document.getElementById("globalNoResults");
-  if (q && visibleCount === 0) {
-    const safeQuery = searchQuery.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-    if (!globalEmpty) {
-      globalEmpty = document.createElement("div");
-      globalEmpty.id = "globalNoResults";
-      globalEmpty.className = "container";
-      root.parentNode.insertBefore(globalEmpty, root);
-    }
-    globalEmpty.innerHTML = `<div class="no-results" style="padding:60px 20px;">No listings match "${safeQuery}".</div>`;
-  } else if (globalEmpty) {
-    globalEmpty.remove();
-  }
+  show("switchList",  INVENTORY.switches, renderProductCard);
+  show("gamesGrid",   INVENTORY.games,    renderProductCard);
+  show("consoleList", INVENTORY.consoles, renderProductCard);
+  show("laptopList",  INVENTORY.laptops,  renderProductCard);
 }
-
-// ---- side menu ----
-
-function openSideMenu() {
-  document.getElementById("sideMenu").classList.add("open");
-  document.getElementById("sideMenuOverlay").classList.add("open");
-}
-function closeSideMenu() {
-  document.getElementById("sideMenu").classList.remove("open");
-  document.getElementById("sideMenuOverlay").classList.remove("open");
-}
-
 
 // ============================================================
 // PRODUCT DETAIL PAGE LOGIC

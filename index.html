@@ -81,28 +81,6 @@
   }
 
   /* ============================================================
-     PRESS / POP MICRO-INTERACTION
-     Applied to interactive elements so they give tactile feedback.
-     ============================================================ */
-  .btn, .cat-tab, .card, .hamburger-btn, .filter-btn,
-  .drawer-close, .side-menu-close, .side-menu-link,
-  .admin-item-toggle, .admin-toggle, .cart-line-remove,
-  .modal-close-row button, .ctrl-no-thanks{
-    transition:transform 120ms ease, background-color 150ms, color 150ms, border-color 150ms, box-shadow 150ms;
-  }
-  .btn:active, .filter-btn:active, .hamburger-btn:active,
-  .admin-item-toggle:active{
-    transform:scale(0.94);
-  }
-  .card{transition:transform 150ms ease, box-shadow 150ms;}
-  .card:active{transform:scale(0.985);}
-  @keyframes pop-in{
-    0%{transform:scale(0.9); opacity:0;}
-    100%{transform:scale(1); opacity:1;}
-  }
-  .card{animation:pop-in 280ms ease both;}
-
-  /* ============================================================
      TYPOGRAPHY
      ============================================================ */
   h1,h2,h3,h4,h5,h6{font-weight:600; color:var(--heading);}
@@ -159,195 +137,44 @@
   .topbar{
     position:relative; z-index:2;
     display:flex; align-items:center; justify-content:space-between;
-    padding:14px 0; gap:12px;
+    padding:14px 0; gap:16px;
   }
-  .topbar-left{display:flex; align-items:center; gap:10px; min-width:0;}
+  .brand-mark{display:flex; align-items:baseline; gap:8px;}
+  .brand-mark .name{font-size:20px; font-weight:700; color:var(--white); letter-spacing:-0.3px;}
+  .brand-mark .name .accent{color:var(--brand);}
+  .brand-mark .tagline{font-size:12px; color:var(--gray); display:none;}
+  @media(min-width:640px){.brand-mark .tagline{display:inline;}}
+  .header-actions{display:flex; align-items:center; gap:8px;}
 
-  .hamburger-btn{
-    display:flex; align-items:center; justify-content:center;
-    width:38px; height:38px; flex-shrink:0;
+  /* ============================================================
+     CATEGORY NAV TABS
+     ============================================================ */
+  .cat-nav{
+    position:relative; z-index:2;
+    display:flex;
+    gap:4px;
+    flex-wrap:wrap;
+    padding:0 0 20px;
+  }
+  .cat-tab{
     background:rgba(255,255,255,0.07);
     border:1px solid rgba(255,255,255,0.15);
-    border-radius:var(--radius-base);
-    cursor:pointer;
-    color:var(--white);
-    transition:background 150ms, transform 120ms;
-  }
-  .hamburger-btn:hover{background:rgba(255,255,255,0.15);}
-  .hamburger-btn:active{transform:scale(0.92);}
-  .hamburger-btn svg{width:20px; height:20px;}
-
-  .brand-mark{display:flex; align-items:baseline; gap:8px; min-width:0;}
-  .brand-mark .logo-img{
-    height:34px; width:auto; display:block;
-  }
-  @media(min-width:640px){.brand-mark .logo-img{height:42px;}}
-  @media(min-width:1024px){.brand-mark .logo-img{height:48px;}}
-  .brand-mark .tagline{font-size:12px; color:var(--gray); display:none;}
-  @media(min-width:768px){.brand-mark .tagline{display:inline;}}
-  .header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0;}
-
-  /* ============================================================
-     SEARCH + FILTER BAR
-     ============================================================ */
-  .search-bar{
-    position:relative; z-index:2;
-    display:flex; align-items:stretch; gap:8px;
-    padding:0 0 16px;
-  }
-  .search-field{
-    position:relative; flex:1; min-width:0;
-  }
-  .search-field input{
-    width:100%;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:var(--radius-base);
-    color:var(--white);
-    font-family:"Open Sans", sans-serif;
-    font-size:14px;
-    padding:10px 14px 10px 38px;
-    transition:background 150ms, border-color 150ms;
-  }
-  .search-field input::placeholder{color:var(--gray);}
-  .search-field input:focus{outline:none; background:rgba(255,255,255,0.13); border-color:var(--brand);}
-  .search-field svg{
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    width:16px; height:16px; color:var(--gray); pointer-events:none;
-  }
-  .filter-btn{
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:var(--radius-base);
-    color:var(--white);
-    font-family:"Open Sans", sans-serif;
-    font-size:13px; font-weight:500;
-    padding:0 14px;
-    cursor:pointer;
-    white-space:nowrap;
-    transition:background 150ms, border-color 150ms, transform 120ms;
-  }
-  .filter-btn svg{width:15px; height:15px;}
-  .filter-btn:hover{background:rgba(255,255,255,0.15);}
-  .filter-btn:active{transform:scale(0.95);}
-  .filter-btn.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
-
-  .filter-panel{
-    position:relative; z-index:2;
-    max-height:0; overflow:hidden;
-    transition:max-height 250ms ease, opacity 200ms ease, margin-bottom 250ms ease;
-    opacity:0;
-    margin-bottom:0;
-  }
-  .filter-panel.open{max-height:160px; opacity:1; margin-bottom:16px;}
-  .filter-panel-inner{
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:var(--radius-base);
-    padding:14px 16px;
-  }
-  .filter-panel-head{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:10px;
-  }
-  .filter-panel-head span{font-size:12px; font-weight:600; color:var(--white);}
-  .filter-range-val{font-size:13px; font-weight:700; color:var(--brand);}
-  .filter-slider{
-    width:100%; height:4px;
-    -webkit-appearance:none; appearance:none;
-    background:rgba(255,255,255,0.2);
-    border-radius:var(--radius-full);
-    outline:none;
-    margin:10px 0 4px;
-  }
-  .filter-slider::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:18px; height:18px;
-    background:var(--brand);
-    border-radius:50%;
-    cursor:pointer;
-    border:2px solid var(--dark);
-    transition:transform 120ms;
-  }
-  .filter-slider::-webkit-slider-thumb:active{transform:scale(1.2);}
-  .filter-slider::-moz-range-thumb{
-    width:18px; height:18px;
-    background:var(--brand);
-    border-radius:50%;
-    cursor:pointer;
-    border:2px solid var(--dark);
-  }
-  .filter-panel-foot{
-    display:flex; justify-content:flex-end; gap:8px; margin-top:10px;
-  }
-  .filter-clear-btn{
-    background:none; border:none; color:var(--gray);
-    font-size:12px; cursor:pointer; padding:6px 8px;
-  }
-  .filter-clear-btn:hover{color:var(--white); text-decoration:underline;}
-
-  .no-results{
-    grid-column:1/-1;
-    text-align:center; padding:40px 20px;
-    color:var(--body-subtle); font-size:14px;
-  }
-
-  /* ============================================================
-     SIDE MENU (HAMBURGER)
-     ============================================================ */
-  .side-menu-overlay{
-    position:fixed; inset:0; background:rgba(15,17,17,0.65);
-    z-index:190; display:none;
-  }
-  .side-menu-overlay.open{display:block;}
-  .side-menu{
-    position:fixed; top:0; left:0; height:100%;
-    width:min(300px,82%);
-    background:var(--dark);
-    border-right:1px solid rgba(255,255,255,0.1);
-    z-index:200;
-    transform:translateX(-100%);
-    transition:transform 250ms ease;
-    display:flex; flex-direction:column;
-  }
-  .side-menu.open{transform:translateX(0);}
-  .side-menu-head{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 20px;
-    border-bottom:1px solid rgba(255,255,255,0.1);
-  }
-  .side-menu-head .logo-img{height:30px; width:auto; display:block;}
-  .side-menu-close{
-    background:none; border:none; color:var(--gray);
-    font-size:22px; cursor:pointer; line-height:1;
-    width:32px; height:32px; border-radius:var(--radius-default);
-    display:flex; align-items:center; justify-content:center;
-    transition:background 150ms, color 150ms, transform 120ms;
-  }
-  .side-menu-close:hover{background:rgba(255,255,255,0.1); color:var(--white);}
-  .side-menu-close:active{transform:scale(0.9);}
-  .side-menu-body{padding:12px; flex:1; overflow-y:auto;}
-  .side-menu-link{
-    display:block; width:100%; text-align:left;
-    background:none; border:none;
     color:var(--gray);
     font-family:"Open Sans", sans-serif;
-    font-size:15px; font-weight:500;
-    padding:13px 14px;
-    border-radius:var(--radius-base);
+    font-size:13px;
+    font-weight:500;
+    padding:7px 14px;
+    border-radius:var(--radius-full);
     cursor:pointer;
-    transition:background 150ms, color 150ms, transform 120ms;
-    margin-bottom:2px;
+    transition:background 150ms, color 150ms, border-color 150ms;
+    white-space:nowrap;
   }
-  .side-menu-link:hover{background:rgba(255,255,255,0.08); color:var(--white);}
-  .side-menu-link:active{transform:scale(0.97);}
-  .side-menu-link.active{background:var(--brand); color:var(--dark-strong);}
-
-  /* ============================================================
-     CATEGORY NAV TABS (legacy — kept for reference, unused)
-     ============================================================ */
-  .cat-nav{display:none;}
+  .cat-tab:hover{background:rgba(255,255,255,0.13); color:var(--white);}
+  .cat-tab.active{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:var(--dark-strong);
+  }
 
   /* ============================================================
      BUTTONS
@@ -524,7 +351,7 @@
   /* ============================================================
      CART DRAWER
      ============================================================ */
-  .overlay{position:fixed; inset:0; background:rgba(10,11,11,0.72); z-index:90; display:none;}
+  .overlay{position:fixed; inset:0; background:rgba(15,17,17,0.5); z-index:90; display:none;}
   .overlay.open{display:block;}
   .drawer{
     position:fixed; top:0; right:0; height:100%;
@@ -686,14 +513,9 @@
   <div class="header-pattern" aria-hidden="true"></div>
   <div class="container">
     <div class="topbar">
-      <div class="topbar-left">
-        <button class="hamburger-btn" id="menuOpenBtn" aria-label="Open menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
-        <div class="brand-mark">
-          <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86">
-          <span class="tagline">Used gaming hardware · Beirut</span>
-        </div>
+      <div class="brand-mark">
+        <span class="name">STOCK<span class="accent">/86</span></span>
+        <span class="tagline">Used gaming hardware · Beirut</span>
       </div>
       <div class="header-actions">
         <button class="btn btn-base cart-btn btn-ghost" id="cartOpenBtn" aria-label="Open cart">
@@ -714,53 +536,19 @@
       </div>
     </div>
 
-    <!-- SEARCH + FILTER -->
-    <div class="search-bar">
-      <div class="search-field">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Search listings — e.g. Switch, MacBook, ROG Ally">
-      </div>
-      <button class="filter-btn" id="filterToggleBtn" aria-label="Filter by price">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
-        Filter
-      </button>
-    </div>
-    <div class="filter-panel" id="filterPanel">
-      <div class="filter-panel-inner">
-        <div class="filter-panel-head">
-          <span>Max price</span>
-          <span class="filter-range-val" id="filterRangeVal">$450</span>
-        </div>
-        <input type="range" class="filter-slider" id="filterSlider" min="10" max="450" step="10" value="450">
-        <div class="filter-panel-foot">
-          <button class="filter-clear-btn" id="filterClearBtn">Clear filter</button>
-        </div>
-      </div>
-    </div>
+    <!-- CATEGORY TABS -->
+    <nav class="cat-nav" aria-label="Filter by category">
+      <button class="cat-tab active" data-cat="all"      onclick="setCategory('all')">All listings</button>
+      <button class="cat-tab"        data-cat="switches"  onclick="setCategory('switches')">Nintendo Switch</button>
+      <button class="cat-tab"        data-cat="games"     onclick="setCategory('games')">Switch Games</button>
+      <button class="cat-tab"        data-cat="consoles"  onclick="setCategory('consoles')">Handhelds &amp; Consoles</button>
+      <button class="cat-tab"        data-cat="laptops"   onclick="setCategory('laptops')">Laptops</button>
+    </nav>
   </div>
 </header>
 
-<!-- SIDE MENU -->
-<div class="side-menu-overlay" id="sideMenuOverlay"></div>
-<nav class="side-menu" id="sideMenu" aria-label="Categories">
-  <div class="side-menu-head">
-    <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86">
-    <button class="side-menu-close" id="sideMenuCloseBtn" aria-label="Close menu">&times;</button>
-  </div>
-  <div class="side-menu-body">
-    <button class="side-menu-link active" data-cat="all"      onclick="setCategory('all')">All listings</button>
-    <button class="side-menu-link"        data-cat="switches" onclick="setCategory('switches')">Nintendo Switch</button>
-    <button class="side-menu-link"        data-cat="games"    onclick="setCategory('games')">Switch Games</button>
-    <button class="side-menu-link"        data-cat="consoles" onclick="setCategory('consoles')">Handhelds &amp; Consoles</button>
-    <button class="side-menu-link"        data-cat="laptops"  onclick="setCategory('laptops')">Laptops</button>
-  </div>
-</nav>
-
-<!-- PRODUCT SECTIONS (order can be re-ranked by search relevance) -->
-<div id="sectionsRoot">
-
 <!-- NINTENDO SWITCH -->
-<section class="section bg-soft" id="sectionSwitches" data-cat="switches">
+<section class="section bg-soft">
   <div class="container">
     <div class="section-head">
       <h2>Nintendo Switch</h2>
@@ -771,7 +559,7 @@
 </section>
 
 <!-- SWITCH GAMES -->
-<section class="section bg-secondary" id="sectionGames" data-cat="games">
+<section class="section bg-secondary">
   <div class="container">
     <div class="section-head">
       <h2>Switch Games</h2>
@@ -782,7 +570,7 @@
 </section>
 
 <!-- HANDHELDS / CONSOLES -->
-<section class="section bg-soft" id="sectionConsoles" data-cat="consoles">
+<section class="section bg-soft">
   <div class="container">
     <div class="section-head">
       <h2>Handhelds &amp; Consoles</h2>
@@ -793,7 +581,7 @@
 </section>
 
 <!-- LAPTOPS -->
-<section class="section bg-secondary" id="sectionLaptops" data-cat="laptops">
+<section class="section bg-secondary">
   <div class="container">
     <div class="section-head">
       <h2>Laptops</h2>
@@ -802,8 +590,6 @@
     <div class="product-grid" id="laptopList" data-cat="laptops"></div>
   </div>
 </section>
-
-</div>
 
 <!-- PAYMENT / DELIVERY INFO -->
 <section class="section bg-soft">
