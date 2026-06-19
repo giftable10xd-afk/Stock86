@@ -86,8 +86,12 @@ function renderProductCard(item) {
   const soldClass = item.sold ? "is-sold" : "";
   const icon = ICONS[item.icon] || ICONS.console;
 
+  const imgStyle = item.sold
+    ? `width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(100%);`
+    : `width:100%;height:100%;object-fit:cover;display:block;`;
+
   const mediaHtml = item.image
-    ? `<img src="${item.image}" alt="${item.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">`
+    ? `<img src="${item.image}" alt="${item.name}" loading="lazy" style="${imgStyle}" onerror="this.style.display='none'">`
     : icon;
 
   let priceActionHtml = "";
@@ -116,7 +120,7 @@ function renderProductCard(item) {
       <a class="card-media-link" href="product.html?id=${item.id}" aria-label="View ${item.name}">
         <div class="card-media ${item.image ? 'has-photo' : ''}">
           ${mediaHtml}
-          ${item.sold ? `<div class="sold-overlay"><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
+          ${item.sold ? `<div class="sold-overlay"><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"><line x1="0" y1="0" x2="100" y2="100" stroke="#CC0C39" stroke-width="3" vector-effect="non-scaling-stroke"/><line x1="100" y1="0" x2="0" y2="100" stroke="#CC0C39" stroke-width="3" vector-effect="non-scaling-stroke"/></svg><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
         </div>
       </a>
       <div class="card-body">
@@ -676,8 +680,12 @@ function renderProductPage() {
   document.title = `${item.name} — STOCK/86`;
 
   const icon = ICONS[item.icon] || ICONS.console;
+  const detailImgStyle = item.sold
+    ? `width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(100%);`
+    : `width:100%;height:100%;object-fit:cover;display:block;`;
+
   const mediaHtml = item.image
-    ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">`
+    ? `<img src="${item.image}" alt="${item.name}" style="${detailImgStyle}" onerror="this.style.display='none'">`
     : icon;
 
   const specsHtml = (item.specs || [])
@@ -719,7 +727,7 @@ function renderProductPage() {
     <div class="product-detail-grid">
       <div class="product-detail-media ${item.image ? 'has-photo' : ''} ${item.sold ? 'is-sold' : ''}">
         ${mediaHtml}
-        ${item.sold ? `<div class="sold-overlay"><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
+        ${item.sold ? `<div class="sold-overlay"><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"><line x1="0" y1="0" x2="100" y2="100" stroke="#CC0C39" stroke-width="3" vector-effect="non-scaling-stroke"/><line x1="100" y1="0" x2="0" y2="100" stroke="#CC0C39" stroke-width="3" vector-effect="non-scaling-stroke"/></svg><span class="badge badge-lg badge-danger">Sold</span></div>` : ""}
       </div>
       <div class="product-detail-info">
         <span class="card-sku">${item.id}</span>
