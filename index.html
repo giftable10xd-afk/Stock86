@@ -417,21 +417,50 @@
   .nav-sub-btn:active{transform:scale(0.97);}
   .nav-sub-btn.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
 
-  /* ============================================================
-     FILTER & SORT DRAWER (slides from LEFT, over content)
-     ============================================================ */
-  .filter-drawer{
-    position:fixed; top:0; left:0; bottom:0;
-    width:min(340px,88vw);
-    background:var(--white);
-    z-index:230;
-    transform:translateX(-100%);
-    transition:transform 280ms cubic-bezier(0.215,0.61,0.355,1);
-    display:flex; flex-direction:column;
-    overflow:hidden;
-    box-shadow:var(--shadow-lg);
+  /* Contact (WhatsApp) — pill shape, set apart from rectangular category buttons */
+  .nav-divider{
+    height:1px;
+    background:rgba(255,255,255,0.1);
+    margin:10px 2px 12px;
+    flex-shrink:0;
   }
-  .filter-drawer.open{ transform:translateX(0); }
+  .nav-contact-btn{
+    display:flex; align-items:center; gap:10px;
+    width:100%;
+    background:rgba(37,211,102,0.12);
+    border:1px solid rgba(37,211,102,0.4);
+    color:var(--white);
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:14px; font-weight:500;
+    padding:11px 16px;
+    border-radius:var(--radius-full);
+    cursor:pointer;
+    text-align:left;
+    text-decoration:none;
+    transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
+  }
+  .nav-contact-btn:hover{background:rgba(37,211,102,0.22); border-color:#25D366;}
+  .nav-contact-btn:active{transform:scale(0.97);}
+  .nav-contact-btn img{
+    width:20px; height:20px; flex-shrink:0; display:block;
+  }
+
+  /* ============================================================
+     FILTER & SORT PANEL — white dropdown under the count bar,
+     sits in normal flow right above the product sections
+     ============================================================ */
+  .filter-panel-wrap{
+    background:var(--white);
+    overflow:hidden;
+    max-height:0;
+    opacity:0;
+    transition:max-height 320ms cubic-bezier(0.215,0.61,0.355,1),
+                opacity 260ms cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .filter-panel-wrap.open{
+    max-height:600px;
+    opacity:1;
+  }
 
   .filter-drawer-head{
     position:relative;
@@ -453,8 +482,7 @@
   .filter-drawer-close-btn:active{ transform:translateY(-50%) scale(0.9); }
 
   .filter-drawer-body{
-    flex:1; overflow-y:auto;
-    padding:8px 0 24px;
+    padding:8px 0 12px;
   }
 
   .filter-section{ border-bottom:1px solid var(--border-light); }
@@ -660,6 +688,8 @@
   .badge-success{background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);}
   .badge-dark{background:var(--dark); border-color:transparent; color:var(--white);}
   .badge-logo{height:14px; width:auto; display:block;}
+  .badge-logo-whish{height:14px; width:auto; display:block; position:relative; top:2px;}
+  .badge-logo-whatsapp{height:18px; width:auto; display:block;}
 
   /* ============================================================
      CONDITION BADGE (on cards and detail page)
@@ -1119,106 +1149,18 @@
         Phones
       </button>
     </div>
+
+    <div class="nav-divider"></div>
+
+    <!-- Contact (WhatsApp) -->
+    <div class="nav-item">
+      <a class="nav-contact-btn" href="https://wa.me/96176553829?text=Hi%20STOCK%2F86%2C%20I%20have%20an%20inquiry%20about%20your%20listings." target="_blank" rel="noopener" aria-label="Contact us on WhatsApp">
+        <img src="assets/whatsapp-logo.png" alt="" onerror="this.style.display='none'">
+        Contact us
+      </a>
+    </div>
   </div>
 </nav>
-
-<!-- FILTER & SORT BACKDROP -->
-<div class="nav-backdrop" id="filterBackdrop"></div>
-
-<!-- FILTER & SORT DRAWER (slides from LEFT) -->
-<aside class="filter-drawer" id="filterDrawer" aria-label="Filter and sort" role="dialog">
-  <div class="filter-drawer-head">
-    <div class="filter-drawer-head-text">
-      <h3>Filter and sort</h3>
-      <span class="filter-drawer-count" id="filterDrawerCount"></span>
-    </div>
-    <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter and sort">&times;</button>
-  </div>
-
-  <div class="filter-drawer-body">
-
-    <!-- AVAILABILITY -->
-    <div class="filter-section">
-      <button class="filter-section-toggle" id="toggleAvailability" aria-expanded="false">
-        <span>Availability</span>
-        <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="filter-section-body" id="bodyAvailability">
-        <label class="filter-radio-row">
-          <input type="radio" name="availability" value="all" checked>
-          <span class="filter-radio-dot"></span>
-          <span>All</span>
-        </label>
-        <label class="filter-radio-row">
-          <input type="radio" name="availability" value="in-stock">
-          <span class="filter-radio-dot"></span>
-          <span>In stock</span>
-        </label>
-        <label class="filter-radio-row">
-          <input type="radio" name="availability" value="out-of-stock">
-          <span class="filter-radio-dot"></span>
-          <span>Out of stock</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- PRICE -->
-    <div class="filter-section">
-      <button class="filter-section-toggle" id="togglePrice" aria-expanded="false">
-        <span>Price</span>
-        <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="filter-section-body" id="bodyPrice">
-        <div class="price-input-row">
-          <div class="price-input-wrap">
-            <span class="price-input-currency">$</span>
-            <input type="number" inputmode="numeric" min="0" class="price-input" id="priceFrom" placeholder="From">
-          </div>
-          <span class="price-input-sep">–</span>
-          <div class="price-input-wrap">
-            <span class="price-input-currency">$</span>
-            <input type="number" inputmode="numeric" min="0" class="price-input" id="priceTo" placeholder="To">
-          </div>
-        </div>
-        <div class="price-actions-row">
-          <button class="price-clear-btn" id="priceClearBtn">Clear</button>
-          <button class="price-apply-btn" id="priceApplyBtn">Apply</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SORT BY -->
-    <div class="filter-section">
-      <button class="filter-section-toggle" id="toggleSort" aria-expanded="false">
-        <span>Sort by</span>
-        <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="filter-section-body" id="bodySort">
-        <label class="filter-radio-row">
-          <input type="radio" name="sortby" value="price-asc">
-          <span class="filter-radio-dot"></span>
-          <span>Price, low to high</span>
-        </label>
-        <label class="filter-radio-row">
-          <input type="radio" name="sortby" value="price-desc">
-          <span class="filter-radio-dot"></span>
-          <span>Price, high to low</span>
-        </label>
-        <label class="filter-radio-row">
-          <input type="radio" name="sortby" value="date-new">
-          <span class="filter-radio-dot"></span>
-          <span>Date, new to old</span>
-        </label>
-        <label class="filter-radio-row">
-          <input type="radio" name="sortby" value="date-old">
-          <span class="filter-radio-dot"></span>
-          <span>Date, old to new</span>
-        </label>
-      </div>
-    </div>
-
-  </div>
-</aside>
 
 <header class="header">
   <div class="container">
@@ -1279,11 +1221,11 @@
           💵 Cash on Delivery
         </span>
         <span class="badge badge-lg badge-brand">
-          <img class="badge-logo" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
+          <img class="badge-logo-whish" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
           Whish Money
         </span>
         <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">
-          <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
+          <img class="badge-logo-whatsapp" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
           Orders confirmed on WhatsApp
         </span>
         <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $5 — all of Lebanon</span>
@@ -1292,6 +1234,73 @@
 
   </div>
 </header>
+
+<!-- FILTER & SORT PANEL — white dropdown, anchored under the count bar, above the product sections -->
+<div class="filter-panel-wrap" id="filterPanelWrap">
+  <div class="container">
+    <div class="filter-drawer-head">
+      <div class="filter-drawer-head-text">
+        <h3>Filter and sort</h3>
+        <span class="filter-drawer-count" id="filterDrawerCount"></span>
+      </div>
+      <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter and sort">&times;</button>
+    </div>
+
+    <div class="filter-drawer-body">
+
+      <!-- AVAILABILITY -->
+      <div class="filter-section">
+        <button class="filter-section-toggle" id="toggleAvailability" aria-expanded="false">
+          <span>Availability</span>
+          <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="filter-section-body" id="bodyAvailability">
+          <label class="filter-radio-row">
+            <input type="radio" name="availability" value="all" checked>
+            <span class="filter-radio-dot"></span>
+            <span>All</span>
+          </label>
+          <label class="filter-radio-row">
+            <input type="radio" name="availability" value="in-stock">
+            <span class="filter-radio-dot"></span>
+            <span>In stock</span>
+          </label>
+          <label class="filter-radio-row">
+            <input type="radio" name="availability" value="out-of-stock">
+            <span class="filter-radio-dot"></span>
+            <span>Out of stock</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- PRICE -->
+      <div class="filter-section">
+        <button class="filter-section-toggle" id="togglePrice" aria-expanded="false">
+          <span>Price</span>
+          <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="filter-section-body" id="bodyPrice">
+          <div class="price-input-row">
+            <div class="price-input-wrap">
+              <span class="price-input-currency">$</span>
+              <input type="number" inputmode="numeric" min="0" class="price-input" id="priceFrom" placeholder="From">
+            </div>
+            <span class="price-input-sep">–</span>
+            <div class="price-input-wrap">
+              <span class="price-input-currency">$</span>
+              <input type="number" inputmode="numeric" min="0" class="price-input" id="priceTo" placeholder="To">
+            </div>
+          </div>
+          <div class="price-actions-row">
+            <button class="price-clear-btn" id="priceClearBtn">Clear</button>
+            <button class="price-apply-btn" id="priceApplyBtn">Apply</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <main>
   <!-- NINTENDO SWITCH -->
@@ -1355,14 +1364,15 @@
     <div class="info-grid">
       <div class="info-card">
         <span class="badge badge-lg badge-brand">
-          <img class="badge-logo" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
+          <span aria-hidden="true">💵</span>
+          <img class="badge-logo-whish" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
           How payment works
         </span>
         <p>Cash on delivery or Whish Money — your choice at checkout. For Whish, scan the QR code, send the exact total, and attach the screenshot on WhatsApp. For COD, pay in cash when the order arrives.</p>
       </div>
       <div class="info-card">
         <span class="badge badge-lg badge-gray">
-          <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
+          <span aria-hidden="true">🚚</span>
           Delivery
         </span>
         <p>Flat <strong>$5 delivery fee</strong> anywhere in Lebanon, added automatically at checkout. Order is confirmed on WhatsApp before it ships.</p>
@@ -1629,25 +1639,25 @@
     closeNav();
   });
 
-  // ── Filter & Sort drawer (LEFT side) ────────────────────────
-  const filterSortBtn    = document.getElementById("filterSortBtn");
-  const filterDrawer     = document.getElementById("filterDrawer");
-  const filterBackdrop   = document.getElementById("filterBackdrop");
-  const filterDrawerClose= document.getElementById("filterDrawerClose");
+  // ── Filter & Sort panel (white dropdown, in normal page flow) ──
+  const filterSortBtn     = document.getElementById("filterSortBtn");
+  const filterPanelWrap   = document.getElementById("filterPanelWrap");
+  const filterDrawerClose = document.getElementById("filterDrawerClose");
 
   function openFilterDrawer() {
-    filterDrawer.classList.add("open");
-    filterBackdrop.classList.add("open");
+    filterPanelWrap.classList.add("open");
     filterSortBtn.setAttribute("aria-expanded", "true");
   }
   function closeFilterDrawer() {
-    filterDrawer.classList.remove("open");
-    filterBackdrop.classList.remove("open");
+    filterPanelWrap.classList.remove("open");
     filterSortBtn.setAttribute("aria-expanded", "false");
   }
-  filterSortBtn.addEventListener("click", openFilterDrawer);
+  function toggleFilterDrawer() {
+    if (filterPanelWrap.classList.contains("open")) closeFilterDrawer();
+    else openFilterDrawer();
+  }
+  filterSortBtn.addEventListener("click", toggleFilterDrawer);
   filterDrawerClose.addEventListener("click", closeFilterDrawer);
-  filterBackdrop.addEventListener("click", closeFilterDrawer);
 
   // ── Accordion sections inside the drawer ────────────────────
   function wireAccordion(toggleId, bodyId) {
@@ -1660,7 +1670,6 @@
   }
   wireAccordion("toggleAvailability", "bodyAvailability");
   wireAccordion("togglePrice",        "bodyPrice");
-  wireAccordion("toggleSort",         "bodySort");
 
   // ── Availability filter ──────────────────────────────────────
   let availabilityFilter = "all"; // all | in-stock | out-of-stock
@@ -1694,21 +1703,11 @@
     renderAll();
   });
 
-  // ── Sort by ──────────────────────────────────────────────────
-  let sortBy = null; // price-asc | price-desc | date-new | date-old
-  document.querySelectorAll('input[name="sortby"]').forEach(radio => {
-    radio.addEventListener("change", () => {
-      sortBy = radio.value;
-      renderAll();
-    });
-  });
-
   // Expose filter values for app.js renderAll
   function getSearchQuery()      { var el = document.getElementById("searchInput"); return el ? el.value.trim().toLowerCase() : ""; }
   function getMaxPrice()         { return Infinity; } // legacy hook kept for compatibility, superseded by getPriceRange
   function getPriceRange()       { return { from: appliedPriceFrom, to: appliedPriceTo }; }
   function getAvailabilityFilter(){ return availabilityFilter; }
-  function getSortBy()           { return sortBy; }
 
   // ── Search (header input + nav drawer input, kept in sync) ──
   const searchInput    = document.getElementById("searchInput");
@@ -1730,11 +1729,22 @@
 
   // ── Page transition loader ──────────────────────────────────
   const pageLoader = document.getElementById("pageLoader");
+  let loaderHidden = false;
   function hidePageLoader() {
-    if (!pageLoader) return;
+    if (!pageLoader || loaderHidden) return;
+    loaderHidden = true;
     pageLoader.classList.add("fade-out");
     setTimeout(() => { pageLoader.style.display = "none"; }, 450);
   }
+  // If the page already finished loading by the time this script runs,
+  // 'load' will never fire again — so check readyState directly too.
+  if (document.readyState === "complete") {
+    requestAnimationFrame(() => requestAnimationFrame(hidePageLoader));
+  } else {
+    window.addEventListener("load", hidePageLoader);
+  }
+  // Failsafe: never let the loader hang forever
+  setTimeout(hidePageLoader, 1200);
 
   // ── Boot ───────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
@@ -1743,10 +1753,6 @@
     updateAddToCartButtons();
     updateNavActive("all");
   });
-
-  window.addEventListener("load", hidePageLoader);
-  // Failsafe: never let the loader hang forever
-  setTimeout(hidePageLoader, 2500);
 
   // Re-sync cart when user navigates back from product.html (browser back button restores from cache)
   window.addEventListener("pageshow", (e) => {

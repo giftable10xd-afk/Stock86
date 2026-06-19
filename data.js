@@ -187,8 +187,8 @@ const INVENTORY = {
       sold: false,
       icon: "phone",
       image: "assets/oneplus13r.jpg",
-      description: "OnePlus 13R in like-new condition. Snapdragon 8 Gen 2, 16GB RAM, 256GB storage. Smooth 120Hz AMOLED display, 5500mAh battery with 80W SUPERVOOC fast charging. All original accessories included.",
-      specs: ["256GB storage", "16GB RAM", "Snapdragon 8 Gen 2", "120Hz AMOLED", "80W SUPERVOOC charging", "All accessories included"]
+      description: "OnePlus 13R in like-new condition. Snapdragon 8 Gen 3, 16GB RAM, 256GB storage. Smooth 120Hz AMOLED display, 5500mAh battery with 80W SUPERVOOC fast charging. All original accessories included.",
+      specs: ["256GB storage", "16GB RAM", "Snapdragon 8 Gen 3", "120Hz AMOLED", "80W SUPERVOOC charging", "All accessories included"]
     }
   ],
 

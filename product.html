@@ -191,6 +191,8 @@
     position:absolute; inset:0; background:rgba(255,255,255,0.55);
     display:flex; align-items:center; justify-content:center;
   }
+  .product-detail-media.is-sold .sold-overlay svg{ z-index:1; }
+  .product-detail-media.is-sold .sold-overlay .badge{ z-index:2; position:relative; }
 
   .product-detail-info{display:flex; flex-direction:column; gap:10px;}
 
@@ -717,13 +719,19 @@
 
   // ── Page transition loader ──────────────────────────────────
   const pageLoader = document.getElementById("pageLoader");
+  let loaderHidden = false;
   function hidePageLoader() {
-    if (!pageLoader) return;
+    if (!pageLoader || loaderHidden) return;
+    loaderHidden = true;
     pageLoader.classList.add("fade-out");
     setTimeout(() => { pageLoader.style.display = "none"; }, 450);
   }
-  window.addEventListener("load", hidePageLoader);
-  setTimeout(hidePageLoader, 2500);
+  if (document.readyState === "complete") {
+    requestAnimationFrame(() => requestAnimationFrame(hidePageLoader));
+  } else {
+    window.addEventListener("load", hidePageLoader);
+  }
+  setTimeout(hidePageLoader, 1200);
   window.addEventListener("pageshow", hidePageLoader);
 </script>
 </body>

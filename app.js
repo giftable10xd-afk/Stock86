@@ -575,7 +575,6 @@ function renderAll() {
   const query    = (typeof getSearchQuery === "function") ? getSearchQuery() : "";
   const priceRange = (typeof getPriceRange === "function") ? getPriceRange() : { from: null, to: null };
   const availability = (typeof getAvailabilityFilter === "function") ? getAvailabilityFilter() : "all";
-  const sortBy = (typeof getSortBy === "function") ? getSortBy() : null;
 
   const SECTIONS = [
     { key: "switches", items: INVENTORY.switches,  gridId: "switchList",  sectionId: "section-switches", renderFn: renderProductCard },
@@ -617,18 +616,6 @@ function renderAll() {
     }
   }
 
-  function sortItems(items) {
-    if (!sortBy) return items;
-    const sorted = [...items];
-    if (sortBy === "price-asc")  sorted.sort((a, b) => a.price - b.price);
-    if (sortBy === "price-desc") sorted.sort((a, b) => b.price - a.price);
-    // No dateAdded field in data.js yet — use original listing order as a proxy
-    // (items later in the array are assumed to be added more recently).
-    if (sortBy === "date-new")   sorted.reverse();
-    if (sortBy === "date-old")   { /* original order already old-to-new */ }
-    return sorted;
-  }
-
   let grandTotal = 0;
 
   orderedSections.forEach(sec => {
@@ -652,7 +639,7 @@ function renderAll() {
       return matchPrice && matchAvail && matchSearch;
     });
 
-    filtered = sortItems(filtered);
+    // (no sorting — sort feature removed)
 
     if (filtered.length === 0 && (query || availability !== "all" || priceRange.from != null || priceRange.to != null)) {
       if (sectionEl) sectionEl.style.display = "none";
