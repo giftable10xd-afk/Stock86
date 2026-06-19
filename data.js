@@ -126,8 +126,8 @@ const INVENTORY = {
       sold: false,
       icon: "handheld",
       image: "assets/rogally.jpg",
-      description: "7-inch 120Hz touchscreen, AMD Z1 Extreme APU, runs Windows 11 with a built-in kickstand.",
-      specs: ["16GB RAM / 512GB", "7\" 120Hz touchscreen", "Original box included", "65W charger + manual"]
+      description: "7-inch 120Hz touchscreen, AMD Z1 Extreme APU, runs Windows 11 with a built-in kickstand. No original box, comes with a carrying bag.",
+      specs: ["16GB RAM / 512GB", "7\" 120Hz touchscreen", "No original box", "Carrying bag included", "65W charger + manual"]
     },
     {
       id: "HC-03",
