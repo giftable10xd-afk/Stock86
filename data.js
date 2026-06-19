@@ -17,7 +17,7 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switchscratched.jpg",
-      description: "Modded Nintendo Switch with 512GB of storage. Comes complete with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a[...]
+      description: "Modded Nintendo Switch with 512GB of storage. Comes complete with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
       specs: ["512GB modded", "Dock + all accessories", "AC charger included", "Case included", "Free bag — gift"],
       hasControllerAddon: true
     },
@@ -29,7 +29,7 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switchlikenewmodded.jpg",
-      description: "Modded Nintendo Switch with 256GB of storage. Comes complete with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a[...]
+      description: "Modded Nintendo Switch with 256GB of storage. Comes complete with all original accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag as a gift.",
       specs: ["256GB modded", "Dock + all accessories", "AC charger included", "Case included", "Free bag — gift"],
       hasControllerAddon: true
     },
@@ -41,7 +41,7 @@ const INVENTORY = {
       sold: false,
       icon: "switch",
       image: "assets/switcholed.jpg",
-      description: "Nintendo Switch OLED in like-new condition, with its original box and all accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carr[...]
+      description: "Nintendo Switch OLED in like-new condition, with its original box and all accessories: dock, Joy-Con controllers, Joy-Con grip, HDMI cable, and AC charger. Also includes a carrying case and a free bag. Comes preloaded with 25 games split across a 64GB memory card and a 256GB memory card.",
       specs: ["Original box", "Dock + all accessories", "AC charger included", "25 games preloaded", "64GB + 256GB cards (320GB)", "Free bag — gift"],
       hasControllerAddon: true
     }
@@ -131,17 +131,6 @@ const INVENTORY = {
     },
     {
       id: "HC-03",
-      name: "Lenovo Legion Go — Like New",
-      price: 500,
-      condition: "Like New",
-      sold: false,
-      icon: "handheld",
-      image: "assets/legiongolikenew.jpg",
-      description: "Lenovo Legion Go in like-new condition with original box. Features an 8-inch display and detachable controllers for versatile gaming.",
-      specs: ["Original box", "Detachable controllers", "8\" display", "Like new condition", "All accessories included"]
-    },
-    {
-      id: "HC-04",
       name: "Xbox One S — Fortnite Edition",
       price: 145,
       condition: "Excellent",
@@ -152,7 +141,7 @@ const INVENTORY = {
       specs: ["1TB storage", "Fortnite-themed design", "1 controller included", "No original box"]
     },
     {
-      id: "HC-05",
+      id: "HC-04",
       name: "Xbox Series S",
       price: 205,
       condition: "Like New",
