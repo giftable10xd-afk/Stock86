@@ -945,6 +945,13 @@
         Laptops
       </button>
     </div>
+    <!-- Phones -->
+    <div class="nav-item">
+      <button class="nav-btn" data-cat="phones" id="navPhones">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="18" r="1" fill="currentColor"/><line x1="9" y1="5" x2="15" y2="5"/></svg>
+        Phones
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -1066,6 +1073,16 @@
         <span class="count"></span>
       </div>
       <div class="product-grid" id="laptopList" data-cat="laptops"></div>
+    </div>
+  </section>
+
+  <section class="section bg-secondary" id="section-phones">
+    <div class="container">
+      <div class="section-head">
+        <h2>Phones</h2>
+        <span class="count"></span>
+      </div>
+      <div class="product-grid" id="phoneList" data-cat="phones"></div>
     </div>
   </section>
 </main>
@@ -1302,6 +1319,7 @@
     games:    document.getElementById("navGames"),
     consoles: document.getElementById("navConsoles"),
     laptops:  document.getElementById("navLaptops"),
+    phones:   document.getElementById("navPhones"),
   };
   const switchSub = document.getElementById("navSwitchSub");
 
@@ -1337,6 +1355,13 @@
 
   NAV_BUTTONS.laptops.addEventListener("click", () => {
     setCategory("laptops"); updateNavActive("laptops");
+    switchSub.classList.remove("open");
+    NAV_BUTTONS.switches.classList.remove("open");
+    closeNav();
+  });
+
+  NAV_BUTTONS.phones.addEventListener("click", () => {
+    setCategory("phones"); updateNavActive("phones");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
     closeNav();
