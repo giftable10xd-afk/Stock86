@@ -1017,7 +1017,7 @@
           <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
           Orders confirmed on WhatsApp
         </span>
-        <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $10 — all of Lebanon</span>
+        <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $5 — all of Lebanon</span>
       </div>
     </div>
 
@@ -1086,7 +1086,7 @@
           <img class="badge-logo" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
           Delivery
         </span>
-        <p>Flat <strong>$10 delivery fee</strong> anywhere in Lebanon, added automatically at checkout. Order is confirmed on WhatsApp before it ships.</p>
+        <p>Flat <strong>$5 delivery fee</strong> anywhere in Lebanon, added automatically at checkout. Order is confirmed on WhatsApp before it ships.</p>
       </div>
     </div>
   </div>
@@ -1130,7 +1130,7 @@
       <span>&nbsp;Whish Money</span>
     </div>
     <div class="drawer-row"><span>Subtotal</span><span id="subtotalVal">$0</span></div>
-    <div class="drawer-row"><span>Delivery (flat, Lebanon-wide)</span><span>$10</span></div>
+    <div class="drawer-row"><span>Delivery (flat, Lebanon-wide)</span><span>$5</span></div>
     <div class="drawer-row total"><span>Total</span><span id="totalVal">$0</span></div>
     <button class="btn btn-brand btn-lg" style="width:100%; margin-top:10px;" id="checkoutBtn">Proceed to payment</button>
   </div>
@@ -1251,9 +1251,10 @@
       <div class="ctrl-games-title">Add a game?</div>
       <div class="ctrl-games-subtitle">Pick any — each adds to your total.</div>
       <div id="controllerModalGamesSection"></div>
+      <button class="btn btn-brand btn-sm" id="controllerModalGamesConfirm" style="margin-top:10px; width:100%;" onclick="confirmControllerChoice('none')" disabled>Add to order</button>
     </div>
 
-    <button class="ctrl-no-thanks" onclick="confirmControllerChoice('none')">No thanks — just the console</button>
+    <button class="ctrl-no-thanks" onclick="confirmNoAddon()">No thanks — just the console</button>
   </div>
 </div>
 

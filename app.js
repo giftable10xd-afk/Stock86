@@ -207,12 +207,36 @@ function openSwitchAddonModal(item) {
     `).join("");
   }
 
+  updateGamesConfirmButton();
   document.getElementById("controllerModalOverlay").classList.add("open");
+}
+
+function updateGamesConfirmButton() {
+  const btn = document.getElementById("controllerModalGamesConfirm");
+  if (!btn) return;
+  const checkedCount = document.querySelectorAll(".game-addon-check:checked").length;
+  btn.disabled = checkedCount === 0;
+  btn.textContent = checkedCount === 0
+    ? "Add to order"
+    : `Add to order (${checkedCount} game${checkedCount > 1 ? "s" : ""})`;
 }
 
 function closeControllerModal() {
   document.getElementById("controllerModalOverlay").classList.remove("open");
   pendingSwitchId = null;
+}
+
+// Delegated listener so dynamically-injected game checkboxes stay in sync
+document.addEventListener("change", (e) => {
+  if (e.target.classList && e.target.classList.contains("game-addon-check")) {
+    updateGamesConfirmButton();
+  }
+});
+
+function confirmNoAddon() {
+  // Uncheck any selected games so "No thanks" never silently adds them
+  document.querySelectorAll(".game-addon-check:checked").forEach(cb => { cb.checked = false; });
+  confirmControllerChoice("none");
 }
 
 function confirmControllerChoice(type) {
