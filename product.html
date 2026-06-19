@@ -458,10 +458,38 @@
   .pay-method-tab.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
   .pay-method-tab:not(.active):hover{background:var(--neutral-tertiary-medium); border-color:var(--border-default-strong);}
 
+  /* ============================================================
+     PAGE TRANSITION LOADER
+     ============================================================ */
+  .page-loader{
+    position:fixed; inset:0;
+    background:var(--white);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity 420ms ease;
+  }
+  .page-loader img{
+    height:56px; width:auto;
+    animation:loaderPulse 1.1s ease-in-out infinite;
+  }
+  .page-loader.fade-out{
+    opacity:0;
+    pointer-events:none;
+  }
+  @keyframes loaderPulse{
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:0.6; transform:scale(0.94); }
+  }
+
   @media(prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
 </style>
 </head>
 <body>
+
+<!-- PAGE TRANSITION LOADER -->
+<div class="page-loader" id="pageLoader">
+  <img src="assets/stock86-logo.png" alt="" onerror="this.style.display='none'">
+</div>
 
 <header class="header">
   <div class="container">
@@ -686,6 +714,17 @@
     const item = findItemById(params.get("id"));
     if (item) document.getElementById("breadcrumbName").textContent = item.name;
   });
+
+  // ── Page transition loader ──────────────────────────────────
+  const pageLoader = document.getElementById("pageLoader");
+  function hidePageLoader() {
+    if (!pageLoader) return;
+    pageLoader.classList.add("fade-out");
+    setTimeout(() => { pageLoader.style.display = "none"; }, 450);
+  }
+  window.addEventListener("load", hidePageLoader);
+  setTimeout(hidePageLoader, 2500);
+  window.addEventListener("pageshow", hidePageLoader);
 </script>
 </body>
 </html>

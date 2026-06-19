@@ -573,7 +573,9 @@ function renderAll() {
   if (adminBar) adminBar.classList.toggle("open", adminMode);
 
   const query    = (typeof getSearchQuery === "function") ? getSearchQuery() : "";
-  const maxPrice = (typeof getMaxPrice    === "function") ? getMaxPrice()    : Infinity;
+  const priceRange = (typeof getPriceRange === "function") ? getPriceRange() : { from: null, to: null };
+  const availability = (typeof getAvailabilityFilter === "function") ? getAvailabilityFilter() : "all";
+  const sortBy = (typeof getSortBy === "function") ? getSortBy() : null;
 
   const SECTIONS = [
     { key: "switches", items: INVENTORY.switches,  gridId: "switchList",  sectionId: "section-switches", renderFn: renderProductCard },
@@ -615,6 +617,20 @@ function renderAll() {
     }
   }
 
+  function sortItems(items) {
+    if (!sortBy) return items;
+    const sorted = [...items];
+    if (sortBy === "price-asc")  sorted.sort((a, b) => a.price - b.price);
+    if (sortBy === "price-desc") sorted.sort((a, b) => b.price - a.price);
+    // No dateAdded field in data.js yet — use original listing order as a proxy
+    // (items later in the array are assumed to be added more recently).
+    if (sortBy === "date-new")   sorted.reverse();
+    if (sortBy === "date-old")   { /* original order already old-to-new */ }
+    return sorted;
+  }
+
+  let grandTotal = 0;
+
   orderedSections.forEach(sec => {
     const gridEl    = document.getElementById(sec.gridId);
     const sectionEl = document.getElementById(sec.sectionId);
@@ -625,14 +641,20 @@ function renderAll() {
       return;
     }
 
-    const filtered = sec.items.filter(item => {
-      const matchPrice  = item.price <= maxPrice;
+    let filtered = sec.items.filter(item => {
+      const matchPrice  = (priceRange.from == null || item.price >= priceRange.from) &&
+                           (priceRange.to   == null || item.price <= priceRange.to);
+      const matchAvail  = availability === "all" ||
+                           (availability === "in-stock"     && !item.sold) ||
+                           (availability === "out-of-stock" &&  item.sold);
       const score       = searchScore(item, query);
       const matchSearch = !query || score > 0;
-      return matchPrice && matchSearch;
+      return matchPrice && matchAvail && matchSearch;
     });
 
-    if (filtered.length === 0 && query) {
+    filtered = sortItems(filtered);
+
+    if (filtered.length === 0 && (query || availability !== "all" || priceRange.from != null || priceRange.to != null)) {
       if (sectionEl) sectionEl.style.display = "none";
       return;
     }
@@ -645,12 +667,21 @@ function renderAll() {
       gridEl.innerHTML = filtered.map(sec.renderFn).join("");
     }
 
+    grandTotal += filtered.length;
+
     const countEl = sectionEl && sectionEl.querySelector(".count");
     if (countEl) {
       const avail = filtered.filter(i => !i.sold).length;
       countEl.textContent = `${avail} of ${filtered.length} available`;
     }
   });
+
+  // Update the top count-bar total ("X products"), and the drawer's count line
+  const totalLabel = `${grandTotal} product${grandTotal === 1 ? "" : "s"}`;
+  const countBarTotalEl = document.getElementById("countBarTotal");
+  if (countBarTotalEl) countBarTotalEl.textContent = totalLabel;
+  const filterDrawerCountEl = document.getElementById("filterDrawerCount");
+  if (filterDrawerCountEl) filterDrawerCountEl.textContent = totalLabel;
 
   if (typeof updateAddToCartButtons === "function") updateAddToCartButtons();
 }

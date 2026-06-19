@@ -181,6 +181,11 @@
     position:relative;
     z-index:4;
   }
+  /* Maximize search width on small/mobile viewports since filter icon was removed from header */
+  @media(max-width:499px){
+    .topbar{ flex-wrap:nowrap; }
+    .header-search-wrap{ flex:1 1 auto; }
+  }
   .header-search-wrap svg{
     position:absolute; left:10px; top:50%; transform:translateY(-50%);
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
@@ -207,32 +212,6 @@
   .header-search-input::placeholder{color:rgba(255,255,255,0.4);}
   .header-search-input:focus{outline:none; background:rgba(255,255,255,0.2); border-color:var(--brand);}
 
-  /* Filter button — next to search */
-  .filter-toggle-btn{
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.22);
-    border-radius:var(--radius-base);
-    color:rgba(255,255,255,0.85);
-    font-family:"NintendoSwitchUI", sans-serif;
-    font-size:13px; font-weight:500;
-    padding:9px 10px;
-    display:flex; align-items:center; gap:6px;
-    cursor:pointer;
-    white-space:nowrap;
-    flex-shrink:0;
-    transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
-  }
-  .filter-toggle-btn:hover{background:rgba(255,255,255,0.18);}
-  .filter-toggle-btn:active{transform:scale(0.93);}
-  .filter-btn-label{ display:none; }
-  @media(min-width:500px){ .filter-btn-label{ display:inline; } }
-  .filter-toggle-btn.active{
-    background:var(--brand);
-    border-color:var(--brand);
-    color:var(--dark-strong);
-  }
-  .filter-toggle-btn svg{width:14px; height:14px; flex-shrink:0;}
-
   /* Header right-side: cart button */
   .header-actions{display:flex; align-items:center; gap:8px; flex-shrink:0;}
   .cart-btn-label{ display:none; }
@@ -258,61 +237,36 @@
     padding:0 5px; flex-shrink:0;
   }
 
-  /* Filter panel — slides down under the topbar */
-  .filter-panel{
+  /* ============================================================
+     COUNT BAR — "Filter and sort" trigger + total product count
+     ============================================================ */
+  .count-bar{
     position:relative; z-index:2;
-    overflow:hidden;
-    max-height:0;
-    opacity:0;
-    transition:max-height 260ms cubic-bezier(0.215,0.61,0.355,1),
-                opacity 200ms cubic-bezier(0.25,0.46,0.45,0.94);
-  }
-  .filter-panel.open{
-    max-height:120px;
-    opacity:1;
-  }
-  .filter-panel-inner{
+    display:flex; align-items:center; justify-content:space-between;
     padding:10px 0 18px;
-    display:flex;
-    align-items:center;
     gap:12px;
-    flex-wrap:wrap;
   }
-  .price-filter-label{
-    font-size:12px;
-    color:var(--gray);
-    font-family:"NintendoSwitchUI", sans-serif;
-    white-space:nowrap;
-  }
-  .price-range{
-    -webkit-appearance:none;
-    appearance:none;
-    height:4px;
-    background:rgba(255,255,255,0.2);
-    border-radius:var(--radius-full);
-    outline:none;
-    cursor:pointer;
-    accent-color:var(--brand);
-    width:160px;
-    transition:transform 150ms ease;
-  }
-  .price-range::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:18px; height:18px;
-    border-radius:50%;
-    background:var(--brand);
-    cursor:pointer;
-    box-shadow:0 1px 3px rgba(0,0,0,0.3);
-    transition:transform 150ms ease;
-  }
-  .price-range::-webkit-slider-thumb:hover{transform:scale(1.2);}
-  .price-val{
-    font-size:13px;
+  .filter-sort-btn{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:var(--radius-base);
     color:var(--white);
     font-family:"NintendoSwitchUI", sans-serif;
+    font-size:13px; font-weight:500;
+    padding:9px 12px;
+    cursor:pointer;
     white-space:nowrap;
-    min-width:44px;
-    font-weight:600;
+    transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
+  }
+  .filter-sort-btn:hover{background:rgba(255,255,255,0.18);}
+  .filter-sort-btn:active{transform:scale(0.96);}
+  .filter-sort-btn svg{width:16px; height:16px; flex-shrink:0;}
+  .count-bar-total{
+    font-size:13px;
+    color:rgba(255,255,255,0.7);
+    font-family:"NintendoSwitchUI", sans-serif;
+    white-space:nowrap;
   }
 
   /* ============================================================
@@ -371,6 +325,29 @@
   }
   .nav-drawer-close:hover{background:rgba(255,255,255,0.15);}
   .nav-drawer-close:active{transform:scale(0.9);}
+
+  /* Search inside nav drawer */
+  .nav-drawer-search-wrap{
+    position:relative;
+    margin-bottom:14px;
+    flex-shrink:0;
+  }
+  .nav-drawer-search-wrap svg{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
+  }
+  .nav-drawer-search-input{
+    width:100%;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:var(--radius-base);
+    color:var(--white);
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:14px;
+    padding:10px 10px 10px 34px;
+  }
+  .nav-drawer-search-input::placeholder{color:rgba(255,255,255,0.4);}
+  .nav-drawer-search-input:focus{outline:none; background:rgba(255,255,255,0.14); border-color:var(--brand);}
 
   /* Drawer body */
   .nav-drawer-body{
@@ -439,6 +416,181 @@
   .nav-sub-btn:hover{background:rgba(255,255,255,0.1); color:var(--white);}
   .nav-sub-btn:active{transform:scale(0.97);}
   .nav-sub-btn.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
+
+  /* ============================================================
+     FILTER & SORT DRAWER (slides from LEFT, over content)
+     ============================================================ */
+  .filter-drawer{
+    position:fixed; top:0; left:0; bottom:0;
+    width:min(340px,88vw);
+    background:var(--white);
+    z-index:230;
+    transform:translateX(-100%);
+    transition:transform 280ms cubic-bezier(0.215,0.61,0.355,1);
+    display:flex; flex-direction:column;
+    overflow:hidden;
+    box-shadow:var(--shadow-lg);
+  }
+  .filter-drawer.open{ transform:translateX(0); }
+
+  .filter-drawer-head{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    padding:18px 18px 14px;
+    border-bottom:1px solid var(--border-light);
+    flex-shrink:0;
+  }
+  .filter-drawer-head-text{ text-align:center; }
+  .filter-drawer-head-text h3{ margin-bottom:2px; }
+  .filter-drawer-count{ font-size:13px; color:var(--body-subtle); font-weight:500; }
+  .filter-drawer-close-btn{
+    position:absolute; right:16px; top:50%; transform:translateY(-50%);
+    background:var(--neutral-secondary-medium);
+    border:1px solid var(--border-default);
+    color:var(--heading);
+  }
+  .filter-drawer-close-btn:hover{ background:var(--neutral-tertiary-medium); }
+  .filter-drawer-close-btn:active{ transform:translateY(-50%) scale(0.9); }
+
+  .filter-drawer-body{
+    flex:1; overflow-y:auto;
+    padding:8px 0 24px;
+  }
+
+  .filter-section{ border-bottom:1px solid var(--border-light); }
+  .filter-section-toggle{
+    width:100%;
+    display:flex; align-items:center; justify-content:space-between;
+    background:none; border:none;
+    padding:16px 20px;
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:15px; font-weight:600; color:var(--heading);
+    cursor:pointer;
+  }
+  .filter-chevron{ width:16px; height:16px; transition:transform 220ms cubic-bezier(0.215,0.61,0.355,1); flex-shrink:0; }
+  .filter-section-toggle[aria-expanded="true"] .filter-chevron{ transform:rotate(180deg); }
+
+  .filter-section-body{
+    overflow:hidden;
+    max-height:0;
+    opacity:0;
+    transition:max-height 240ms cubic-bezier(0.215,0.61,0.355,1),
+                opacity 200ms cubic-bezier(0.25,0.46,0.45,0.94);
+    padding:0 20px;
+  }
+  .filter-section-body.open{
+    max-height:400px;
+    opacity:1;
+    padding-bottom:18px;
+  }
+
+  /* Radio rows (Availability + Sort by) */
+  .filter-radio-row{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 2px;
+    cursor:pointer;
+    font-size:14px; color:var(--body);
+  }
+  .filter-radio-row input[type="radio"]{
+    position:absolute; opacity:0; width:0; height:0;
+  }
+  .filter-radio-dot{
+    width:18px; height:18px; flex-shrink:0;
+    border-radius:50%;
+    border:2px solid var(--border-default-strong);
+    position:relative;
+    transition:border-color 150ms ease;
+  }
+  .filter-radio-row input[type="radio"]:checked + .filter-radio-dot{
+    border-color:var(--brand);
+  }
+  .filter-radio-row input[type="radio"]:checked + .filter-radio-dot::after{
+    content:"";
+    position:absolute; inset:3px;
+    border-radius:50%;
+    background:var(--brand);
+  }
+  .filter-radio-row input[type="radio"]:focus-visible + .filter-radio-dot{
+    box-shadow:0 0 0 4px var(--brand-medium);
+  }
+
+  /* Price inputs */
+  .price-input-row{
+    display:flex; align-items:center; gap:10px;
+    margin-top:6px;
+  }
+  .price-input-wrap{
+    flex:1;
+    display:flex; align-items:center;
+    border:1px solid var(--border-default);
+    border-radius:var(--radius-base);
+    padding:0 10px;
+    background:var(--neutral-primary-soft);
+  }
+  .price-input-currency{ font-size:14px; color:var(--body-subtle); margin-right:4px; }
+  .price-input{
+    width:100%;
+    border:none; outline:none;
+    padding:10px 0;
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:14px; color:var(--heading);
+    background:transparent;
+    -moz-appearance:textfield;
+  }
+  .price-input::-webkit-outer-spin-button,
+  .price-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .price-input-sep{ color:var(--body-subtle); flex-shrink:0; }
+
+  .price-actions-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:16px;
+  }
+  .price-clear-btn{
+    background:none; border:none;
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:13px; font-weight:500;
+    color:var(--body);
+    text-decoration:underline;
+    cursor:pointer;
+    padding:6px 0;
+  }
+  .price-clear-btn:hover{ color:var(--heading); }
+  .price-apply-btn{
+    background:var(--dark-strong);
+    color:var(--white);
+    border:none;
+    border-radius:var(--radius-default);
+    font-family:"NintendoSwitchUI", sans-serif;
+    font-size:13px; font-weight:600;
+    padding:10px 22px;
+    cursor:pointer;
+    transition:background 150ms ease, transform 120ms ease;
+  }
+  .price-apply-btn:hover{ background:#2a2f36; }
+  .price-apply-btn:active{ transform:scale(0.95); }
+
+  /* ============================================================
+     PAGE TRANSITION LOADER
+     ============================================================ */
+  .page-loader{
+    position:fixed; inset:0;
+    background:var(--white);
+    z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity 420ms ease;
+  }
+  .page-loader img{
+    height:56px; width:auto;
+    animation:loaderPulse 1.1s ease-in-out infinite;
+  }
+  .page-loader.fade-out{
+    opacity:0;
+    pointer-events:none;
+  }
+  @keyframes loaderPulse{
+    0%,100%{ opacity:1; transform:scale(1); }
+    50%{ opacity:0.6; transform:scale(0.94); }
+  }
 
   /* ============================================================
      BUTTONS — global press animation
@@ -580,6 +732,8 @@
     background:rgba(255,255,255,0.55);
     display:flex; align-items:center; justify-content:center;
   }
+  .card-media .sold-overlay svg{ z-index:1; }
+  .card-media .sold-overlay .badge{ z-index:2; position:relative; }
 
   .card-body{padding:12px 16px 16px; display:flex; flex-direction:column; gap:6px; flex:1;}
   .card-sku{font-size:11px; color:var(--body-subtle); font-weight:500; letter-spacing:0.3px;}
@@ -896,6 +1050,11 @@
 </head>
 <body>
 
+<!-- PAGE TRANSITION LOADER -->
+<div class="page-loader" id="pageLoader">
+  <img src="assets/stock86-logo.png" alt="" onerror="this.style.display='none'">
+</div>
+
 <!-- NAV BACKDROP -->
 <div class="nav-backdrop" id="navBackdrop"></div>
 
@@ -907,6 +1066,14 @@
     <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu">&times;</button>
   </div>
   <div class="nav-drawer-body">
+    <!-- Search inside nav drawer -->
+    <div class="nav-drawer-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input class="nav-drawer-search-input" type="text" id="navSearchInput" placeholder="Search listings…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+
     <!-- All listings -->
     <div class="nav-item">
       <button class="nav-btn active" data-cat="all" id="navAll">
@@ -955,6 +1122,104 @@
   </div>
 </nav>
 
+<!-- FILTER & SORT BACKDROP -->
+<div class="nav-backdrop" id="filterBackdrop"></div>
+
+<!-- FILTER & SORT DRAWER (slides from LEFT) -->
+<aside class="filter-drawer" id="filterDrawer" aria-label="Filter and sort" role="dialog">
+  <div class="filter-drawer-head">
+    <div class="filter-drawer-head-text">
+      <h3>Filter and sort</h3>
+      <span class="filter-drawer-count" id="filterDrawerCount"></span>
+    </div>
+    <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter and sort">&times;</button>
+  </div>
+
+  <div class="filter-drawer-body">
+
+    <!-- AVAILABILITY -->
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="toggleAvailability" aria-expanded="false">
+        <span>Availability</span>
+        <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="filter-section-body" id="bodyAvailability">
+        <label class="filter-radio-row">
+          <input type="radio" name="availability" value="all" checked>
+          <span class="filter-radio-dot"></span>
+          <span>All</span>
+        </label>
+        <label class="filter-radio-row">
+          <input type="radio" name="availability" value="in-stock">
+          <span class="filter-radio-dot"></span>
+          <span>In stock</span>
+        </label>
+        <label class="filter-radio-row">
+          <input type="radio" name="availability" value="out-of-stock">
+          <span class="filter-radio-dot"></span>
+          <span>Out of stock</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- PRICE -->
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="togglePrice" aria-expanded="false">
+        <span>Price</span>
+        <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="filter-section-body" id="bodyPrice">
+        <div class="price-input-row">
+          <div class="price-input-wrap">
+            <span class="price-input-currency">$</span>
+            <input type="number" inputmode="numeric" min="0" class="price-input" id="priceFrom" placeholder="From">
+          </div>
+          <span class="price-input-sep">–</span>
+          <div class="price-input-wrap">
+            <span class="price-input-currency">$</span>
+            <input type="number" inputmode="numeric" min="0" class="price-input" id="priceTo" placeholder="To">
+          </div>
+        </div>
+        <div class="price-actions-row">
+          <button class="price-clear-btn" id="priceClearBtn">Clear</button>
+          <button class="price-apply-btn" id="priceApplyBtn">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SORT BY -->
+    <div class="filter-section">
+      <button class="filter-section-toggle" id="toggleSort" aria-expanded="false">
+        <span>Sort by</span>
+        <svg class="filter-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="filter-section-body" id="bodySort">
+        <label class="filter-radio-row">
+          <input type="radio" name="sortby" value="price-asc">
+          <span class="filter-radio-dot"></span>
+          <span>Price, low to high</span>
+        </label>
+        <label class="filter-radio-row">
+          <input type="radio" name="sortby" value="price-desc">
+          <span class="filter-radio-dot"></span>
+          <span>Price, high to low</span>
+        </label>
+        <label class="filter-radio-row">
+          <input type="radio" name="sortby" value="date-new">
+          <span class="filter-radio-dot"></span>
+          <span>Date, new to old</span>
+        </label>
+        <label class="filter-radio-row">
+          <input type="radio" name="sortby" value="date-old">
+          <span class="filter-radio-dot"></span>
+          <span>Date, old to new</span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+</aside>
+
 <header class="header">
   <div class="container">
 
@@ -982,14 +1247,6 @@
         <input class="header-search-input" type="text" id="searchInput" placeholder="Search listings…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
 
-      <!-- Filter button -->
-      <button class="filter-toggle-btn" id="filterToggleBtn" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
-        </svg>
-        <span class="filter-btn-label">Filter</span>
-      </button>
-
       <!-- Cart -->
       <div class="header-actions">
         <button class="btn btn-base cart-btn btn-ghost" id="cartOpenBtn" aria-label="Open cart">
@@ -1000,12 +1257,17 @@
       </div>
     </div>
 
-    <!-- FILTER PANEL — slides down when filter button pressed -->
-    <div class="filter-panel" id="filterPanel">
-      <div class="filter-panel-inner">
-        <span class="price-filter-label">Max price: <span id="priceVal">$500+</span></span>
-        <input class="price-range" type="range" id="priceRange" min="0" max="500" value="500" step="10">
-      </div>
+    <!-- COUNT BAR — "Filter and sort" trigger + total product count -->
+    <div class="count-bar">
+      <button class="filter-sort-btn" id="filterSortBtn" aria-haspopup="dialog" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/>
+          <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/>
+          <line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Filter and sort</span>
+      </button>
+      <span class="count-bar-total" id="countBarTotal"></span>
     </div>
 
     <!-- HERO -->
@@ -1367,41 +1629,112 @@
     closeNav();
   });
 
-  // ── Filter toggle button ───────────────────────────────────
-  const filterToggleBtn = document.getElementById("filterToggleBtn");
-  const filterPanel     = document.getElementById("filterPanel");
+  // ── Filter & Sort drawer (LEFT side) ────────────────────────
+  const filterSortBtn    = document.getElementById("filterSortBtn");
+  const filterDrawer     = document.getElementById("filterDrawer");
+  const filterBackdrop   = document.getElementById("filterBackdrop");
+  const filterDrawerClose= document.getElementById("filterDrawerClose");
 
-  filterToggleBtn.addEventListener("click", () => {
-    const isOpen = filterPanel.classList.toggle("open");
-    filterToggleBtn.classList.toggle("active", isOpen);
-    filterToggleBtn.setAttribute("aria-expanded", isOpen);
-    if (!isOpen) {
-      // Reset price filter when closing
-      priceRange.value = 500;
-      priceValEl.textContent = "$500+";
+  function openFilterDrawer() {
+    filterDrawer.classList.add("open");
+    filterBackdrop.classList.add("open");
+    filterSortBtn.setAttribute("aria-expanded", "true");
+  }
+  function closeFilterDrawer() {
+    filterDrawer.classList.remove("open");
+    filterBackdrop.classList.remove("open");
+    filterSortBtn.setAttribute("aria-expanded", "false");
+  }
+  filterSortBtn.addEventListener("click", openFilterDrawer);
+  filterDrawerClose.addEventListener("click", closeFilterDrawer);
+  filterBackdrop.addEventListener("click", closeFilterDrawer);
+
+  // ── Accordion sections inside the drawer ────────────────────
+  function wireAccordion(toggleId, bodyId) {
+    const toggle = document.getElementById(toggleId);
+    const body   = document.getElementById(bodyId);
+    toggle.addEventListener("click", () => {
+      const isOpen = body.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", isOpen);
+    });
+  }
+  wireAccordion("toggleAvailability", "bodyAvailability");
+  wireAccordion("togglePrice",        "bodyPrice");
+  wireAccordion("toggleSort",         "bodySort");
+
+  // ── Availability filter ──────────────────────────────────────
+  let availabilityFilter = "all"; // all | in-stock | out-of-stock
+  document.querySelectorAll('input[name="availability"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      availabilityFilter = radio.value;
       renderAll();
-    }
+    });
   });
 
-  // ── Search + price filter ──────────────────────────────────
-  const searchInput = document.getElementById("searchInput");
-  const priceRange  = document.getElementById("priceRange");
-  const priceValEl  = document.getElementById("priceVal");
+  // ── Price filter (From / To with Apply + Clear) ──────────────
+  const priceFromEl   = document.getElementById("priceFrom");
+  const priceToEl     = document.getElementById("priceTo");
+  const priceApplyBtn = document.getElementById("priceApplyBtn");
+  const priceClearBtn = document.getElementById("priceClearBtn");
+  let appliedPriceFrom = null;
+  let appliedPriceTo   = null;
 
-  function _doSearch() { renderAll(); }
-  searchInput.addEventListener("input",          _doSearch);
-  searchInput.addEventListener("keyup",          _doSearch);
-  searchInput.addEventListener("compositionend", _doSearch);
-  searchInput.addEventListener("change",         _doSearch);
-  priceRange.addEventListener("input", () => {
-    const v = parseInt(priceRange.value);
-    priceValEl.textContent = v >= 500 ? "$500+" : `$${v}`;
+  priceApplyBtn.addEventListener("click", () => {
+    const fromVal = parseFloat(priceFromEl.value);
+    const toVal   = parseFloat(priceToEl.value);
+    appliedPriceFrom = isNaN(fromVal) ? null : fromVal;
+    appliedPriceTo   = isNaN(toVal)   ? null : toVal;
+    renderAll();
+  });
+  priceClearBtn.addEventListener("click", () => {
+    priceFromEl.value = "";
+    priceToEl.value   = "";
+    appliedPriceFrom = null;
+    appliedPriceTo   = null;
     renderAll();
   });
 
+  // ── Sort by ──────────────────────────────────────────────────
+  let sortBy = null; // price-asc | price-desc | date-new | date-old
+  document.querySelectorAll('input[name="sortby"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      sortBy = radio.value;
+      renderAll();
+    });
+  });
+
   // Expose filter values for app.js renderAll
-  function getSearchQuery() { var el = document.getElementById("searchInput"); return el ? el.value.trim().toLowerCase() : ""; }
-  function getMaxPrice()    { return parseInt(priceRange.value) >= 500 ? Infinity : parseInt(priceRange.value); }
+  function getSearchQuery()      { var el = document.getElementById("searchInput"); return el ? el.value.trim().toLowerCase() : ""; }
+  function getMaxPrice()         { return Infinity; } // legacy hook kept for compatibility, superseded by getPriceRange
+  function getPriceRange()       { return { from: appliedPriceFrom, to: appliedPriceTo }; }
+  function getAvailabilityFilter(){ return availabilityFilter; }
+  function getSortBy()           { return sortBy; }
+
+  // ── Search (header input + nav drawer input, kept in sync) ──
+  const searchInput    = document.getElementById("searchInput");
+  const navSearchInput = document.getElementById("navSearchInput");
+
+  function _doSearch(e) {
+    const val = e.target.value;
+    if (searchInput)    searchInput.value    = val;
+    if (navSearchInput) navSearchInput.value = val;
+    renderAll();
+  }
+  [searchInput, navSearchInput].forEach(el => {
+    if (!el) return;
+    el.addEventListener("input",          _doSearch);
+    el.addEventListener("keyup",          _doSearch);
+    el.addEventListener("compositionend", _doSearch);
+    el.addEventListener("change",         _doSearch);
+  });
+
+  // ── Page transition loader ──────────────────────────────────
+  const pageLoader = document.getElementById("pageLoader");
+  function hidePageLoader() {
+    if (!pageLoader) return;
+    pageLoader.classList.add("fade-out");
+    setTimeout(() => { pageLoader.style.display = "none"; }, 450);
+  }
 
   // ── Boot ───────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
@@ -1411,8 +1744,13 @@
     updateNavActive("all");
   });
 
+  window.addEventListener("load", hidePageLoader);
+  // Failsafe: never let the loader hang forever
+  setTimeout(hidePageLoader, 2500);
+
   // Re-sync cart when user navigates back from product.html (browser back button restores from cache)
   window.addEventListener("pageshow", (e) => {
+    hidePageLoader();
     if (e.persisted) {
       loadCartState();
       renderCart();
