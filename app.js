@@ -765,3 +765,237 @@ function renderProductPage() {
     </div>
   `;
 }
+
+// ============================================================
+// ADMIN — ADD / DELETE PRODUCT PANEL
+// Everything here only touches the in-memory INVENTORY + this
+// browser's localStorage. The "Save & download data.js" button
+// is what makes a change permanent for every visitor: it writes
+// a fresh data.js file (photos embedded) ready to drag into GitHub.
+// ============================================================
+
+const ADMIN_CATEGORY_PREFIX = {
+  switches: "SW", games: "GM", consoles: "HC", laptops: "LP", phones: "PH"
+};
+
+let apPendingImageData = null; // base64 data-URI of the chosen photo, or null
+
+function adminNextId(category) {
+  const prefix = ADMIN_CATEGORY_PREFIX[category] || "IT";
+  const list = INVENTORY[category] || [];
+  let maxNum = 0;
+  list.forEach(item => {
+    const m = /^[A-Z]+-(\d+)$/.exec(item.id || "");
+    if (m) maxNum = Math.max(maxNum, parseInt(m[1], 10));
+  });
+  const num = String(maxNum + 1).padStart(2, "0");
+  return `${prefix}-${num}`;
+}
+
+function openAdminPanel() {
+  document.getElementById("adminPanelOverlay").classList.add("open");
+  adminSwitchTab("add");
+}
+function closeAdminPanel() {
+  document.getElementById("adminPanelOverlay").classList.remove("open");
+}
+
+function adminSwitchTab(tab) {
+  document.getElementById("tabAdd").classList.toggle("active", tab === "add");
+  document.getElementById("tabDelete").classList.toggle("active", tab === "delete");
+  document.getElementById("adminTabAdd").style.display    = tab === "add" ? "" : "none";
+  document.getElementById("adminTabDelete").style.display = tab === "delete" ? "" : "none";
+  if (tab === "delete") renderAdminDeleteList();
+}
+
+function renderAdminDeleteList() {
+  const wrap = document.getElementById("adminDeleteList");
+  const allItems = [];
+  Object.keys(ADMIN_CATEGORY_PREFIX).forEach(cat => {
+    (INVENTORY[cat] || []).forEach(item => allItems.push(item));
+  });
+  if (!allItems.length) {
+    wrap.innerHTML = `<div class="admin-empty">No products yet.</div>`;
+    return;
+  }
+  wrap.innerHTML = allItems.map(item => `
+    <div class="admin-list-row">
+      <img class="admin-list-thumb" src="${item.image || ''}" alt="" onerror="this.style.visibility='hidden'">
+      <div class="admin-list-info">
+        <div class="admin-list-name">${item.name}</div>
+        <div class="admin-list-meta">${item.id} · $${item.price}${item.sold ? " · Sold" : ""}</div>
+      </div>
+      <button class="admin-item-toggle ${item.sold ? 'is-sold' : ''}" onclick="toggleSold('${item.id}'); renderAdminDeleteList();">
+        ${item.sold ? "Mark available" : "Mark sold (delete)"}
+      </button>
+    </div>
+  `).join("");
+}
+
+function wireAdminImageInput() {
+  const drop = document.getElementById("apImgDrop");
+  const fileInput = document.getElementById("apImgFile");
+  const preview = document.getElementById("apImgPreview");
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      apPendingImageData = reader.result;
+      preview.src = apPendingImageData;
+      preview.classList.add("show");
+      drop.textContent = file.name + " — tap to change";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  drop.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+  ["dragenter", "dragover"].forEach(evt =>
+    drop.addEventListener(evt, (e) => { e.preventDefault(); drop.classList.add("drag-over"); })
+  );
+  ["dragleave", "drop"].forEach(evt =>
+    drop.addEventListener(evt, (e) => { e.preventDefault(); drop.classList.remove("drag-over"); })
+  );
+  drop.addEventListener("drop", (e) => {
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    handleFile(file);
+  });
+}
+
+function resetAdminAddForm() {
+  document.getElementById("apName").value = "";
+  document.getElementById("apPrice").value = "";
+  document.getElementById("apCondition").value = "Like New";
+  document.getElementById("apCategory").value = "switches";
+  document.getElementById("apDescription").value = "";
+  document.getElementById("apSpecs").value = "";
+  document.getElementById("apImgPreview").classList.remove("show");
+  document.getElementById("apImgPreview").src = "";
+  document.getElementById("apImgDrop").textContent = "Tap to choose a photo, or drag one here";
+  apPendingImageData = null;
+}
+
+function adminAddProduct() {
+  const category = document.getElementById("apCategory").value;
+  const name = document.getElementById("apName").value.trim();
+  const price = parseFloat(document.getElementById("apPrice").value);
+  const condition = document.getElementById("apCondition").value || null;
+  const description = document.getElementById("apDescription").value.trim();
+  const specsRaw = document.getElementById("apSpecs").value;
+  const specs = specsRaw.split("\n").map(s => s.trim()).filter(Boolean);
+
+  if (!name)            { alert("Please enter a product name."); return; }
+  if (isNaN(price))     { alert("Please enter a valid price."); return; }
+  if (!apPendingImageData) { alert("Please add a photo."); return; }
+
+  const iconMap = { switches: "switch", games: "game", consoles: "console", laptops: "laptop", phones: "phone" };
+
+  const newItem = {
+    id: adminNextId(category),
+    name,
+    price,
+    condition,
+    sold: false,
+    icon: iconMap[category] || "switch",
+    image: apPendingImageData,
+    description,
+    specs
+  };
+
+  if (!INVENTORY[category]) INVENTORY[category] = [];
+  INVENTORY[category].push(newItem);
+
+  if (typeof renderAll === "function") renderAll();
+  alert(`"${name}" added. Now click "Save & download data.js" to make it permanent.`);
+  resetAdminAddForm();
+}
+
+function escapeForJs(str) {
+  return String(str).replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+}
+
+function generateDataJsSource() {
+  const sectionOrder = [
+    ["switches", "NINTENDO SWITCH"],
+    ["games", "SWITCH GAMES"],
+    ["consoles", "HANDHELDS & CONSOLES"],
+    ["laptops", "LAPTOPS"],
+    ["phones", "PHONES"]
+  ];
+
+  function serializeItem(item) {
+    const lines = [];
+    lines.push(`    {`);
+    lines.push(`      id: ${JSON.stringify(item.id)},`);
+    lines.push(`      name: \`${escapeForJs(item.name)}\`,`);
+    lines.push(`      price: ${Number(item.price)},`);
+    lines.push(`      condition: ${item.condition ? JSON.stringify(item.condition) : "null"},`);
+    lines.push(`      sold: ${!!item.sold},`);
+    lines.push(`      icon: ${JSON.stringify(item.icon || "switch")},`);
+    lines.push(`      image: \`${escapeForJs(item.image || "")}\`,`);
+    lines.push(`      description: \`${escapeForJs(item.description || "")}\`,`);
+    if (item.hasControllerAddon) {
+      lines.push(`      specs: ${JSON.stringify(item.specs || [])},`);
+      lines.push(`      hasControllerAddon: true`);
+    } else {
+      lines.push(`      specs: ${JSON.stringify(item.specs || [])}`);
+    }
+    lines.push(`    }`);
+    return lines.join("\n");
+  }
+
+  function serializeSection(key, label) {
+    const list = INVENTORY[key] || [];
+    const body = list.map(serializeItem).join(",\n");
+    return `  // ----------------------------------------------------------\n  // ${label}\n  // ----------------------------------------------------------\n  ${key}: [\n${body}${body ? "\n" : ""}  ]`;
+  }
+
+  const blocks = [];
+
+  // switches, then controllerAddons (kept adjacent to switches, matching original file)
+  blocks.push(serializeSection("switches", "NINTENDO SWITCH"));
+  if (INVENTORY.controllerAddons) {
+    const addonsJson = JSON.stringify(INVENTORY.controllerAddons, null, 4).replace(/\n/g, "\n  ");
+    blocks.push(`  // ----------------------------------------------------------\n  // CONTROLLER ADD-ONS\n  // ----------------------------------------------------------\n  controllerAddons: ${addonsJson}`);
+  }
+  blocks.push(serializeSection("games",    "SWITCH GAMES"));
+  blocks.push(serializeSection("consoles", "HANDHELDS & CONSOLES"));
+  blocks.push(serializeSection("laptops",  "LAPTOPS"));
+  blocks.push(serializeSection("phones",   "PHONES"));
+
+  let out = `// ============================================================\n// STOCK/86 — INVENTORY DATA\n// ============================================================\n\nconst INVENTORY = {\n\n`;
+  out += blocks.join(",\n\n");
+  out += `\n};\n\n// ----------------------------------------------------------\n// SITE CONFIG\n// ----------------------------------------------------------\nconst WHATSAPP_NUMBER = ${JSON.stringify(WHATSAPP_NUMBER)};\nconst DELIVERY_FEE    = ${JSON.stringify(DELIVERY_FEE)};\nconst ADMIN_CODE      = ${JSON.stringify(ADMIN_CODE)};\n`;
+
+  return out;
+}
+
+function adminDownloadDataJs() {
+  const src = generateDataJsSource();
+  const blob = new Blob([src], { type: "text/javascript" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "data.js";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function wireAdminPanel() {
+  const manageBtn = document.getElementById("adminManageBtn");
+  if (!manageBtn) return; // panel only exists on index.html
+
+  manageBtn.addEventListener("click", openAdminPanel);
+  document.getElementById("adminPanelClose").addEventListener("click", closeAdminPanel);
+  document.getElementById("adminPanelOverlay").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("adminPanelOverlay")) closeAdminPanel();
+  });
+  document.getElementById("tabAdd").addEventListener("click", () => adminSwitchTab("add"));
+  document.getElementById("tabDelete").addEventListener("click", () => adminSwitchTab("delete"));
+  document.getElementById("apSaveBtn").addEventListener("click", () => { adminAddProduct(); adminDownloadDataJs(); });
+  document.getElementById("apSaveBtn2").addEventListener("click", adminDownloadDataJs);
+  wireAdminImageInput();
+}

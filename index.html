@@ -80,6 +80,18 @@
   a{color:inherit; text-decoration:none;}
   img{max-width:100%; display:block;}
 
+  /* Remove default mobile blue tap flash */
+  a, button, [role="button"], label{
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+  }
+  /* Smooth press fallback for generic links/buttons without specific :active overrides */
+  a:active, button:active{
+    opacity: 0.82;
+    transform: scale(0.97);
+    transition: transform 80ms ease, opacity 80ms ease;
+  }
+
   :focus-visible{
     outline:none;
     box-shadow:0 0 0 4px var(--brand-medium);
@@ -246,25 +258,32 @@
     padding:10px 0 18px;
     gap:12px;
   }
+  /* Solid white strip anchored under the header */
+  .count-bar-outer{
+    background:var(--white);
+    border-bottom:1px solid var(--border-light);
+    position:sticky; top:0; z-index:50;
+  }
   .filter-sort-btn{
     display:flex; align-items:center; gap:8px;
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.22);
+    background:var(--neutral-secondary-medium);
+    border:1px solid var(--border-default);
     border-radius:var(--radius-base);
-    color:var(--white);
+    color:var(--heading);
     font-family:"NintendoSwitchUI", sans-serif;
     font-size:13px; font-weight:500;
     padding:9px 12px;
     cursor:pointer;
     white-space:nowrap;
     transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
+    -webkit-tap-highlight-color: transparent;
   }
-  .filter-sort-btn:hover{background:rgba(255,255,255,0.18);}
+  .filter-sort-btn:hover{background:var(--neutral-tertiary-medium);}
   .filter-sort-btn:active{transform:scale(0.96);}
   .filter-sort-btn svg{width:16px; height:16px; flex-shrink:0;}
   .count-bar-total{
     font-size:13px;
-    color:rgba(255,255,255,0.7);
+    color:var(--body-subtle);
     font-family:"NintendoSwitchUI", sans-serif;
     white-space:nowrap;
   }
@@ -446,20 +465,36 @@
   }
 
   /* ============================================================
-     FILTER & SORT PANEL — white dropdown under the count bar,
-     sits in normal flow right above the product sections
+     FILTER & SORT PANEL — fixed right-side slide-in drawer
      ============================================================ */
-  .filter-panel-wrap{
-    background:var(--white);
-    overflow:hidden;
-    max-height:0;
+  /* Backdrop (reuses nav-backdrop style but separate element) */
+  .filter-backdrop{
+    position:fixed; inset:0;
+    background:rgba(6,8,14,0.55);
+    z-index:200;
     opacity:0;
-    transition:max-height 320ms cubic-bezier(0.215,0.61,0.355,1),
-                opacity 260ms cubic-bezier(0.25,0.46,0.45,0.94);
+    pointer-events:none;
+    transition:opacity 250ms ease;
+  }
+  .filter-backdrop.open{
+    opacity:1;
+    pointer-events:all;
+  }
+
+  .filter-panel-wrap{
+    position:fixed; top:0; right:0; bottom:0;
+    width:min(340px,92vw);
+    background:var(--white);
+    border-left:1px solid var(--border-light);
+    box-shadow:var(--shadow-lg);
+    z-index:210;
+    transform:translateX(100%);
+    transition:transform 280ms cubic-bezier(0.215,0.61,0.355,1);
+    display:flex; flex-direction:column;
+    overflow:hidden;
   }
   .filter-panel-wrap.open{
-    max-height:600px;
-    opacity:1;
+    transform:translateX(0);
   }
 
   .filter-drawer-head{
@@ -483,6 +518,7 @@
 
   .filter-drawer-body{
     padding:8px 0 12px;
+    flex:1; overflow-y:auto;
   }
 
   .filter-section{ border-bottom:1px solid var(--border-light); }
@@ -597,28 +633,7 @@
   .price-apply-btn:hover{ background:#2a2f36; }
   .price-apply-btn:active{ transform:scale(0.95); }
 
-  /* ============================================================
-     PAGE TRANSITION LOADER
-     ============================================================ */
-  .page-loader{
-    position:fixed; inset:0;
-    background:var(--white);
-    z-index:9999;
-    display:flex; align-items:center; justify-content:center;
-    transition:opacity 420ms ease;
-  }
-  .page-loader img{
-    height:56px; width:auto;
-    animation:loaderPulse 1.1s ease-in-out infinite;
-  }
-  .page-loader.fade-out{
-    opacity:0;
-    pointer-events:none;
-  }
-  @keyframes loaderPulse{
-    0%,100%{ opacity:1; transform:scale(1); }
-    50%{ opacity:0.6; transform:scale(0.94); }
-  }
+  /* page loader removed */
 
   /* ============================================================
      BUTTONS — global press animation
@@ -1046,6 +1061,85 @@
   .login-box.open{display:flex;}
 
   /* ============================================================
+     ADMIN PRODUCT PANEL (Add / Delete)
+     ============================================================ */
+  .admin-panel-overlay{
+    position:fixed; inset:0; background:rgba(15,17,17,0.6);
+    z-index:300; display:none; align-items:flex-end; justify-content:center;
+  }
+  .admin-panel-overlay.open{display:flex;}
+  @media(min-width:700px){ .admin-panel-overlay{ align-items:center; } }
+  .admin-panel{
+    background:var(--neutral-primary-soft);
+    width:100%; max-width:640px;
+    max-height:88vh; overflow-y:auto;
+    border-radius:var(--radius-base) var(--radius-base) 0 0;
+    box-shadow:var(--shadow-lg);
+    padding:20px;
+  }
+  @media(min-width:700px){ .admin-panel{ border-radius:var(--radius-base); max-height:80vh; } }
+  .admin-panel-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px; gap:10px;
+  }
+  .admin-panel-head h3{ font-size:18px; }
+  .admin-panel-close{
+    background:var(--neutral-secondary-medium); border:1px solid var(--border-default);
+    border-radius:var(--radius-default); width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:16px; line-height:1; color:var(--body);
+    flex-shrink:0;
+  }
+  .admin-panel-close:hover{ background:var(--neutral-tertiary-medium); }
+  .admin-tabs{ display:flex; gap:8px; margin-bottom:18px; border-bottom:1px solid var(--border-light); }
+  .admin-tab{
+    padding:8px 4px 10px; font-size:14px; font-weight:600; color:var(--body-subtle);
+    background:none; border:none; border-bottom:2px solid transparent;
+    cursor:pointer; font-family:"NintendoSwitchUI", sans-serif; margin-bottom:-1px;
+  }
+  .admin-tab.active{ color:var(--fg-brand-strong); border-bottom-color:var(--brand); }
+  .admin-field{ margin-bottom:12px; }
+  .admin-field label{ display:block; font-size:12px; font-weight:600; color:var(--heading); margin-bottom:5px; }
+  .admin-field input[type="text"],
+  .admin-field input[type="number"],
+  .admin-field select,
+  .admin-field textarea{
+    width:100%; border:1px solid var(--border-default); border-radius:var(--radius-default);
+    padding:9px 10px; font-size:14px; font-family:"NintendoSwitchUI", sans-serif;
+    background:var(--neutral-primary-soft); color:var(--heading);
+  }
+  .admin-field textarea{ resize:vertical; min-height:64px; }
+  .admin-field-row{ display:flex; gap:10px; }
+  .admin-field-row > .admin-field{ flex:1; min-width:0; }
+  .admin-img-drop{
+    border:2px dashed var(--border-default-strong); border-radius:var(--radius-base);
+    padding:18px; text-align:center; cursor:pointer; font-size:13px; color:var(--body-subtle);
+    transition:border-color 150ms ease, background 150ms ease;
+  }
+  .admin-img-drop:hover, .admin-img-drop.drag-over{ border-color:var(--brand); background:var(--brand-softer); }
+  .admin-img-preview{ width:100%; max-height:180px; object-fit:contain; border-radius:var(--radius-default); margin-bottom:8px; display:none; }
+  .admin-img-preview.show{ display:block; }
+  .admin-panel-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .admin-panel-actions .btn{ flex:1; min-width:140px; }
+  .admin-list-row{
+    display:flex; align-items:center; gap:10px; padding:9px 6px;
+    border-bottom:1px solid var(--border-light);
+  }
+  .admin-list-thumb{ width:40px; height:40px; border-radius:var(--radius-default); object-fit:cover; background:var(--neutral-secondary-soft); flex-shrink:0; }
+  .admin-list-info{ flex:1; min-width:0; }
+  .admin-list-name{ font-size:13px; font-weight:600; color:var(--heading); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .admin-list-meta{ font-size:11px; color:var(--body-subtle); }
+  .admin-list-row .admin-item-toggle{ flex-shrink:0; }
+  .admin-empty{ font-size:13px; color:var(--body-subtle); padding:20px 0; text-align:center; }
+  .admin-save-note{ font-size:12px; color:var(--body-subtle); margin-top:10px; line-height:1.5; }
+  .admin-toolbar-btn{
+    background:var(--dark-strong); color:var(--white); border:none;
+    font-size:11px; font-weight:600; padding:6px 12px;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
+  }
+  .admin-toolbar-btn:hover{ background:#000; }
+
+  /* ============================================================
      PAYMENT METHOD TABS (checkout modal)
      ============================================================ */
   .pay-method-tabs{
@@ -1080,10 +1174,6 @@
 </head>
 <body>
 
-<!-- PAGE TRANSITION LOADER -->
-<div class="page-loader" id="pageLoader">
-  <img src="assets/stock86-logo.png" alt="" onerror="this.style.display='none'">
-</div>
 
 <!-- NAV BACKDROP -->
 <div class="nav-backdrop" id="navBackdrop"></div>
@@ -1199,19 +1289,6 @@
       </div>
     </div>
 
-    <!-- COUNT BAR — "Filter and sort" trigger + total product count -->
-    <div class="count-bar">
-      <button class="filter-sort-btn" id="filterSortBtn" aria-haspopup="dialog" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/>
-          <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/>
-          <line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/>
-        </svg>
-        <span>Filter and sort</span>
-      </button>
-      <span class="count-bar-total" id="countBarTotal"></span>
-    </div>
-
     <!-- HERO -->
     <div class="hero">
       <h1>Used consoles &amp; handhelds, checked by hand</h1>
@@ -1235,18 +1312,37 @@
   </div>
 </header>
 
-<!-- FILTER & SORT PANEL — white dropdown, anchored under the count bar, above the product sections -->
-<div class="filter-panel-wrap" id="filterPanelWrap">
+<!-- COUNT BAR — solid white strip, sticky below header -->
+<div class="count-bar-outer">
   <div class="container">
-    <div class="filter-drawer-head">
-      <div class="filter-drawer-head-text">
-        <h3>Filter and sort</h3>
-        <span class="filter-drawer-count" id="filterDrawerCount"></span>
-      </div>
-      <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter and sort">&times;</button>
+    <div class="count-bar">
+      <button class="filter-sort-btn" id="filterSortBtn" aria-haspopup="dialog" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/>
+          <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/>
+          <line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Filter and sort</span>
+      </button>
+      <span class="count-bar-total" id="countBarTotal"></span>
     </div>
+  </div>
+</div>
 
-    <div class="filter-drawer-body">
+<!-- FILTER BACKDROP -->
+<div class="filter-backdrop" id="filterBackdrop"></div>
+
+<!-- FILTER & SORT PANEL — right-side slide-in drawer -->
+<div class="filter-panel-wrap" id="filterPanelWrap" role="dialog" aria-label="Filter and sort">
+  <div class="filter-drawer-head">
+    <div class="filter-drawer-head-text">
+      <h3>Filter and sort</h3>
+      <span class="filter-drawer-count" id="filterDrawerCount"></span>
+    </div>
+    <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter and sort">&times;</button>
+  </div>
+
+  <div class="filter-drawer-body">
 
       <!-- AVAILABILITY -->
       <div class="filter-section">
@@ -1299,7 +1395,6 @@
       </div>
 
     </div>
-  </div>
 </div>
 
 <main>
@@ -1557,7 +1652,85 @@
 <!-- ADMIN BAR -->
 <div class="admin-bar" id="adminBar">
   <span>Admin mode — click any listing to toggle sold / available</span>
-  <button class="admin-item-toggle" id="adminExitBtn">Exit admin</button>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <button class="admin-toolbar-btn" id="adminManageBtn">Manage products</button>
+    <button class="admin-item-toggle" id="adminExitBtn">Exit admin</button>
+  </div>
+</div>
+
+<!-- ADMIN PRODUCT PANEL -->
+<div class="admin-panel-overlay" id="adminPanelOverlay">
+  <div class="admin-panel">
+    <div class="admin-panel-head">
+      <h3 id="adminPanelTitle">Manage products</h3>
+      <button class="admin-panel-close" id="adminPanelClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" id="tabAdd" data-tab="add">Add product</button>
+      <button class="admin-tab" id="tabDelete" data-tab="delete">Delete / restore</button>
+    </div>
+
+    <!-- ADD TAB -->
+    <div id="adminTabAdd">
+      <div class="admin-field">
+        <label for="apCategory">Category</label>
+        <select id="apCategory">
+          <option value="switches">Nintendo Switch</option>
+          <option value="games">Switch Games</option>
+          <option value="consoles">Handhelds &amp; Consoles</option>
+          <option value="laptops">Laptops</option>
+          <option value="phones">Phones</option>
+        </select>
+      </div>
+      <div class="admin-field">
+        <label for="apName">Product name</label>
+        <input type="text" id="apName" placeholder="e.g. Nintendo Switch OLED">
+      </div>
+      <div class="admin-field-row">
+        <div class="admin-field">
+          <label for="apPrice">Price ($)</label>
+          <input type="number" id="apPrice" placeholder="e.g. 225" min="0" step="1">
+        </div>
+        <div class="admin-field">
+          <label for="apCondition">Condition</label>
+          <select id="apCondition">
+            <option value="Like New">Like New</option>
+            <option value="Excellent">Excellent</option>
+            <option value="Good">Good</option>
+            <option value="">No condition (games)</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-field">
+        <label>Photo</label>
+        <img class="admin-img-preview" id="apImgPreview" alt="Preview">
+        <div class="admin-img-drop" id="apImgDrop">Tap to choose a photo, or drag one here</div>
+        <input type="file" id="apImgFile" accept="image/*" style="display:none;">
+      </div>
+      <div class="admin-field">
+        <label for="apDescription">Description</label>
+        <textarea id="apDescription" placeholder="Short description shown on the product page"></textarea>
+      </div>
+      <div class="admin-field">
+        <label for="apSpecs">Specs (one per line)</label>
+        <textarea id="apSpecs" placeholder="256GB storage&#10;Original box&#10;AC charger included"></textarea>
+      </div>
+      <div class="admin-panel-actions">
+        <button class="btn btn-brand" id="apSaveBtn">Save &amp; download data.js</button>
+      </div>
+      <p class="admin-save-note">This downloads an updated <strong>data.js</strong> with your new product (photo included) plus everything currently on the site. Drag it into your GitHub repo, replacing the old data.js, then commit.</p>
+    </div>
+
+    <!-- DELETE/RESTORE TAB -->
+    <div id="adminTabDelete" style="display:none;">
+      <div id="adminDeleteList"></div>
+      <div class="admin-panel-actions">
+        <button class="btn btn-brand" id="apSaveBtn2">Save &amp; download data.js</button>
+      </div>
+      <p class="admin-save-note">Marking a product sold hides it as "Sold" (matches normal sold/available). Download data.js afterward to make the change permanent on GitHub — otherwise it only updates in this browser.</p>
+    </div>
+  </div>
 </div>
 
 <script src="data.js"></script>
@@ -1573,6 +1746,8 @@
     navDrawer.classList.add("open");
     navBackdrop.classList.add("open");
     hamburgerBtn.setAttribute("aria-expanded", "true");
+    // Close filter if open
+    closeFilterDrawer();
   }
   function closeNav() {
     navDrawer.classList.remove("open");
@@ -1639,17 +1814,22 @@
     closeNav();
   });
 
-  // ── Filter & Sort panel (white dropdown, in normal page flow) ──
+  // ── Filter & Sort panel (right-side drawer) ──
   const filterSortBtn     = document.getElementById("filterSortBtn");
   const filterPanelWrap   = document.getElementById("filterPanelWrap");
   const filterDrawerClose = document.getElementById("filterDrawerClose");
+  const filterBackdrop    = document.getElementById("filterBackdrop");
 
   function openFilterDrawer() {
     filterPanelWrap.classList.add("open");
+    filterBackdrop.classList.add("open");
     filterSortBtn.setAttribute("aria-expanded", "true");
+    // Close nav if open
+    closeNav();
   }
   function closeFilterDrawer() {
     filterPanelWrap.classList.remove("open");
+    filterBackdrop.classList.remove("open");
     filterSortBtn.setAttribute("aria-expanded", "false");
   }
   function toggleFilterDrawer() {
@@ -1658,6 +1838,7 @@
   }
   filterSortBtn.addEventListener("click", toggleFilterDrawer);
   filterDrawerClose.addEventListener("click", closeFilterDrawer);
+  filterBackdrop.addEventListener("click", closeFilterDrawer);
 
   // ── Accordion sections inside the drawer ────────────────────
   function wireAccordion(toggleId, bodyId) {
@@ -1727,28 +1908,39 @@
     el.addEventListener("change",         _doSearch);
   });
 
-  // ── Page transition loader ──────────────────────────────────
-  const pageLoader = document.getElementById("pageLoader");
-  let loaderHidden = false;
-  function hidePageLoader() {
-    if (!pageLoader || loaderHidden) return;
-    loaderHidden = true;
-    pageLoader.classList.add("fade-out");
-    setTimeout(() => { pageLoader.style.display = "none"; }, 450);
+  // ── Logo click — reset filters & scroll to top ─────────────
+  const brandMarkEl = document.querySelector(".brand-mark");
+  if (brandMarkEl) {
+    brandMarkEl.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Reset search
+      if (searchInput)    { searchInput.value = ""; }
+      if (navSearchInput) { navSearchInput.value = ""; }
+      // Reset category
+      setCategory("all");
+      updateNavActive("all");
+      // Reset price filter
+      if (priceFromEl) priceFromEl.value = "";
+      if (priceToEl)   priceToEl.value = "";
+      appliedPriceFrom = null;
+      appliedPriceTo   = null;
+      // Reset availability
+      availabilityFilter = "all";
+      const allRadio = document.querySelector('input[name="availability"][value="all"]');
+      if (allRadio) allRadio.checked = true;
+      // Close drawers
+      closeNav();
+      closeFilterDrawer();
+      // Re-render and scroll
+      renderAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   }
-  // If the page already finished loading by the time this script runs,
-  // 'load' will never fire again — so check readyState directly too.
-  if (document.readyState === "complete") {
-    requestAnimationFrame(() => requestAnimationFrame(hidePageLoader));
-  } else {
-    window.addEventListener("load", hidePageLoader);
-  }
-  // Failsafe: never let the loader hang forever
-  setTimeout(hidePageLoader, 1200);
 
   // ── Boot ───────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
     wireCommonUI();
+    wireAdminPanel();
     renderAll();
     updateAddToCartButtons();
     updateNavActive("all");
@@ -1756,13 +1948,38 @@
 
   // Re-sync cart when user navigates back from product.html (browser back button restores from cache)
   window.addEventListener("pageshow", (e) => {
-    hidePageLoader();
     if (e.persisted) {
       loadCartState();
       renderCart();
       updateAddToCartButtons();
     }
   });
+
+  // ── Prefetch product pages for instant navigation ───────────
+  function prefetchUrl(url) {
+    if (document.querySelector(`link[rel="prefetch"][href="${url}"]`)) return;
+    const link = document.createElement("link");
+    link.rel = "prefetch";
+    link.href = url;
+    document.head.appendChild(link);
+  }
+  // Eagerly prefetch all product pages shortly after load (catalog is small)
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      if (typeof PRODUCTS !== "undefined") {
+        PRODUCTS.forEach(p => prefetchUrl(`product.html?id=${p.id}`));
+      }
+    }, 800);
+  });
+  // Also prefetch on hover/touchstart for any product link
+  document.addEventListener("mouseover", (e) => {
+    const a = e.target.closest("a[href*='product.html']");
+    if (a) prefetchUrl(a.href);
+  }, { passive: true });
+  document.addEventListener("touchstart", (e) => {
+    const a = e.target.closest("a[href*='product.html']");
+    if (a) prefetchUrl(a.href);
+  }, { passive: true });
 </script>
 </body>
 </html>
