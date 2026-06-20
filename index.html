@@ -1370,6 +1370,16 @@
 </style>
 </head>
 <body>
+<script>
+  // Runs synchronously before any of #gridView/#productView below is
+  // parsed or painted. Without this, a fresh load of index.html?id=X
+  // would briefly paint the grid (CSS default) before DOMContentLoaded
+  // JS adds .showing-product — the same one-frame flash this whole
+  // routing system exists to avoid, just moved one step earlier.
+  if (new URLSearchParams(window.location.search).get("id")) {
+    document.body.className = "showing-product";
+  }
+</script>
 
 
 <!-- NAV BACKDROP -->

@@ -2,6 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+  // product.html is kept only as a stable, shareable/bookmarkable URL.
+  // The actual app now lives entirely in index.html (grid + product view
+  // in one document, swapped via JS — no reload, no blink). The instant
+  // anyone lands here directly, send them straight to the equivalent
+  // index.html URL before anything paints, so there's no flash of this
+  // page's own header underneath and no second navigation later when
+  // they click "All listings". This runs synchronously, before <body>,
+  // so it pre-empts paint entirely rather than redirecting after load.
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get("id");
+    var target = id ? ("index.html?id=" + encodeURIComponent(id)) : "index.html";
+    window.location.replace(target);
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STOCK/86</title>
 <style>
