@@ -5,12 +5,14 @@
 <script>
   // product.html is kept only as a stable, shareable/bookmarkable URL.
   // The actual app now lives entirely in index.html (grid + product view
-  // in one document, swapped via JS — no reload, no blink). The instant
+  // in one document, swapped via JS — no reload, no blink, and always
+  // the same up-to-date markup/styles as the homepage). The instant
   // anyone lands here directly, send them straight to the equivalent
   // index.html URL before anything paints, so there's no flash of this
-  // page's own header underneath and no second navigation later when
-  // they click "All listings". This runs synchronously, before <body>,
-  // so it pre-empts paint entirely rather than redirecting after load.
+  // page's own (now-stale) header underneath and no second navigation
+  // later when they click "All listings". This runs synchronously,
+  // before <body>, so it pre-empts paint entirely rather than
+  // redirecting after load.
   (function () {
     var params = new URLSearchParams(window.location.search);
     var id = params.get("id");
@@ -195,6 +197,7 @@
   .condition-good{background:#FFF7ED; border-color:#FED7AA; color:#92400E;}
   .condition-excellent{background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;}
   .condition-like-new{background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);}
+  .condition-new{background:var(--brand-softer); border-color:var(--border-brand-subtle); color:var(--fg-brand-strong);}
 
   /* ============================================================
      PRODUCT DETAIL PAGE LAYOUT

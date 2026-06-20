@@ -211,6 +211,14 @@ const INVENTORY = {
 };
 
 // ----------------------------------------------------------
+// CONDITION OPTIONS (admin-manageable)
+// Seeded here, then synced via Firebase like everything else —
+// admins can add/remove options from the admin panel and it's
+// reflected for every visitor.
+// ----------------------------------------------------------
+let CUSTOM_CONDITIONS = ["New", "Like New", "Excellent", "Good"];
+
+// ----------------------------------------------------------
 // SITE CONFIG
 // ----------------------------------------------------------
 const WHATSAPP_NUMBER = "9617655382" + "9"; // +961 76 553 829

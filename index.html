@@ -201,7 +201,6 @@
     .header-search-wrap{ flex:1 1 auto; }
   }
   .header-search-wrap svg{
-    position:absolute; left:10px; top:50%; transform:translateY(-50%);
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
   }
   .header-search-input{
@@ -363,7 +362,6 @@
     flex-shrink:0;
   }
   .nav-drawer-search-wrap svg{
-    position:absolute; left:10px; top:50%; transform:translateY(-50%);
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
   }
   .nav-drawer-search-input{
@@ -378,6 +376,25 @@
   }
   .nav-drawer-search-input::placeholder{color:rgba(255,255,255,0.4);}
   .nav-drawer-search-input:focus{outline:none; background:rgba(255,255,255,0.14); border-color:var(--brand);}
+
+  /* Shared search-submit icon button (header bar + nav drawer).
+     Press-triggered search, not live filtering — frequency-appropriate:
+     this fires on a deliberate tap, not on every keystroke, so a subtle
+     press feedback is enough; nothing fancier is warranted. */
+  .search-icon-btn{
+    position:absolute; left:6px; top:50%; transform:translateY(-50%);
+    width:28px; height:28px;
+    display:flex; align-items:center; justify-content:center;
+    background:none; border:none; border-radius:var(--radius-base);
+    cursor:pointer; padding:0;
+    transition:background 150ms ease, transform 120ms cubic-bezier(0.4,0,0.2,1);
+  }
+  .search-icon-btn svg{ pointer-events:none; }
+  .search-icon-btn:active{ transform:translateY(-50%) scale(0.92); }
+  @media(hover:hover) and (pointer:fine){
+    .search-icon-btn:hover{ background:rgba(255,255,255,0.12); }
+    .search-icon-btn:hover svg{ color:rgba(255,255,255,0.85); }
+  }
 
   /* Drawer body */
   .nav-drawer-body{
@@ -719,36 +736,6 @@
   .hero-badges{display:flex; flex-wrap:wrap; gap:8px;}
 
   /* ============================================================
-     HERO ENTRANCE — runs once on load, rare/first-time-seen content,
-     so a touch more presence than the card stagger is justified.
-     transform+opacity only; eased out so motion is front-loaded,
-     not lingering at the end where it'd feel sluggish.
-     ============================================================ */
-  .hero h1, .hero p.lead, .hero-badges{
-    opacity:0; transform:translateY(10px);
-    animation:hero-rise 520ms cubic-bezier(0.215,0.61,0.355,1) both;
-  }
-  .hero h1{animation-delay:40ms;}
-  .hero p.lead{animation-delay:120ms;}
-  .hero-badges{animation-delay:200ms;}
-  .hero-badges .badge{
-    opacity:0; transform:translateY(6px);
-    animation:hero-rise 420ms cubic-bezier(0.215,0.61,0.355,1) both;
-  }
-  .hero-badges .badge:nth-child(1){animation-delay:240ms;}
-  .hero-badges .badge:nth-child(2){animation-delay:270ms;}
-  .hero-badges .badge:nth-child(3){animation-delay:300ms;}
-  .hero-badges .badge:nth-child(4){animation-delay:330ms;}
-  @keyframes hero-rise{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
-  @media(prefers-reduced-motion:reduce){
-    .hero h1, .hero p.lead, .hero-badges, .hero-badges .badge{
-      animation:hero-rise-fade 300ms ease both;
-      transform:none;
-    }
-    @keyframes hero-rise-fade{ from{opacity:0;} to{opacity:1;} }
-  }
-
-  /* ============================================================
      BADGES
      ============================================================ */
   .badge{
@@ -790,6 +777,37 @@
   }
   .condition-like-new{
     background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);
+  }
+  .condition-new{
+    background:var(--brand-softer); border-color:var(--border-brand-subtle); color:var(--fg-brand-strong);
+  }
+  /* Fallback for admin-added custom conditions that don't have a named
+     color rule above (e.g. "Refurbished") — same shape, neutral tone. */
+  .card-condition-badge:not(.condition-good):not(.condition-excellent):not(.condition-like-new):not(.condition-new){
+    background:var(--neutral-secondary-medium); border-color:var(--border-default); color:var(--heading);
+  }
+
+  /* "Stamp" entrance: condition badges punch in like a rubber stamp
+     hitting paper — slightly oversized and rotated, snapping down to
+     rest with a touch of overshoot. Runs once per card on mount, same
+     as the card's own entrance, so it reads as one moment rather than
+     two competing animations. Occasional/first-paint frequency, so the
+     extra personality (vs. the plainer card-enter fade) is earned. */
+  .card-condition-badge.stamp-in{
+    animation:badge-stamp 360ms cubic-bezier(0.34,1.56,0.64,1) both;
+    animation-delay:calc(var(--card-i, 0) * 30ms + 120ms);
+  }
+  @keyframes badge-stamp{
+    0%   { opacity:0; transform:scale(1.7) rotate(-8deg); }
+    60%  { opacity:1; transform:scale(0.96) rotate(1deg); }
+    100% { opacity:1; transform:scale(1) rotate(0deg); }
+  }
+  @media(prefers-reduced-motion:reduce){
+    .card-condition-badge.stamp-in{
+      animation:badge-stamp-fade 200ms ease both;
+      animation-delay:0ms;
+    }
+    @keyframes badge-stamp-fade{ from{ opacity:0; } to{ opacity:1; } }
   }
 
   /* ============================================================
@@ -1239,6 +1257,24 @@
   .admin-list-row .admin-item-toggle{ flex-shrink:0; }
   .admin-empty{ font-size:13px; color:var(--body-subtle); padding:20px 0; text-align:center; }
   .admin-save-note{ font-size:12px; color:var(--body-subtle); margin-top:10px; line-height:1.5; }
+
+  .admin-link-btn{
+    background:none; border:none; padding:0; margin-top:6px;
+    font-size:12px; font-weight:600; color:var(--fg-brand-strong);
+    cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
+  }
+  @media(hover:hover) and (pointer:fine){
+    .admin-link-btn:hover{ text-decoration:underline; }
+  }
+  .admin-conditions-intro{
+    font-size:12px; color:var(--body-subtle); line-height:1.5; margin-bottom:14px;
+  }
+  .admin-condition-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:9px 6px; border-bottom:1px solid var(--border-light);
+  }
+  .admin-condition-row .admin-condition-name{ font-size:13px; font-weight:600; color:var(--heading); }
+  .admin-condition-row .admin-item-toggle{ flex-shrink:0; }
   .admin-toolbar-btn{
     background:var(--dark-strong); color:var(--white); border:none;
     font-size:11px; font-weight:600; padding:6px 12px;
@@ -1395,9 +1431,11 @@
   <div class="nav-drawer-body">
     <!-- Search inside nav drawer -->
     <div class="nav-drawer-search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
+      <button type="button" class="search-icon-btn" id="navSearchIconBtn" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
       <input class="nav-drawer-search-input" type="text" id="navSearchInput" placeholder="Search listings…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
 
@@ -1480,9 +1518,11 @@
 
       <!-- Search bar -->
       <div class="header-search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
+        <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
         <input class="header-search-input" type="text" id="searchInput" placeholder="Search listings…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
 
@@ -1904,6 +1944,7 @@
     <div class="admin-tabs">
       <button class="admin-tab active" id="tabAdd" data-tab="add">Add product</button>
       <button class="admin-tab" id="tabDelete" data-tab="delete">Delete / restore</button>
+      <button class="admin-tab" id="tabConditions" data-tab="conditions">Conditions</button>
     </div>
 
     <!-- ADD TAB -->
@@ -1930,11 +1971,9 @@
         <div class="admin-field">
           <label for="apCondition">Condition</label>
           <select id="apCondition">
-            <option value="Like New">Like New</option>
-            <option value="Excellent">Excellent</option>
-            <option value="Good">Good</option>
             <option value="">No condition (games)</option>
           </select>
+          <button type="button" class="admin-link-btn" id="apManageConditionsBtn">+ Manage conditions</button>
         </div>
       </div>
       <div class="admin-field">
@@ -1964,6 +2003,19 @@
         <button class="btn btn-brand" id="apSaveBtn2">Save changes</button>
       </div>
       <p class="admin-save-note">Changes sync instantly across all devices.</p>
+    </div>
+
+    <!-- CONDITIONS TAB -->
+    <div id="adminTabConditions" style="display:none;">
+      <p class="admin-conditions-intro">Conditions shown in the product condition dropdown. Removing one here won't change products that already use it.</p>
+      <div class="admin-field-row">
+        <div class="admin-field" style="flex:1;">
+          <label for="apNewCondition">New condition</label>
+          <input type="text" id="apNewCondition" placeholder="e.g. Refurbished" maxlength="24">
+        </div>
+        <button type="button" class="btn btn-brand btn-sm" id="apAddConditionBtn" style="align-self:flex-end; margin-bottom:1px;">Add</button>
+      </div>
+      <div id="adminConditionsList"></div>
     </div>
   </div>
 </div>
@@ -2122,30 +2174,47 @@
   });
 
   // Expose filter values for app.js renderAll
-  function getSearchQuery()      { var el = document.getElementById("searchInput"); return el ? el.value.trim().toLowerCase() : ""; }
+  // Search is "press to apply" — appliedSearchQuery only updates when the
+  // user presses Enter or taps the search icon, not on every keystroke.
+  let appliedSearchQuery = "";
+  function getSearchQuery()      { return appliedSearchQuery; }
   function getMaxPrice()         { return Infinity; } // legacy hook kept for compatibility, superseded by getPriceRange
   function getPriceRange()       { return { from: appliedPriceFrom, to: appliedPriceTo }; }
   function getAvailabilityFilter(){ return availabilityFilter; }
 
   // ── Search (header input + nav drawer input, kept in sync) ──
-  const searchInput    = document.getElementById("searchInput");
-  const navSearchInput = document.getElementById("navSearchInput");
+  const searchInput     = document.getElementById("searchInput");
+  const navSearchInput  = document.getElementById("navSearchInput");
+  const searchIconBtn   = document.getElementById("searchIconBtn");
+  const navSearchIconBtn = document.getElementById("navSearchIconBtn");
 
-  function _doSearch(e) {
-    const val = e.target.value;
+  function applySearch(val) {
+    appliedSearchQuery = (val || "").trim().toLowerCase();
     if (searchInput)    searchInput.value    = val;
     if (navSearchInput) navSearchInput.value = val;
     renderAll();
   }
+
+  // Typing keeps both inputs in sync with each other (so switching between
+  // the header bar and the nav drawer doesn't lose what was typed) without
+  // touching results until the search is actually submitted.
+  function _syncTyping(e) {
+    const val = e.target.value;
+    if (searchInput    && searchInput    !== e.target) searchInput.value    = val;
+    if (navSearchInput && navSearchInput !== e.target) navSearchInput.value = val;
+  }
   [searchInput, navSearchInput].forEach(el => {
     if (!el) return;
-    el.addEventListener("input",          _doSearch);
-    el.addEventListener("keyup",          _doSearch);
-    el.addEventListener("compositionend", _doSearch);
-    el.addEventListener("change",         _doSearch);
+    el.addEventListener("input", _syncTyping);
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); applySearch(el.value); }
+    });
   });
+  if (searchIconBtn)    searchIconBtn.addEventListener("click",    () => applySearch(searchInput.value));
+  if (navSearchIconBtn) navSearchIconBtn.addEventListener("click", () => applySearch(navSearchInput.value));
 
   // ── Logo click handled centrally by wireLogoPress() in app.js ──
+
 
   // ── Boot ───────────────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
@@ -2157,14 +2226,14 @@
     updateNavActive("all");
 
     // If someone lands on index.html with ?id=... in the URL (a shared
-    // or bookmarked product link), show the product view immediately
-    // instead of the grid — no flash, since this runs before first paint
-    // settles either way. We commit to the product view based on the id
-    // being *present*, not on the item being found yet — data.js's seed
-    // list may not include a brand-new item, and Firebase hasn't loaded
-    // yet at this point. renderProductPage already shows a graceful
-    // "Loading…" state until window.fbInventoryReady flips true, then
-    // firebase.js calls renderProductPage() again on its own.
+    // or bookmarked product link, or redirected here from product.html),
+    // show the product view immediately instead of the grid. We commit
+    // to the product view based on the id being *present*, not on the
+    // item being found yet — data.js's seed list may not include a
+    // brand-new item, and Firebase hasn't loaded yet at this point.
+    // renderProductPage already shows a graceful "Loading…" state until
+    // window.fbInventoryReady flips true, then firebase.js calls
+    // renderProductPage() again on its own.
     const bootParams = new URLSearchParams(window.location.search);
     const bootId = bootParams.get("id");
     if (bootId) {

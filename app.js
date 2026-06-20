@@ -19,8 +19,8 @@ let adminMode = false;
 //
 // product.html itself is kept as-is, untouched, purely as a fallback:
 // a shared link, a bookmark, or a no-JS visitor landing directly on
-// product.html still gets a working page. It just isn't part of the
-// normal in-app click path anymore.
+// product.html redirects straight into this same-document app (see
+// the redirect script at the top of product.html).
 
 const isIndexDocument = !!document.getElementById("gridView");
 
@@ -56,24 +56,6 @@ window.addEventListener("popstate", (e) => {
     showGridView({ skipPush: true });
   }
 });
-
-// product.html is only ever reached via a real document navigation now
-// (shared link, bookmark, no-JS fallback) — give very old browsers that
-// don't support the native cross-document View Transition a gentle
-// fade-in instead of a hard cut. Browsers that do support it use the
-// `@view-transition { navigation: auto; }` CSS rule instead.
-if (!isIndexDocument) {
-  let hasViewTransitionSupport = false;
-  try {
-    hasViewTransitionSupport = CSS.supports("selector(::view-transition-old(root))");
-  } catch (e) { /* very old browser — CSS.supports selector() syntax itself unsupported */ }
-
-  if (!hasViewTransitionSupport) {
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.classList.add("page-fade-fallback");
-    });
-  }
-}
 
 // ---------- SCROLL MEMORY (index.html ⇄ product.html) ----------
 // Remembers exactly which product card the person was looking at, so
@@ -169,6 +151,24 @@ function wireSmoothNav() {
       return;
     }
   }, { capture: true });
+}
+
+// product.html immediately redirects into index.html (see the redirect
+// script at the top of product.html), so in practice this branch only
+// ever runs in that brief instant before the redirect fires, or if JS
+// is disabled and the redirect script itself didn't run. Kept as a
+// harmless safety net, not load-bearing for the normal flow.
+if (!isIndexDocument) {
+  let hasViewTransitionSupport = false;
+  try {
+    hasViewTransitionSupport = CSS.supports("selector(::view-transition-old(root))");
+  } catch (e) { /* very old browser — CSS.supports selector() syntax itself unsupported */ }
+
+  if (!hasViewTransitionSupport) {
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("page-fade-fallback");
+    });
+  }
 }
 
 // ---------- ICONS ----------
@@ -300,7 +300,7 @@ function renderProductCard(item) {
         <a href="product.html?id=${item.id}" class="card-title-link">
           <h3 class="card-title">${item.name}</h3>
         </a>
-        ${showConditionOnCard ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition}</span>` : ""}
+        ${showConditionOnCard ? `<span class="card-condition-badge stamp-in condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition}</span>` : ""}
         ${specsHtml ? `<div class="card-specs">${specsHtml}</div>` : ""}
         <div class="card-price-row">
           <span class="card-price"><span class="currency">$</span>${item.price}</span>
@@ -731,6 +731,7 @@ function wireLogoPress() {
     // Single/double press: reset filters & go to top, only if those controls exist on this page.
     if (typeof searchInput !== "undefined" && searchInput)       searchInput.value = "";
     if (typeof navSearchInput !== "undefined" && navSearchInput) navSearchInput.value = "";
+    if (typeof appliedSearchQuery !== "undefined") appliedSearchQuery = "";
     if (typeof setCategory === "function")      setCategory("all");
     if (typeof updateNavActive === "function")  updateNavActive("all");
     if (typeof priceFromEl !== "undefined" && priceFromEl) priceFromEl.value = "";
@@ -820,6 +821,17 @@ function wireCommonUI() {
 
 let activeCategory = "all";
 
+// Category keys → the human-readable label shown in the UI, so a search
+// for "switch" or "phones" can match the category itself, not just
+// individual product names.
+const CATEGORY_LABELS = {
+  switches: "Nintendo Switch",
+  games:    "Switch Games",
+  consoles: "Handhelds & Consoles",
+  laptops:  "Laptops",
+  phones:   "Phones"
+};
+
 function setCategory(cat) {
   activeCategory = cat;
   document.querySelectorAll(".cat-tab").forEach(btn => {
@@ -828,16 +840,27 @@ function setCategory(cat) {
   renderAll();
 }
 
-function searchScore(item, query) {
+// Score tiers, highest wins. Product name is checked before anything else
+// so "switch" matching ten Switch Games by category never outranks an
+// actual product named "Switch", and a search is judged by what it most
+// specifically matched.
+//   4 — product name
+//   3 — product id / SKU
+//   2 — category name (e.g. "phones", "laptops")
+//   1 — description / specs (fallback full-text match)
+//   0 — no match
+function searchScore(item, query, categoryKey) {
   if (!query) return 1;
-  const name  = (item.name  || "").toLowerCase();
-  const id    = (item.id    || "").toLowerCase();
-  const desc  = (item.description || "").toLowerCase();
-  const specs = (item.specs || []).join(" ").toLowerCase();
+  const name     = (item.name  || "").toLowerCase();
+  const id       = (item.id    || "").toLowerCase();
+  const desc     = (item.description || "").toLowerCase();
+  const specs    = (item.specs || []).join(" ").toLowerCase();
+  const catLabel = (CATEGORY_LABELS[categoryKey] || "").toLowerCase();
 
-  if (name.includes(query))               return 3;
-  if (id.includes(query))                 return 2;
-  if (desc.includes(query) || specs.includes(query)) return 1;
+  if (name.includes(query))                          return 4;
+  if (id.includes(query))                             return 3;
+  if (catLabel && catLabel.includes(query))            return 2;
+  if (desc.includes(query) || specs.includes(query))   return 1;
   return 0;
 }
 
@@ -860,7 +883,7 @@ function renderAll() {
   let orderedSections = [...SECTIONS];
   if (query) {
     orderedSections = orderedSections.map(sec => {
-      const bestScore = sec.items.reduce((best, item) => Math.max(best, searchScore(item, query)), 0);
+      const bestScore = sec.items.reduce((best, item) => Math.max(best, searchScore(item, query, sec.key)), 0);
       return { ...sec, bestScore };
     }).sort((a, b) => b.bestScore - a.bestScore);
   }
@@ -907,15 +930,23 @@ function renderAll() {
       const matchAvail  = availability === "all" ||
                            (availability === "in-stock"     && !item.sold) ||
                            (availability === "out-of-stock" &&  item.sold);
-      const score       = searchScore(item, query);
+      const score       = searchScore(item, query, sec.key);
       const matchSearch = !query || score > 0;
       return matchPrice && matchAvail && matchSearch;
     });
 
-    // Available items first (highest price → lowest), sold items always
-    // pushed below available ones (also highest → lowest within that group).
+    // Available items first, sold items always pushed below available
+    // ones. While searching, items are additionally ranked by how they
+    // matched — product name beats category name beats description —
+    // before price breaks ties within the same tier; with no active
+    // search, price-descending is the only ordering.
     filtered = filtered.slice().sort((a, b) => {
       if (a.sold !== b.sold) return a.sold ? 1 : -1;
+      if (query) {
+        const scoreA = searchScore(a, query, sec.key);
+        const scoreB = searchScore(b, query, sec.key);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+      }
       return b.price - a.price;
     });
 
@@ -1014,7 +1045,7 @@ function renderProductPage(explicitId) {
 
   // Condition: hide for games (icon === "game")
   const conditionHtml = (item.condition && item.icon !== "game")
-    ? `<span class="card-condition-badge condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition}</span>`
+    ? `<span class="card-condition-badge stamp-in condition-${(item.condition||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}">${item.condition}</span>`
     : "";
 
   const inCart = cart.some(l => l.sourceId === item.id);
@@ -1103,9 +1134,12 @@ function closeAdminPanel() {
 function adminSwitchTab(tab) {
   document.getElementById("tabAdd").classList.toggle("active", tab === "add");
   document.getElementById("tabDelete").classList.toggle("active", tab === "delete");
-  document.getElementById("adminTabAdd").style.display    = tab === "add" ? "" : "none";
-  document.getElementById("adminTabDelete").style.display = tab === "delete" ? "" : "none";
+  document.getElementById("tabConditions").classList.toggle("active", tab === "conditions");
+  document.getElementById("adminTabAdd").style.display        = tab === "add"        ? "" : "none";
+  document.getElementById("adminTabDelete").style.display      = tab === "delete"     ? "" : "none";
+  document.getElementById("adminTabConditions").style.display  = tab === "conditions" ? "" : "none";
   if (tab === "delete") renderAdminDeleteList();
+  if (tab === "conditions") renderAdminConditionsList();
 }
 
 function renderAdminDeleteList() {
@@ -1135,6 +1169,73 @@ function renderAdminDeleteList() {
       </div>
     </div>
   `).join("");
+}
+
+// ---------- CONDITION OPTIONS (admin-manageable) ----------
+// CUSTOM_CONDITIONS is declared with `let` in data.js, seeded there, and
+// kept in sync by firebase.js exactly like INVENTORY — every admin edit
+// here is synced to all visitors, the same as adding/removing a product.
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// Repaints every <select id="apCondition"> on the page (just the one
+// today, but this stays correct if more appear) from the current
+// condition list, preserving whatever was already selected if it still
+// exists in the list.
+function refreshConditionDropdowns() {
+  const list = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS) || [];
+  document.querySelectorAll("#apCondition").forEach(select => {
+    const prevValue = select.value;
+    const options = list.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+    select.innerHTML = options + `<option value="">No condition (games)</option>`;
+    const stillExists = prevValue && (list.includes(prevValue) || prevValue === "");
+    select.value = stillExists ? prevValue : (list[0] || "");
+  });
+}
+
+function renderAdminConditionsList() {
+  const wrap = document.getElementById("adminConditionsList");
+  if (!wrap) return;
+  const list = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS) || [];
+  if (!list.length) {
+    wrap.innerHTML = `<div class="admin-empty">No conditions yet — add one above.</div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(cond => `
+    <div class="admin-condition-row">
+      <span class="admin-condition-name">${escapeHtml(cond)}</span>
+      <button class="admin-item-toggle" style="background:var(--danger);color:var(--white);border-color:transparent;" onclick="removeCondition('${escapeForJs(cond)}')">
+        Remove
+      </button>
+    </div>
+  `).join("");
+}
+
+function addCondition() {
+  const input = document.getElementById("apNewCondition");
+  const val = input.value.trim();
+  if (!val) return;
+  if (typeof CUSTOM_CONDITIONS === "undefined" || !CUSTOM_CONDITIONS) CUSTOM_CONDITIONS = [];
+  if (CUSTOM_CONDITIONS.some(c => c.toLowerCase() === val.toLowerCase())) {
+    alert("That condition already exists.");
+    return;
+  }
+  CUSTOM_CONDITIONS.push(val);
+  input.value = "";
+  renderAdminConditionsList();
+  refreshConditionDropdowns();
+  if (typeof window.fbSaveConditions === "function") window.fbSaveConditions();
+}
+
+function removeCondition(cond) {
+  if (typeof CUSTOM_CONDITIONS === "undefined" || !CUSTOM_CONDITIONS) return;
+  if (!confirm(`Remove "${cond}" from the condition list? Products already using it keep their condition — this only affects new products.`)) return;
+  CUSTOM_CONDITIONS = CUSTOM_CONDITIONS.filter(c => c !== cond);
+  renderAdminConditionsList();
+  refreshConditionDropdowns();
+  if (typeof window.fbSaveConditions === "function") window.fbSaveConditions();
 }
 
 // Resizes/recompresses an image so the resulting base64 string stays safely
@@ -1214,7 +1315,7 @@ function wireAdminImageInput() {
 function resetAdminAddForm() {
   document.getElementById("apName").value = "";
   document.getElementById("apPrice").value = "";
-  document.getElementById("apCondition").value = "Like New";
+  document.getElementById("apCondition").value = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS[0]) || "";
   document.getElementById("apCategory").value = "switches";
   document.getElementById("apDescription").value = "";
   document.getElementById("apSpecs").value = "";
@@ -1290,6 +1391,7 @@ function wireAdminPanel() {
   });
   document.getElementById("tabAdd").addEventListener("click", () => adminSwitchTab("add"));
   document.getElementById("tabDelete").addEventListener("click", () => adminSwitchTab("delete"));
+  document.getElementById("tabConditions").addEventListener("click", () => adminSwitchTab("conditions"));
   document.getElementById("apSaveBtn").addEventListener("click", adminAddProduct);
   document.getElementById("apSaveBtn2").addEventListener("click", () => {
     if (typeof window.fbSaveInventory === "function") {
@@ -1303,5 +1405,20 @@ function wireAdminPanel() {
       });
     }
   });
+
+  const manageConditionsBtn = document.getElementById("apManageConditionsBtn");
+  if (manageConditionsBtn) manageConditionsBtn.addEventListener("click", () => adminSwitchTab("conditions"));
+
+  const addConditionBtn = document.getElementById("apAddConditionBtn");
+  if (addConditionBtn) addConditionBtn.addEventListener("click", addCondition);
+
+  const newConditionInput = document.getElementById("apNewCondition");
+  if (newConditionInput) {
+    newConditionInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); addCondition(); }
+    });
+  }
+
+  refreshConditionDropdowns();
   wireAdminImageInput();
 }
