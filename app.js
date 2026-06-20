@@ -102,7 +102,7 @@ function deleteProduct(id) {
     window.fbSaveInventory(() => {
       if (typeof renderAll === "function") renderAll();
       renderAdminDeleteList();
-    });
+    }, [id]);
   } else {
     if (typeof renderAll === "function") renderAll();
     renderAdminDeleteList();
@@ -531,6 +531,50 @@ function sendOrderToWhatsApp() {
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
 }
 
+// ---------- LOGO: never navigates/refreshes; triple-press opens admin login ----------
+
+let logoPressCount = 0;
+let logoPressTimer = null;
+
+function wireLogoPress() {
+  const brandMarkEl = document.querySelector(".brand-mark");
+  if (!brandMarkEl) return;
+
+  brandMarkEl.addEventListener("click", (e) => {
+    // Always block default link behaviour — the logo must never navigate or refresh.
+    e.preventDefault();
+    e.stopPropagation();
+
+    logoPressCount++;
+    if (logoPressTimer) clearTimeout(logoPressTimer);
+
+    if (logoPressCount >= 3) {
+      logoPressCount = 0;
+      showLoginBox();
+      return;
+    }
+    logoPressTimer = setTimeout(() => { logoPressCount = 0; }, 700);
+
+    // Single/double press: reset filters & go to top, only if those controls exist on this page.
+    if (typeof searchInput !== "undefined" && searchInput)       searchInput.value = "";
+    if (typeof navSearchInput !== "undefined" && navSearchInput) navSearchInput.value = "";
+    if (typeof setCategory === "function")      setCategory("all");
+    if (typeof updateNavActive === "function")  updateNavActive("all");
+    if (typeof priceFromEl !== "undefined" && priceFromEl) priceFromEl.value = "";
+    if (typeof priceToEl   !== "undefined" && priceToEl)   priceToEl.value   = "";
+    if (typeof appliedPriceFrom !== "undefined") appliedPriceFrom = null;
+    if (typeof appliedPriceTo   !== "undefined") appliedPriceTo   = null;
+    if (typeof availabilityFilter !== "undefined") availabilityFilter = "all";
+    const allRadio = document.querySelector('input[name="availability"][value="all"]');
+    if (allRadio) allRadio.checked = true;
+    if (typeof closeNav === "function")         closeNav();
+    if (typeof closeFilterDrawer === "function") closeFilterDrawer();
+
+    if (typeof renderAll === "function") renderAll();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 // ---------- ADMIN ----------
 
 function showLoginBox() { document.getElementById("loginBox").classList.add("open"); }
@@ -886,6 +930,45 @@ function renderAdminDeleteList() {
   `).join("");
 }
 
+// Resizes/recompresses an image so the resulting base64 string stays safely
+// under Firebase's ~1MB single-write limit, regardless of the original photo size.
+function resizeImageForUpload(file, maxDimension, callback) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDimension || height > maxDimension) {
+        if (width >= height) {
+          height = Math.round(height * (maxDimension / width));
+          width = maxDimension;
+        } else {
+          width = Math.round(width * (maxDimension / height));
+          height = maxDimension;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Try progressively lower quality until the result is comfortably small.
+      let quality = 0.85;
+      let dataUrl = canvas.toDataURL("image/jpeg", quality);
+      while (dataUrl.length > 700000 && quality > 0.4) {
+        quality -= 0.15;
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+      }
+      callback(dataUrl);
+    };
+    img.onerror = () => callback(null);
+    img.src = reader.result;
+  };
+  reader.onerror = () => callback(null);
+  reader.readAsDataURL(file);
+}
+
 function wireAdminImageInput() {
   const drop = document.getElementById("apImgDrop");
   const fileInput = document.getElementById("apImgFile");
@@ -893,14 +976,18 @@ function wireAdminImageInput() {
 
   function handleFile(file) {
     if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      apPendingImageData = reader.result;
+    drop.textContent = "Processing photo…";
+    resizeImageForUpload(file, 1280, (dataUrl) => {
+      if (!dataUrl) {
+        alert("Couldn't process that photo — please try a different image.");
+        drop.textContent = "Tap to choose a photo, or drag one here";
+        return;
+      }
+      apPendingImageData = dataUrl;
       preview.src = apPendingImageData;
       preview.classList.add("show");
       drop.textContent = file.name + " — tap to change";
-    };
-    reader.readAsDataURL(file);
+    });
   }
 
   drop.addEventListener("click", () => fileInput.click());
