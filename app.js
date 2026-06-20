@@ -9,6 +9,46 @@ const CART_STORAGE_KEY = "stock86_cart_v1";
 let cart = [];
 let adminMode = false;
 
+// ---------- SMOOTH PAGE NAVIGATION ----------
+// Uses the native View Transitions API where supported (Chrome/Edge/Safari 18+)
+// for a smooth cross-fade between index.html and product.html. Falls back to a
+// simple opacity fade for other browsers. Works with plain <a href> links —
+// no SPA rewrite needed.
+
+const supportsViewTransitions = typeof document.startViewTransition === "function";
+
+if (!supportsViewTransitions) {
+  document.documentElement.classList.add("no-view-transitions");
+  document.addEventListener("DOMContentLoaded", () => {
+    document.body.classList.add("page-fade-fallback");
+  });
+}
+
+function navigateWithFade(url) {
+  if (supportsViewTransitions) {
+    document.startViewTransition(() => { window.location.href = url; });
+  } else {
+    document.body.classList.add("page-leaving");
+    setTimeout(() => { window.location.href = url; }, 150);
+  }
+}
+
+// Intercept clicks on same-origin links between index.html and product.html
+// so the navigation gets a smooth transition instead of the default blank flash.
+function wireSmoothNav() {
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute("href");
+    if (!href) return;
+    // Only intercept our own product/index links, not external/anchor/admin links
+    if (!/^(product\.html(\?|$)|index\.html(\?|$)?)/.test(href)) return;
+    if (link.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    navigateWithFade(href);
+  });
+}
+
 // ---------- ICONS ----------
 
 const ICONS = {
@@ -520,6 +560,7 @@ function exitAdmin() {
 function wireCommonUI() {
   loadCartState();
   renderCart();
+  wireSmoothNav();
 
   document.getElementById("cartOpenBtn").addEventListener("click", openDrawer);
   document.getElementById("drawerCloseBtn").addEventListener("click", closeDrawer);
@@ -537,6 +578,12 @@ function wireCommonUI() {
     if (e.key === "Enter") attemptAdminLogin();
   });
   document.getElementById("adminExitBtn").addEventListener("click", exitAdmin);
+
+  const loginBoxCloseBtn = document.getElementById("loginBoxCloseBtn");
+  if (loginBoxCloseBtn) loginBoxCloseBtn.addEventListener("click", hideLoginBox);
+
+  // Triple-press the logo to reveal the admin login box is wired in index.html
+  // (alongside the existing "reset filters" logo handler) to avoid double-binding.
 
   document.getElementById("controllerModalOverlay").addEventListener("click", (e) => {
     if (e.target === document.getElementById("controllerModalOverlay")) closeControllerModal();
