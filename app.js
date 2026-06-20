@@ -50,6 +50,25 @@ function toggleSold(id) {
   if (typeof renderProductPage === "function") renderProductPage();
 }
 
+function deleteProduct(id) {
+  if (!confirm("Permanently delete this product? This cannot be undone.")) return;
+  let deleted = false;
+  ["switches","games","consoles","laptops","phones"].forEach(cat => {
+    const idx = (INVENTORY[cat] || []).findIndex(i => i.id === id);
+    if (idx !== -1) { INVENTORY[cat].splice(idx, 1); deleted = true; }
+  });
+  if (!deleted) return;
+  if (typeof window.fbSaveInventory === "function") {
+    window.fbSaveInventory(() => {
+      if (typeof renderAll === "function") renderAll();
+      renderAdminDeleteList();
+    });
+  } else {
+    if (typeof renderAll === "function") renderAll();
+    renderAdminDeleteList();
+  }
+}
+
 // ---------- CART PERSISTENCE ----------
 
 function saveCartState() {
@@ -808,9 +827,14 @@ function renderAdminDeleteList() {
         <div class="admin-list-name">${item.name}</div>
         <div class="admin-list-meta">${item.id} · $${item.price}${item.sold ? " · Sold" : ""}</div>
       </div>
-      <button class="admin-item-toggle ${item.sold ? 'is-sold' : ''}" onclick="toggleSold('${item.id}'); renderAdminDeleteList();">
-        ${item.sold ? "Mark available" : "Mark sold (delete)"}
-      </button>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+        <button class="admin-item-toggle ${item.sold ? 'is-sold' : ''}" onclick="toggleSold('${item.id}'); renderAdminDeleteList();">
+          ${item.sold ? "Available" : "Mark sold"}
+        </button>
+        <button class="admin-item-toggle" style="background:var(--danger);color:var(--white);border-color:transparent;" onclick="deleteProduct('${item.id}');">
+          Delete
+        </button>
+      </div>
     </div>
   `).join("");
 }
@@ -886,7 +910,6 @@ function adminAddProduct() {
   if (!INVENTORY[category]) INVENTORY[category] = [];
   INVENTORY[category].push(newItem);
 
-  // Save to Firebase
   if (typeof window.fbSaveInventory === "function") {
     window.fbSaveInventory(() => {
       if (typeof renderAll === "function") renderAll();
@@ -896,7 +919,7 @@ function adminAddProduct() {
       const note = document.getElementById("apSaveNote");
       btn.textContent = "✓ Saved!";
       btn.disabled = true;
-      if (note) note.textContent = "Product saved and live on all devices.";
+      if (note) note.textContent = "Product live on all devices.";
       setTimeout(() => { btn.textContent = "Save product"; btn.disabled = false; if (note) note.textContent = ""; }, 2500);
     });
   } else {
@@ -904,6 +927,10 @@ function adminAddProduct() {
     renderAdminDeleteList();
     resetAdminAddForm();
   }
+}
+
+function escapeForJs(str) {
+  return String(str).replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
 }
 
 function wireAdminPanel() {
