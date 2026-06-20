@@ -12,58 +12,64 @@
     font-style: normal;
     font-display: swap;
   }
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
   :root{
-    --neutral-primary-soft:#FFFFFF;
-    --neutral-secondary-soft:#F7F8F8;
-    --neutral-secondary-medium:#F0F2F2;
-    --neutral-tertiary-soft:#EAEDED;
-    --neutral-tertiary-medium:#E3E6E6;
-    --neutral-quaternary:#D5D9D9;
-    --gray:#BBBFBF;
-    --brand-softer:#FEF7ED;
-    --brand-soft:#FCECD3;
-    --brand:#F3A848;
-    --brand-medium:#F8D4A0;
-    --brand-strong:#D4882A;
-    --success-soft:#F0FCF5;
-    --success:#007A55;
-    --danger-soft:#FEF0F0;
-    --danger:#CC0C39;
-    --danger-medium:#FFE0E3;
-    --danger-strong:#A30028;
-    --dark:#131A22;
-    --dark-strong:#0F1111;
-    --disabled:#EAEDED;
-    --heading:#0F1111;
-    --body:#565959;
-    --body-subtle:#767676;
-    --fg-brand:#D4882A;
-    --fg-brand-strong:#B87320;
-    --fg-disabled:#949494;
+    --neutral-primary-soft:#F7F4ED;
+    --neutral-secondary-soft:#EFEAE0;
+    --neutral-secondary-medium:#E8E2D5;
+    --neutral-tertiary-soft:#E2DCCD;
+    --neutral-tertiary-medium:#D9D1BE;
+    --neutral-quaternary:#C7BCA3;
+    --gray:#9C9686;
+    --brand-softer:#FBE9DD;
+    --brand-soft:#F6CFAE;
+    --brand:#FF6A1A;
+    --brand-medium:#FF8A47;
+    --brand-strong:#D6500E;
+    --success-soft:#E9F3EC;
+    --success:#2B8F6B;
+    --success-strong:#1F6B4F;
+    --danger-soft:#F6E9E5;
+    --danger:#B14A36;
+    --danger-medium:#E8C3B7;
+    --danger-strong:#8A3826;
+    --dark:#15171A;
+    --dark-strong:#0A0B0C;
+    --disabled:#E2DCCD;
+    --heading:#15171A;
+    --body:#4A463D;
+    --body-subtle:#7A7565;
+    --fg-brand:#D6500E;
+    --fg-brand-strong:#B8430C;
+    --fg-disabled:#9C9686;
     --white:#FFFFFF;
-    --border-light:#EAEDED;
-    --border-default:#D5D9D9;
-    --border-default-medium:#D5D9D9;
-    --border-default-strong:#BBBFBF;
-    --border-danger-subtle:#FECDD3;
-    --border-brand:#D4882A;
-    --border-brand-subtle:#F8D4A0;
-    --radius-base:8px;
-    --radius-default:4px;
+    --border-light:#E2DCCD;
+    --border-default:#C7BCA3;
+    --border-default-medium:#C7BCA3;
+    --border-default-strong:#9C9686;
+    --border-danger-subtle:#E8C3B7;
+    --border-brand:#D6500E;
+    --border-brand-subtle:#F6CFAE;
+    --radius-base:3px;
+    --radius-default:2px;
     --radius-full:9999px;
-    --shadow-2xs:0 1px rgb(0 0 0 / 0.04);
-    --shadow-xs:0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --shadow-sm:0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
-    --shadow-md:0 2px 4px -1px rgb(0 0 0 / 0.06), 0 1px 3px -1px rgb(0 0 0 / 0.06);
-    --shadow-lg:0 6px 12px -3px rgb(0 0 0 / 0.08), 0 3px 5px -3px rgb(0 0 0 / 0.06);
+    --shadow-2xs:0 1px rgb(15 17 16 / 0.06);
+    --shadow-xs:0 1px 2px 0 rgb(15 17 16 / 0.08);
+    --shadow-sm:0 1px 2px 0 rgb(15 17 16 / 0.10), 0 1px 2px -1px rgb(15 17 16 / 0.10);
+    --shadow-md:0 2px 4px -1px rgb(15 17 16 / 0.12), 0 1px 3px -1px rgb(15 17 16 / 0.10);
+    --shadow-lg:0 6px 16px -3px rgb(15 17 16 / 0.18), 0 3px 6px -3px rgb(15 17 16 / 0.12);
+    --font-mono:"IBM Plex Mono", "NintendoSwitchUI", monospace;
+    --font-sans:"Inter", "NintendoSwitchUI", sans-serif;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; background:var(--dark-strong);}
   body{
-    font-family:"NintendoSwitchUI", "Open Sans", sans-serif;
-    background:var(--neutral-primary-soft);
+    font-family:var(--font-sans);
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(21,23,26,0.025) 39px, rgba(21,23,26,0.025) 40px),
+      var(--neutral-primary-soft);
     color:var(--body);
     -webkit-font-smoothing:antialiased;
   }
@@ -80,9 +86,9 @@
     transform: scale(0.97);
     transition: transform 80ms ease, opacity 80ms ease;
   }
-  :focus-visible{outline:none; box-shadow:0 0 0 4px var(--brand-medium); border-radius:var(--radius-default);}
-  h1,h2,h3,h4{font-weight:600; color:var(--heading); font-family:"NintendoSwitchUI", sans-serif;}
-  h3{font-size:18px; line-height:1.25;}
+  :focus-visible{outline:none; box-shadow:0 0 0 3px var(--brand-soft); border-radius:var(--radius-default);}
+  h1,h2,h3,h4{font-weight:700; color:var(--heading); font-family:var(--font-mono); letter-spacing:-0.01em;}
+  h3{font-size:17px; line-height:1.25;}
   .container{max-width:1440px; margin:0 auto; padding:0 16px;}
 
   /* ============================================================
@@ -97,7 +103,7 @@
   .header::before{
     content:"";
     position:absolute; inset:0;
-    background:rgba(6,8,14,0.78);
+    background:rgba(10,11,12,0.82);
     pointer-events:none; z-index:1;
   }
   .topbar{
@@ -115,7 +121,7 @@
      ============================================================ */
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    font-family:"NintendoSwitchUI", sans-serif; font-weight:500;
+    font-family:var(--font-sans); font-weight:500;
     border-radius:var(--radius-base); border:1px solid transparent;
     box-shadow:var(--shadow-xs); cursor:pointer;
     transition:background-color 150ms, color 150ms, border-color 150ms, transform 120ms ease;
@@ -147,7 +153,7 @@
   .badge{
     display:inline-flex; align-items:center; gap:4px;
     border:1px solid; border-radius:var(--radius-default);
-    font-weight:500; white-space:nowrap; font-family:"NintendoSwitchUI", sans-serif;
+    font-weight:500; white-space:nowrap; font-family:var(--font-sans);
   }
   .badge-default{font-size:11px; padding:2px 6px;}
   .badge-lg{font-size:12px; padding:3px 8px;}
@@ -156,21 +162,41 @@
   .badge-danger{background:var(--danger-soft); border-color:var(--border-danger-subtle); color:var(--danger-strong);}
 
   /* ============================================================
-     CONDITION BADGE
+     CONDITION STAMP — matches the grid card treatment
      ============================================================ */
   .card-condition-badge{
     display:inline-flex; align-items:center;
-    font-size:12px; font-weight:600;
-    padding:3px 10px;
-    border-radius:var(--radius-full);
-    border:1px solid;
-    font-family:"NintendoSwitchUI", sans-serif;
-    letter-spacing:0.2px;
+    font-size:11px; font-weight:700;
+    padding:4px 11px;
+    border-radius:var(--radius-default);
+    border:1.5px solid;
+    font-family:var(--font-mono);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
     width:fit-content;
+    transform:rotate(-3deg);
+    position:relative;
+    background:var(--neutral-primary-soft);
   }
-  .condition-good{background:#FFF7ED; border-color:#FED7AA; color:#92400E;}
-  .condition-excellent{background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;}
-  .condition-like-new{background:var(--success-soft); border-color:#A7F3D0; color:var(--success-strong);}
+  .card-condition-badge::before{
+    content:"";
+    position:absolute; inset:2px;
+    border:1px solid currentColor;
+    opacity:0.35;
+    border-radius:1px;
+    pointer-events:none;
+  }
+  @keyframes stamp-down{
+    0%{ transform:rotate(-3deg) scale(2.2); opacity:0; }
+    60%{ transform:rotate(-3deg) scale(0.92); opacity:1; }
+    100%{ transform:rotate(-3deg) scale(1); opacity:1; }
+  }
+  @media not (prefers-reduced-motion: reduce){
+    .card-condition-badge{ animation:stamp-down 360ms cubic-bezier(0.215,0.61,0.355,1) 80ms both; }
+  }
+  .condition-good{background:var(--neutral-primary-soft); border-color:#92400E; color:#92400E;}
+  .condition-excellent{background:var(--neutral-primary-soft); border-color:#1D4ED8; color:#1D4ED8;}
+  .condition-like-new{background:var(--neutral-primary-soft); border-color:var(--success-strong); color:var(--success-strong);}
 
   /* ============================================================
      PRODUCT DETAIL PAGE LAYOUT
@@ -207,16 +233,17 @@
 
   .product-detail-info{display:flex; flex-direction:column; gap:10px;}
 
-  .card-sku{font-size:11px; color:var(--body-subtle); font-weight:500; letter-spacing:0.3px;}
+  .card-sku{font-size:11px; color:var(--body-subtle); font-weight:600; letter-spacing:0.06em; font-family:var(--font-mono); text-transform:uppercase;}
 
   .product-detail-title{
-    font-size:22px; font-weight:700; color:var(--heading);
-    line-height:1.2; letter-spacing:-0.3px;
+    font-size:21px; font-weight:700; color:var(--heading);
+    line-height:1.2; letter-spacing:-0.01em;
+    font-family:var(--font-sans);
   }
-  @media(min-width:768px){.product-detail-title{font-size:26px;}}
+  @media(min-width:768px){.product-detail-title{font-size:25px;}}
 
-  .product-detail-price{font-size:32px; font-weight:700; color:var(--heading); margin:4px 0;}
-  .product-detail-price .currency{font-size:18px; font-weight:600; margin-right:2px;}
+  .product-detail-price{font-size:30px; font-weight:700; color:var(--heading); margin:4px 0; font-family:var(--font-mono); letter-spacing:-0.01em;}
+  .product-detail-price .currency{font-size:17px; font-weight:600; margin-right:2px;}
 
   .product-detail-desc{
     font-size:14px; color:var(--body); line-height:1.7;
@@ -265,7 +292,7 @@
     border-radius:var(--radius-base); border:1px solid var(--border-default-medium);
     background:var(--neutral-secondary-medium); box-shadow:var(--shadow-2xs);
     font-size:13px; color:var(--heading); padding:8px 10px;
-    transition:all 200ms; font-family:"NintendoSwitchUI", sans-serif;
+    transition:all 200ms; font-family:var(--font-sans);
   }
   select.input{padding:6px 8px; font-size:12px;}
   .input::placeholder{color:var(--body);}
@@ -292,7 +319,7 @@
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
   .admin-toggle:hover{color:var(--gray);}
   .footer-slogan{
-    font-size:12px; font-weight:700; color:var(--gray); font-family:"NintendoSwitchUI",sans-serif;
+    font-size:12px; font-weight:700; color:var(--gray); font-family:var(--font-sans);
     letter-spacing:0.4px; text-align:center;
   }
   @media(max-width:600px){
@@ -304,7 +331,7 @@
   .inquiry-wa-btn{
     display:inline-flex; align-items:center; gap:8px;
     background:#25D366; color:#0a2a14;
-    font-family:"NintendoSwitchUI", sans-serif;
+    font-family:var(--font-sans);
     font-size:13px; font-weight:600;
     padding:9px 16px; border-radius:var(--radius-base);
     border:none; cursor:pointer; text-decoration:none;
@@ -337,7 +364,7 @@
   }
   .game-addon-row:hover{ background:var(--neutral-secondary-soft); border-color:var(--border-default-strong); }
   .game-addon-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex-shrink:0; }
-  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"NintendoSwitchUI",sans-serif; }
+  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:var(--font-sans); }
   .game-addon-price{ font-size:12px; font-weight:600; color:#B87320; white-space:nowrap; }
 
   /* ============================================================
@@ -404,13 +431,13 @@
     background:#25D366; color:var(--dark-strong); font-weight:600;
     padding:12px; border-radius:var(--radius-base); border:1px solid transparent;
     cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs);
-    transition:background-color 150ms ease, transform 120ms ease; font-family:"NintendoSwitchUI",sans-serif;
+    transition:background-color 150ms ease, transform 120ms ease; font-family:var(--font-sans);
   }
   .wa-btn:hover{background:#1FB855;}
   .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
-  .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"NintendoSwitchUI",sans-serif;}
+  .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:var(--font-sans);}
   .modal-close-row button:hover{color:var(--heading); text-decoration:underline;}
 
   /* ============================================================
@@ -436,7 +463,7 @@
   .ctrl-option-label{font-size:14px; font-weight:600; color:var(--heading);}
   .ctrl-option-price{font-size:13px; font-weight:600; color:var(--fg-brand-strong);}
   .ctrl-option-body{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-  .ctrl-no-thanks{width:100%; text-align:center; padding:10px; background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; margin-top:4px; font-family:"NintendoSwitchUI",sans-serif;}
+  .ctrl-no-thanks{width:100%; text-align:center; padding:10px; background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; margin-top:4px; font-family:var(--font-sans);}
   .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
 
   /* ============================================================
@@ -447,7 +474,7 @@
   .admin-item-toggle{
     background:var(--neutral-primary-soft); border:1px solid var(--border-default-medium);
     color:var(--body); font-size:11px; font-weight:500; padding:5px 10px;
-    border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
+    border-radius:var(--radius-default); cursor:pointer; font-family:var(--font-sans);
     transition:background 150ms ease, transform 120ms ease;
   }
   .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
@@ -461,7 +488,7 @@
   .pay-method-tabs{display:flex; gap:8px; margin-bottom:18px;}
   .pay-method-tab{
     flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
-    font-family:"NintendoSwitchUI",sans-serif; font-size:13px; font-weight:500;
+    font-family:var(--font-sans); font-size:13px; font-weight:500;
     padding:9px 10px; border-radius:var(--radius-base);
     border:1px solid var(--border-default); background:var(--neutral-secondary-soft);
     color:var(--body); cursor:pointer;
