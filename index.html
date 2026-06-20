@@ -719,6 +719,36 @@
   .hero-badges{display:flex; flex-wrap:wrap; gap:8px;}
 
   /* ============================================================
+     HERO ENTRANCE — runs once on load, rare/first-time-seen content,
+     so a touch more presence than the card stagger is justified.
+     transform+opacity only; eased out so motion is front-loaded,
+     not lingering at the end where it'd feel sluggish.
+     ============================================================ */
+  .hero h1, .hero p.lead, .hero-badges{
+    opacity:0; transform:translateY(10px);
+    animation:hero-rise 520ms cubic-bezier(0.215,0.61,0.355,1) both;
+  }
+  .hero h1{animation-delay:40ms;}
+  .hero p.lead{animation-delay:120ms;}
+  .hero-badges{animation-delay:200ms;}
+  .hero-badges .badge{
+    opacity:0; transform:translateY(6px);
+    animation:hero-rise 420ms cubic-bezier(0.215,0.61,0.355,1) both;
+  }
+  .hero-badges .badge:nth-child(1){animation-delay:240ms;}
+  .hero-badges .badge:nth-child(2){animation-delay:270ms;}
+  .hero-badges .badge:nth-child(3){animation-delay:300ms;}
+  .hero-badges .badge:nth-child(4){animation-delay:330ms;}
+  @keyframes hero-rise{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @media(prefers-reduced-motion:reduce){
+    .hero h1, .hero p.lead, .hero-badges, .hero-badges .badge{
+      animation:hero-rise-fade 300ms ease both;
+      transform:none;
+    }
+    @keyframes hero-rise-fade{ from{opacity:0;} to{opacity:1;} }
+  }
+
+  /* ============================================================
      BADGES
      ============================================================ */
   .badge{
@@ -1243,13 +1273,86 @@
   @media(prefers-reduced-motion:reduce){
     *{animation:none !important; transition:none !important;}
   }
+
+  /* ============================================================
+     PRODUCT DETAIL VIEW (in-page swap — no document reload)
+     Ported from product.html so the grid and the detail view live
+     in the same document. Switching between them is a class toggle,
+     not a navigation, so there's no white flash.
+     ============================================================ */
+  #productView{ display:none; }
+  body.showing-product #productView{ display:block; }
+  body.showing-product #gridView{ display:none; }
+
+  .detail-section{padding:32px 0 48px;}
+  @media(min-width:768px){.detail-section{padding:40px 0 64px;}}
+
+  .breadcrumb{font-size:13px; color:var(--body-subtle); margin-bottom:24px;}
+  .breadcrumb a{color:var(--fg-brand); cursor:pointer;}
+  .breadcrumb span{margin:0 6px;}
+
+  .product-detail-grid{display:grid; grid-template-columns:1fr; gap:32px;}
+  @media(min-width:768px){.product-detail-grid{grid-template-columns:1fr 1fr; gap:48px; align-items:start;}}
+  @media(min-width:1024px){.product-detail-grid{grid-template-columns:55% 1fr;}}
+
+  .product-detail-media{
+    background:var(--neutral-secondary-soft);
+    border:1px solid var(--border-default);
+    border-radius:var(--radius-base);
+    aspect-ratio:4/3;
+    display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden;
+    color:var(--neutral-quaternary);
+  }
+  .product-detail-media svg{width:80px; height:80px;}
+  .product-detail-media.has-photo img{width:100%; height:100%; object-fit:cover; display:block;}
+  .product-detail-media.is-sold .sold-overlay{
+    position:absolute; inset:0; background:rgba(255,255,255,0.55);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .product-detail-media.is-sold .sold-overlay svg{ z-index:1; }
+  .product-detail-media.is-sold .sold-overlay .badge{ z-index:2; position:relative; }
+
+  .product-detail-info{display:flex; flex-direction:column; gap:10px;}
+
+  .product-detail-title{
+    font-size:22px; font-weight:700; color:var(--heading);
+    line-height:1.2; letter-spacing:-0.3px;
+  }
+  @media(min-width:768px){.product-detail-title{font-size:26px;}}
+
+  .product-detail-price{font-size:32px; font-weight:700; color:var(--heading); margin:4px 0;}
+  .product-detail-price .currency{font-size:18px; font-weight:600; margin-right:2px;}
+
+  .product-detail-desc{
+    font-size:14px; color:var(--body); line-height:1.7;
+    border-top:1px solid var(--border-light); padding-top:12px; margin-top:4px;
+  }
+
+  .product-detail-actions{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+  @media(min-width:480px){.product-detail-actions{flex-direction:row; flex-wrap:wrap;}}
+  .product-detail-actions .btn{flex:1; justify-content:center;}
+  @media(min-width:480px){
+    .product-detail-actions .btn-brand{flex:1 1 auto;}
+    .product-detail-actions .btn-secondary{flex:0 0 auto;}
+  }
+  @media(hover:hover) and (pointer:fine){
+    .breadcrumb a:hover{text-decoration:underline;}
+  }
+
+  /* View-swap transition: same opacity-only fade used for the native
+     cross-document transition, so switching feels consistent whether
+     it's the in-app swap or a hard reload/shared-link fallback. */
+  @media not (prefers-reduced-motion: reduce) {
+    #gridView, #productView{ animation:page-fade-in 200ms cubic-bezier(0.215,0.61,0.355,1) both; }
+  }
+
   /* ============================================================
      SMOOTH PAGE NAVIGATION (native cross-document View Transitions)
-     This opts the whole page into the browser's built-in MPA view
-     transition. No JS needed to trigger it — the browser handles the
-     cross-fade itself on real <a> navigations and the Back button,
-     which is what avoids the blink/flash you get from faking it with
-     window.location.href.
+     This is now only a fallback for the rare case someone lands
+     directly on product.html (shared link, no-JS, etc.) and clicks
+     back to a fresh load of index.html. The normal in-app flow uses
+     the in-page swap above and never triggers a document navigation.
      ============================================================ */
   @view-transition {
     navigation: auto;
@@ -1496,6 +1599,7 @@
     </div>
 </div>
 
+<div id="gridView">
 <main>
   <!-- NINTENDO SWITCH -->
   <section class="section bg-soft" id="section-switches">
@@ -1551,6 +1655,25 @@
     </div>
   </section>
 </main>
+</div>
+<!-- /#gridView -->
+
+<!-- PRODUCT DETAIL VIEW (in-page swap, no document reload) -->
+<div id="productView">
+  <section class="detail-section">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html" id="breadcrumbBack">All listings</a>
+        <span>›</span>
+        <span id="breadcrumbName">Product</span>
+      </nav>
+      <div id="productContent">
+        <!-- Populated by app.js renderProductPage() -->
+      </div>
+    </div>
+  </section>
+</div>
+
 
 <!-- PAYMENT / DELIVERY INFO -->
 <section class="section bg-soft">
@@ -2022,7 +2145,26 @@
     renderAll(); // renders with data.js immediately so the page isn't blank; firebase.js re-renders once live data arrives
     updateAddToCartButtons();
     updateNavActive("all");
-    restoreIndexScroll(); // jump back to where the person was browsing, if returning from a product
+
+    // If someone lands on index.html with ?id=... in the URL (a shared
+    // or bookmarked product link), show the product view immediately
+    // instead of the grid — no flash, since this runs before first paint
+    // settles either way. We commit to the product view based on the id
+    // being *present*, not on the item being found yet — data.js's seed
+    // list may not include a brand-new item, and Firebase hasn't loaded
+    // yet at this point. renderProductPage already shows a graceful
+    // "Loading…" state until window.fbInventoryReady flips true, then
+    // firebase.js calls renderProductPage() again on its own.
+    const bootParams = new URLSearchParams(window.location.search);
+    const bootId = bootParams.get("id");
+    if (bootId) {
+      document.body.classList.add("showing-product");
+      renderProductPage(bootId);
+      history.replaceState({ stock86View: "product", id: bootId }, "", `product.html?id=${encodeURIComponent(bootId)}`);
+    } else {
+      history.replaceState({ stock86View: "grid" }, "", "index.html");
+      restoreIndexScroll(); // jump back to where the person was browsing, if returning from a product
+    }
   });
 
   // Re-sync cart when user navigates back from product.html (browser back button restores from cache)
@@ -2033,32 +2175,6 @@
       updateAddToCartButtons();
     }
   });
-
-  // ── Prefetch product pages for instant navigation ───────────
-  function prefetchUrl(url) {
-    if (document.querySelector(`link[rel="prefetch"][href="${url}"]`)) return;
-    const link = document.createElement("link");
-    link.rel = "prefetch";
-    link.href = url;
-    document.head.appendChild(link);
-  }
-  // Eagerly prefetch all product pages shortly after load (catalog is small)
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      if (typeof PRODUCTS !== "undefined") {
-        PRODUCTS.forEach(p => prefetchUrl(`product.html?id=${p.id}`));
-      }
-    }, 800);
-  });
-  // Also prefetch on hover/touchstart for any product link
-  document.addEventListener("mouseover", (e) => {
-    const a = e.target.closest("a[href*='product.html']");
-    if (a) prefetchUrl(a.href);
-  }, { passive: true });
-  document.addEventListener("touchstart", (e) => {
-    const a = e.target.closest("a[href*='product.html']");
-    if (a) prefetchUrl(a.href);
-  }, { passive: true });
 </script>
 </body>
 </html>

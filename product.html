@@ -741,10 +741,6 @@
     wireCommonUI();
     wireLogoPress();
     renderProductPage();
-
-    const params = new URLSearchParams(window.location.search);
-    const item = findItemById(params.get("id"));
-    if (item) document.getElementById("breadcrumbName").textContent = item.name;
   });
 </script>
 </body>

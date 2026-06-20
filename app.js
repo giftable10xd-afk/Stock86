@@ -9,30 +9,70 @@ const CART_STORAGE_KEY = "stock86_cart_v1";
 let cart = [];
 let adminMode = false;
 
-// ---------- SMOOTH PAGE NAVIGATION ----------
-// The cross-fade itself is now handled entirely by the browser's native
-// cross-document View Transition (see the `@view-transition { navigation:
-// auto; }` CSS rule in both pages). That only fires for *real* navigations
-// — actual <a> clicks and the Back/Forward buttons — not for navigations
-// triggered from JS via window.location.href. So we deliberately let plain
-// <a href="..."> clicks go through untouched; we don't preventDefault or
-// fake the fade in JS anymore, since that's what caused the blink (a fake
-// fade-out on the old page, then a fresh unstyled paint underneath with no
-// real connecting animation).
+// ---------- IN-PAGE PRODUCT VIEW (no document reload) ----------
+// index.html now contains both the grid (#gridView) and the product
+// detail markup (#productView) in the same document. Going to a
+// product swaps which one is visible via a class on <body> and pushes
+// a real URL with pushState — no <a href> navigation, no document
+// reload, so there's no white flash. The History API keeps the URL
+// and Back/Forward button working normally.
+//
+// product.html itself is kept as-is, untouched, purely as a fallback:
+// a shared link, a bookmark, or a no-JS visitor landing directly on
+// product.html still gets a working page. It just isn't part of the
+// normal in-app click path anymore.
 
-// Browsers without cross-document View Transition support get a plain,
-// instant navigation — no transition, but also no blink, since nothing
-// is being faked in JS. We only add a gentle fallback fade-in for very
-// old browsers that don't even support view transitions at all.
-let hasViewTransitionSupport = false;
-try {
-  hasViewTransitionSupport = CSS.supports("selector(::view-transition-old(root))");
-} catch (e) { /* very old browser — CSS.supports selector() syntax itself unsupported */ }
+const isIndexDocument = !!document.getElementById("gridView");
 
-if (!hasViewTransitionSupport) {
-  document.addEventListener("DOMContentLoaded", () => {
-    document.body.classList.add("page-fade-fallback");
-  });
+function showProductView(id, opts) {
+  opts = opts || {};
+  if (!isIndexDocument) return false; // we're actually on product.html — let it render normally
+  document.body.classList.add("showing-product");
+  if (typeof renderProductPage === "function") renderProductPage(id);
+  if (!opts.skipPush) {
+    history.pushState({ stock86View: "product", id }, "", `product.html?id=${encodeURIComponent(id)}`);
+  }
+  if (!opts.skipScrollTop) window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  return true;
+}
+
+function showGridView(opts) {
+  opts = opts || {};
+  if (!isIndexDocument) return false;
+  document.body.classList.remove("showing-product");
+  if (!opts.skipPush) {
+    history.pushState({ stock86View: "grid" }, "", "index.html");
+  }
+  if (typeof restoreIndexScroll === "function") restoreIndexScroll();
+  return true;
+}
+
+window.addEventListener("popstate", (e) => {
+  if (!isIndexDocument) return;
+  const state = e.state;
+  if (state && state.stock86View === "product" && state.id) {
+    showProductView(state.id, { skipPush: true });
+  } else {
+    showGridView({ skipPush: true });
+  }
+});
+
+// product.html is only ever reached via a real document navigation now
+// (shared link, bookmark, no-JS fallback) — give very old browsers that
+// don't support the native cross-document View Transition a gentle
+// fade-in instead of a hard cut. Browsers that do support it use the
+// `@view-transition { navigation: auto; }` CSS rule instead.
+if (!isIndexDocument) {
+  let hasViewTransitionSupport = false;
+  try {
+    hasViewTransitionSupport = CSS.supports("selector(::view-transition-old(root))");
+  } catch (e) { /* very old browser — CSS.supports selector() syntax itself unsupported */ }
+
+  if (!hasViewTransitionSupport) {
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("page-fade-fallback");
+    });
+  }
 }
 
 // ---------- SCROLL MEMORY (index.html ⇄ product.html) ----------
@@ -102,21 +142,32 @@ function restoreIndexScroll() {
   setTimeout(applyAnchor, 300);
 }
 
-// Note: no click interception anymore — links navigate natively so the
-// browser's own cross-document view transition can run. We only listen
-// (not intercept) to record which card was clicked before leaving the grid.
+// Intercepts clicks on product links and routes them in-page instead of
+// letting the browser navigate to product.html — this is what actually
+// removes the reload/blink, not just hides it with a CSS fade.
 function wireSmoothNav() {
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a[href]');
     if (!link) return;
     const href = link.getAttribute("href");
     if (!href) return;
-    const match = /^product\.html\?id=([^&]+)/.exec(href);
-    if (!match) return;
-    const leavingIndex = !!document.getElementById("section-switches");
-    if (leavingIndex) rememberIndexScroll(decodeURIComponent(match[1]));
-    // No preventDefault — let the browser handle the navigation and its
-    // own native view transition.
+
+    // Product card / title links → in-page swap
+    const productMatch = /^product\.html\?id=([^&]+)/.exec(href);
+    if (productMatch && isIndexDocument) {
+      e.preventDefault();
+      const id = decodeURIComponent(productMatch[1]);
+      rememberIndexScroll(id);
+      showProductView(id);
+      return;
+    }
+
+    // "All listings" / breadcrumb / logo links back to index.html → in-page swap
+    if (href === "index.html" && isIndexDocument && document.body.classList.contains("showing-product")) {
+      e.preventDefault();
+      showGridView();
+      return;
+    }
   }, { capture: true });
 }
 
@@ -692,6 +743,13 @@ function wireLogoPress() {
     if (typeof closeNav === "function")         closeNav();
     if (typeof closeFilterDrawer === "function") closeFilterDrawer();
 
+    // If currently viewing a product, the logo should bring us back to
+    // the grid (same as tapping "All listings") before resetting filters.
+    if (typeof isIndexDocument !== "undefined" && isIndexDocument &&
+        document.body.classList.contains("showing-product")) {
+      showGridView();
+    }
+
     if (typeof renderAll === "function") renderAll();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
@@ -905,9 +963,9 @@ function renderAll() {
 // PRODUCT DETAIL PAGE LOGIC
 // ============================================================
 
-function renderProductPage() {
+function renderProductPage(explicitId) {
   const params    = new URLSearchParams(window.location.search);
-  const id        = params.get("id");
+  const id        = explicitId || params.get("id");
   const container = document.getElementById("productContent");
   const adminBar  = document.getElementById("adminBar");
 
@@ -938,6 +996,8 @@ function renderProductPage() {
   }
 
   document.title = `${item.name} — STOCK/86`;
+  const breadcrumbEl = document.getElementById("breadcrumbName");
+  if (breadcrumbEl) breadcrumbEl.textContent = item.name;
 
   const icon = ICONS[item.icon] || ICONS.console;
   const detailImgStyle = item.sold
