@@ -289,20 +289,30 @@ function showMaxOneToast() {
     toast = document.createElement("div");
     toast.id = "maxOneToast";
     toast.style.cssText = `
-      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      position:fixed; bottom:24px; left:50%;
       background:var(--dark); color:var(--white);
       font-family:"NintendoSwitchUI",sans-serif; font-size:13px; font-weight:500;
       padding:10px 18px; border-radius:var(--radius-base);
       box-shadow:var(--shadow-lg); z-index:9999;
-      pointer-events:none; opacity:0; transition:opacity 200ms ease;
-      white-space:nowrap;
+      pointer-events:none; white-space:nowrap;
+      transform:translateX(-50%) translateY(8px); opacity:0;
+      transition:transform 220ms cubic-bezier(0.215,0.61,0.355,1), opacity 200ms ease-out;
     `;
     document.body.appendChild(toast);
   }
   toast.textContent = "Only 1 of each item allowed";
+  // Retrigger-safe: read the current frame before re-animating in.
+  toast.style.transform = "translateX(-50%) translateY(8px)";
+  toast.style.opacity = "0";
+  void toast.offsetWidth;
+  toast.style.transform = "translateX(-50%) translateY(0)";
   toast.style.opacity = "1";
+
   clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => { toast.style.opacity = "0"; }, 2200);
+  toast._timer = setTimeout(() => {
+    toast.style.transform = "translateX(-50%) translateY(8px)";
+    toast.style.opacity = "0";
+  }, 2200);
 }
 
 // ---------- SWITCH ADDON MODAL (controllers + games) ----------
@@ -438,10 +448,34 @@ function directAddToCart(id) {
 // ---------- CART ----------
 
 function removeFromCart(lineId) {
-  cart = cart.filter(line => line.lineId !== lineId);
-  saveCartState();
-  renderCart();
-  updateAddToCartButtons();
+  const row = document.querySelector(`.cart-line[data-line-id="${lineId}"]`);
+  const doRemove = () => {
+    cart = cart.filter(line => line.lineId !== lineId);
+    saveCartState();
+    renderCart();
+    updateAddToCartButtons();
+  };
+
+  if (!row || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    doRemove();
+    return;
+  }
+
+  // Collapse the row's own box (height/margin) while fading + sliding its
+  // content — layout props are confined to a single short-lived element
+  // being removed from the DOM, not animated on an ongoing basis.
+  row.style.overflow = "hidden";
+  row.style.transition = "height 180ms cubic-bezier(0.4,0,0.2,1), padding 180ms cubic-bezier(0.4,0,0.2,1), opacity 140ms ease-out";
+  row.style.height = `${row.offsetHeight}px`;
+  row.style.opacity = "1";
+  void row.offsetHeight;
+  requestAnimationFrame(() => {
+    row.style.height = "0px";
+    row.style.paddingTop = "0px";
+    row.style.paddingBottom = "0px";
+    row.style.opacity = "0";
+  });
+  row.addEventListener("transitionend", doRemove, { once: true });
 }
 
 function cartSubtotal() {
@@ -488,8 +522,19 @@ function renderCart() {
   if (!body) return;
 
   const total_items = cart.length;
+  const prevCount = parseInt(countEl.textContent, 10) || 0;
   countEl.textContent    = total_items;
   countEl.style.display  = total_items === 0 ? "none" : "flex";
+
+  // Feedback pulse only on increase — removal already has its own exit animation.
+  if (total_items > prevCount) {
+    countEl.classList.remove("bump");
+    // Force reflow so the animation can retrigger if it fires again quickly.
+    void countEl.offsetWidth;
+    countEl.classList.add("bump");
+    clearTimeout(countEl._bumpTimer);
+    countEl._bumpTimer = setTimeout(() => countEl.classList.remove("bump"), 180);
+  }
 
   if (total_items === 0) {
     body.innerHTML = `<div class="drawer-empty">Your cart is empty.<br>Browse the inventory and add something.</div>`;
@@ -498,7 +543,7 @@ function renderCart() {
   }
 
   body.innerHTML = cart.map(line => `
-    <div class="cart-line">
+    <div class="cart-line" data-line-id="${line.lineId}">
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="cart-qty-badge">1</span>
