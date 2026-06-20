@@ -5,7 +5,7 @@
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, onValue, get }
+import { getDatabase, ref, set, onValue }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
@@ -73,31 +73,6 @@ function applySoldMap(map) {
   });
 }
 
-// ── Merge helper: combine the latest server state with this device's
-//    local INVENTORY so a save from one device can never delete or
-//    overwrite products that another device added in the meantime.
-//    `removedIds` lists IDs this device is intentionally deleting right
-//    now, so they aren't resurrected by merging in the server's copy. ──
-
-function mergeSnapshots(serverSnap, localSnap, removedIds) {
-  const removed = new Set(removedIds || []);
-  const merged = {};
-  CATS.forEach(cat => {
-    const serverList = (serverSnap && serverSnap[cat]) ? Object.values(serverSnap[cat]) : [];
-    const localList  = (localSnap  && localSnap[cat])  ? Object.values(localSnap[cat])  : [];
-
-    const byId = new Map();
-    // Start with whatever the server currently has (covers items added by other devices).
-    serverList.forEach(item => { if (item && item.id && !removed.has(item.id)) byId.set(item.id, item); });
-    // Layer this device's local items on top — adds new ones, updates existing ones,
-    // but never removes an item this device doesn't know about.
-    localList.forEach(item => { if (item && item.id && !removed.has(item.id)) byId.set(item.id, item); });
-
-    merged[cat] = Array.from(byId.values());
-  });
-  return merged;
-}
-
 // ── Public save functions called by app.js ────────────────────
 
 window.fbSaveSoldState = function() {
@@ -105,23 +80,23 @@ window.fbSaveSoldState = function() {
     .catch(e => console.error("Firebase soldState write failed:", e));
 };
 
-// removedIds (optional): IDs this device just deleted locally, so the merge
-// doesn't bring them back in from the server's still-current copy.
+// removedIds (optional): IDs this device just deleted locally, so they're
+// written out as removed rather than possibly reappearing.
 window.fbSaveInventory = function(callback, removedIds) {
-  // Always re-fetch the latest server state right before writing, then merge,
-  // so a save from this device can never clobber a product another device
-  // added since this device's last sync.
-  get(ref(db, "inventory"))
-    .then(serverSnap => {
-      const merged = mergeSnapshots(serverSnap.exists() ? serverSnap.val() : null, buildInventorySnapshot(), removedIds);
+  const removed = new Set(removedIds || []);
+  if (removed.size) {
+    CATS.forEach(cat => {
+      INVENTORY[cat] = (INVENTORY[cat] || []).filter(item => !removed.has(item.id));
+    });
+  }
 
-      return set(ref(db, "inventory"), merged).then(() => {
-        // Reflect the merged result locally too, so this device's own view
-        // immediately includes anything it just merged in from the server.
-        CATS.forEach(cat => { INVENTORY[cat] = merged[cat]; });
-        return set(ref(db, "soldState"), buildSoldMap());
-      });
-    })
+  // INVENTORY is kept continuously up to date by the onValue() listener
+  // (never a one-shot, possibly-stale get()), so it's already the most
+  // current view of the server plus this device's own local edit.
+  const snapshot = buildInventorySnapshot();
+
+  set(ref(db, "inventory"), snapshot)
+    .then(() => set(ref(db, "soldState"), buildSoldMap()))
     .then(() => {
       if (typeof callback === "function") callback();
     })
@@ -132,52 +107,68 @@ window.fbSaveInventory = function(callback, removedIds) {
 };
 
 // ── Boot ──────────────────────────────────────────────────────
+// IMPORTANT: we deliberately do NOT use get() for the initial load.
+// Firebase's get() can return a stale locally-cached value instead of
+// contacting the server, with no error and no way to tell it happened.
+// onValue() is the reliable path: it always fires with the current
+// server value on first attach, then keeps firing on every change.
 
-async function fbInit() {
-  try {
-    const invSnap = await get(ref(db, "inventory"));
+let seededIfEmpty = false;
+window.fbInventoryReady = false;
 
-    if (invSnap.exists()) {
-      // Firebase has data → use it as source of truth
-      applySnapshot(invSnap.val());
+function fbInit() {
+  let inventoryReady = false;
+  let soldReady = false;
 
-      // Also apply sold state on top
-      const soldSnap = await get(ref(db, "soldState"));
-      if (soldSnap.exists()) applySoldMap(soldSnap.val());
-
-    } else {
-      // First ever run — seed Firebase from data.js
-      await set(ref(db, "inventory"), buildInventorySnapshot());
-      await set(ref(db, "soldState"), buildSoldMap());
-    }
-
-    // Re-render with Firebase data (replaces the initial data.js render)
-    if (typeof renderAll === "function") renderAll();
-    if (typeof renderProductPage === "function") renderProductPage();
-
-    // Live listeners — update instantly when any device makes a change
-    onValue(ref(db, "inventory"), snapshot => {
-      if (snapshot.exists()) {
-        applySnapshot(snapshot.val());
-        if (typeof renderAll === "function") renderAll();
-        if (typeof renderProductPage === "function") renderProductPage();
-      }
-    });
-
-    onValue(ref(db, "soldState"), snapshot => {
-      if (snapshot.exists()) {
-        applySoldMap(snapshot.val());
-        if (typeof renderAll === "function") renderAll();
-        if (typeof renderProductPage === "function") renderProductPage();
-      }
-    });
-
-  } catch (e) {
-    console.error("Firebase init error:", e);
-    // Fallback: just render data.js as-is
+  function rerenderIfReady() {
+    if (!inventoryReady) return; // wait for at least the first real inventory snapshot
     if (typeof renderAll === "function") renderAll();
     if (typeof renderProductPage === "function") renderProductPage();
   }
+
+  onValue(ref(db, "inventory"), snapshot => {
+    if (snapshot.exists()) {
+      applySnapshot(snapshot.val());
+      inventoryReady = true;
+      window.fbInventoryReady = true;
+      rerenderIfReady();
+    } else if (!seededIfEmpty) {
+      // First ever run — seed Firebase from data.js, only once.
+      seededIfEmpty = true;
+      set(ref(db, "inventory"), buildInventorySnapshot())
+        .then(() => set(ref(db, "soldState"), buildSoldMap()))
+        .catch(e => console.error("Firebase seed failed:", e));
+      // The set() above will itself trigger this same onValue listener
+      // again with the real data, so no manual render needed here.
+    }
+  }, e => {
+    console.error("Firebase inventory listener error:", e);
+    showLiveDataErrorBanner(e);
+    inventoryReady = true; // fall back to data.js so the page isn't stuck blank
+    window.fbInventoryReady = true;
+    rerenderIfReady();
+  });
+
+  onValue(ref(db, "soldState"), snapshot => {
+    if (snapshot.exists()) {
+      applySoldMap(snapshot.val());
+    }
+    soldReady = true;
+    rerenderIfReady();
+  }, e => {
+    console.error("Firebase soldState listener error:", e);
+    soldReady = true;
+    rerenderIfReady();
+  });
+}
+
+function showLiveDataErrorBanner(e) {
+  if (document.getElementById("fbErrorBanner")) return;
+  const banner = document.createElement("div");
+  banner.id = "fbErrorBanner";
+  banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:#CC0C39;color:#fff;font-size:13px;padding:8px 12px;text-align:center;";
+  banner.textContent = "Live data failed to load (" + (e && e.message ? e.message : "unknown error") + "). Showing default listing only.";
+  document.body.appendChild(banner);
 }
 
 if (document.readyState === "loading") {

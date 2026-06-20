@@ -91,6 +91,10 @@ function toggleSold(id) {
 }
 
 function deleteProduct(id) {
+  if (window.fbInventoryReady === false) {
+    alert("Still syncing with the live database — please wait a couple of seconds and try again.");
+    return;
+  }
   if (!confirm("Permanently delete this product? This cannot be undone.")) return;
   let deleted = false;
   ["switches","games","consoles","laptops","phones"].forEach(cat => {
@@ -782,9 +786,21 @@ function renderProductPage() {
   const item = id ? findItemById(id) : null;
 
   if (!item) {
+    // Before the live database has confirmed anything, show a neutral
+    // loading state rather than a false "not found" for a brand-new product.
+    const stillLoading = (typeof window.fbInventoryReady !== "undefined") && window.fbInventoryReady === false;
+    if (stillLoading) {
+      container.innerHTML = `<div class="not-found"><p>Loading…</p></div>`;
+      return;
+    }
+    const knownIds = allLists().flat().map(i => i.id).join(", ") || "(none loaded)";
     container.innerHTML = `
       <div class="not-found">
         <p>Product not found.</p>
+        <p style="font-size:12px;color:#888;margin-top:8px;word-break:break-all;">
+          Looking for: <strong>${id || "(no id in link)"}</strong><br>
+          Currently loaded IDs: ${knownIds}
+        </p>
         <a href="index.html" class="btn btn-brand btn-base">← Back to all listings</a>
       </div>`;
     return;
@@ -1018,6 +1034,11 @@ function resetAdminAddForm() {
 }
 
 function adminAddProduct() {
+  if (window.fbInventoryReady === false) {
+    alert("Still syncing with the live database — please wait a couple of seconds and try again.");
+    return;
+  }
+
   const category  = document.getElementById("apCategory").value;
   const name      = document.getElementById("apName").value.trim();
   const price     = parseFloat(document.getElementById("apPrice").value);

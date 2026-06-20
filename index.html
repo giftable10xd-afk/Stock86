@@ -1961,7 +1961,7 @@
     wireCommonUI();
     wireAdminPanel();
     wireLogoPress();
-    renderAll(); // renders with data.js immediately; firebase.js re-renders once Firebase data loads
+    renderAll(); // renders with data.js immediately so the page isn't blank; firebase.js re-renders once live data arrives
     updateAddToCartButtons();
     updateNavActive("all");
   });
