@@ -32,8 +32,46 @@ function showProductView(id, opts) {
   if (!opts.skipPush) {
     history.pushState({ stock86View: "product", id }, "", `product.html?id=${encodeURIComponent(id)}`);
   }
-  if (!opts.skipScrollTop) window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  // Always go to top first (instant), then after the product content renders
+  // scroll down so the "← All listings" button sits at the very bottom of
+  // the viewport — making it trivial for the customer to tap Add to cart and
+  // then return without hunting for the button.
+  window.scrollTo({ top: 0, behavior: "instant" });
+  if (!opts.skipScrollTop) {
+    _scrollToAllListingsBtn();
+  }
   return true;
+}
+
+// Scrolls the page so the "← All listings" button is flush with the bottom
+// of the viewport. Retries after a short delay to handle images loading and
+// reflowing the layout (same pattern as restoreIndexScroll).
+function _scrollToAllListingsBtn() {
+  function attempt() {
+    // The button is inside #productContent, rendered by renderProductPage.
+    // We look for the .btn-secondary inside .product-detail-actions.
+    const actionsEl = document.querySelector("#productContent .product-detail-actions");
+    if (!actionsEl) return false;
+    const rect = actionsEl.getBoundingClientRect();
+    // Bottom of the actions block relative to the page
+    const actionsBottom = window.scrollY + rect.bottom;
+    // We want actionsBottom to equal window.innerHeight from the top of the page,
+    // i.e. scroll so that actions bottom aligns with viewport bottom.
+    const target = actionsBottom - window.innerHeight;
+    if (target > 0) {
+      window.scrollTo({ top: target, behavior: "instant" });
+    }
+    return true;
+  }
+
+  // First attempt — content may already be rendered
+  if (!attempt()) {
+    // Content not yet in DOM; wait a frame
+    requestAnimationFrame(() => { attempt(); });
+  }
+  // Second pass after images/fonts settle
+  setTimeout(attempt, 150);
+  setTimeout(attempt, 400);
 }
 
 function showGridView(opts) {
@@ -43,6 +81,9 @@ function showGridView(opts) {
   if (!opts.skipPush) {
     history.pushState({ stock86View: "grid" }, "", "index.html");
   }
+  // "← All listings" always returns to the very top of the page so the
+  // customer sees the hero / full product grid from the start.
+  window.scrollTo({ top: 0, behavior: "instant" });
   if (typeof restoreIndexScroll === "function") restoreIndexScroll();
   return true;
 }

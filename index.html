@@ -2270,6 +2270,8 @@
       document.body.classList.add("showing-product");
       renderProductPage(bootId);
       history.replaceState({ stock86View: "product", id: bootId }, "", `product.html?id=${encodeURIComponent(bootId)}`);
+      // Scroll so "← All listings" sits at the viewport bottom
+      if (typeof _scrollToAllListingsBtn === "function") _scrollToAllListingsBtn();
     } else {
       document.body.classList.remove("pre-product");
       history.replaceState({ stock86View: "grid" }, "", "index.html");
