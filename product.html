@@ -118,7 +118,7 @@
     font-family:"NintendoSwitchUI", sans-serif; font-weight:500;
     border-radius:var(--radius-base); border:1px solid transparent;
     box-shadow:var(--shadow-xs); cursor:pointer;
-    transition:background-color 150ms, color 150ms, border-color 150ms, transform 120ms ease;
+    transition:background-color 150ms ease, color 150ms ease, border-color 150ms ease, transform 120ms ease;
     white-space:nowrap;
   }
   .btn:active{transform:scale(0.93); box-shadow:none;}
@@ -126,11 +126,11 @@
   .btn-sm{font-size:12px; padding:6px 12px;}
   .btn-lg{font-size:15px; padding:12px 20px;}
   .btn-brand{background:var(--brand); border-color:transparent; color:var(--dark-strong);}
-  .btn-brand:hover{background:var(--brand-strong); color:var(--white);}
+  
   .btn-secondary{background:var(--neutral-secondary-medium); border-color:var(--border-default-medium); color:var(--body);}
-  .btn-secondary:hover{background:var(--neutral-tertiary-medium); color:var(--heading);}
+  
   .btn-ghost{background:transparent; border-color:transparent; color:var(--white); box-shadow:none;}
-  .btn-ghost:hover{background:rgba(255,255,255,0.1);}
+  
   .btn-icon{width:16px; height:16px; flex-shrink:0;}
   .cart-btn{position:relative;}
   .cart-count{
@@ -188,7 +188,7 @@
 
   .breadcrumb{font-size:13px; color:var(--body-subtle); margin-bottom:24px;}
   .breadcrumb a{color:var(--fg-brand);}
-  .breadcrumb a:hover{text-decoration:underline;}
+  
   .breadcrumb span{margin:0 6px;}
 
   .product-detail-grid{display:grid; grid-template-columns:1fr; gap:32px;}
@@ -277,7 +277,7 @@
   }
   select.input{padding:6px 8px; font-size:12px;}
   .input::placeholder{color:var(--body);}
-  .input:hover{border-color:var(--border-default-strong);}
+  
   .input:focus{outline:none; border-color:var(--border-brand); box-shadow:0 0 0 1px var(--brand);}
   label.input-label{display:block; font-size:13px; font-weight:500; color:var(--heading); margin-bottom:6px;}
 
@@ -298,7 +298,7 @@
   footer p{font-size:12px; color:var(--gray);}
   .footer-logo{height:64px; width:auto; display:block; opacity:0.85;}
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
-  .admin-toggle:hover{color:var(--gray);}
+  
   .footer-slogan{
     font-size:12px; font-weight:700; color:var(--gray); font-family:"NintendoSwitchUI",sans-serif;
     letter-spacing:0.4px; text-align:center;
@@ -320,7 +320,7 @@
     transition:background 150ms ease, transform 120ms ease;
     white-space:nowrap; flex-shrink:0;
   }
-  .inquiry-wa-btn:hover{background:#1FB855;}
+  
   .inquiry-wa-btn:active{transform:scale(0.95);}
 
   /* Whish row in cart */
@@ -343,7 +343,7 @@
     margin-bottom:6px; cursor:pointer;
     transition:background 120ms ease, border-color 120ms ease;
   }
-  .game-addon-row:hover{ background:var(--neutral-secondary-soft); border-color:var(--border-default-strong); }
+  
   .game-addon-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex-shrink:0; }
   .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"NintendoSwitchUI",sans-serif; }
   .game-addon-price{ font-size:12px; font-weight:600; color:#B87320; white-space:nowrap; }
@@ -357,7 +357,7 @@
     position:fixed; top:0; right:0; height:100%; width:min(420px,100%);
     background:var(--neutral-primary-soft); border-left:1px solid var(--border-default);
     box-shadow:var(--shadow-lg); z-index:100;
-    transform:translateX(100%); transition:transform 250ms ease;
+    transform:translateX(100%); transition:transform 250ms cubic-bezier(0.215,0.61,0.355,1);
     display:flex; flex-direction:column;
   }
   .drawer.open{transform:translateX(0);}
@@ -369,7 +369,7 @@
     display:flex; align-items:center; justify-content:center;
     transition:background 150ms ease, transform 120ms ease;
   }
-  .drawer-close:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  
   .drawer-close:active{transform:scale(0.9);}
   .drawer-body{flex:1; overflow-y:auto; padding:8px 20px;}
   .drawer-empty{color:var(--body-subtle); font-size:13px; text-align:center; padding:60px 20px;}
@@ -378,7 +378,7 @@
   .cart-line-meta{color:var(--body-subtle); font-size:12px; margin-top:2px;}
   .cart-line-price{font-weight:600; font-size:13px; color:var(--heading); white-space:nowrap;}
   .cart-line-remove{background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer; margin-top:6px; padding:0; font-weight:500;}
-  .cart-line-remove:hover{text-decoration:underline;}
+  
   .drawer-foot{border-top:1px solid var(--border-default); padding:16px 20px 20px;}
   .drawer-row{display:flex; justify-content:space-between; font-size:13px; color:var(--body); margin-bottom:8px;}
   .drawer-row.total{color:var(--heading); font-weight:700; font-size:16px; margin-top:8px; padding-top:8px; border-top:1px solid var(--border-light);}
@@ -414,12 +414,12 @@
     cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs);
     transition:background-color 150ms ease, transform 120ms ease; font-family:"NintendoSwitchUI",sans-serif;
   }
-  .wa-btn:hover{background:#1FB855;}
+  
   .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
   .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"NintendoSwitchUI",sans-serif;}
-  .modal-close-row button:hover{color:var(--heading); text-decoration:underline;}
+  
 
   /* ============================================================
      CONTROLLER ADDON MODAL
@@ -445,7 +445,7 @@
   .ctrl-option-price{font-size:13px; font-weight:600; color:var(--fg-brand-strong);}
   .ctrl-option-body{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .ctrl-no-thanks{width:100%; text-align:center; padding:10px; background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; margin-top:4px; font-family:"NintendoSwitchUI",sans-serif;}
-  .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
+  
 
   /* ============================================================
      ADMIN BAR + LOGIN
@@ -458,10 +458,10 @@
     border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
     transition:background 150ms ease, transform 120ms ease;
   }
-  .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  
   .admin-item-toggle:active{transform:scale(0.95);}
   .admin-item-toggle.is-sold{background:var(--danger); color:var(--white); border-color:transparent;}
-  .admin-item-toggle.is-sold:hover{background:var(--danger-strong);}
+  
   .login-box{position:fixed; bottom:56px; left:16px; background:var(--neutral-primary-soft); border:1px solid var(--border-default); border-radius:var(--radius-base); box-shadow:var(--shadow-md); padding:14px; z-index:160; display:none; flex-direction:column; gap:8px; width:220px;}
   .login-box.open{display:flex;}
 
@@ -477,9 +477,28 @@
   }
   .pay-method-tab:active{transform:scale(0.96);}
   .pay-method-tab.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
-  .pay-method-tab:not(.active):hover{background:var(--neutral-tertiary-medium); border-color:var(--border-default-strong);}
+  
 
   /* page loader removed */
+
+  @media(hover:hover) and (pointer:fine){
+    .btn-brand:hover{background:var(--brand-strong); color:var(--white);}
+    .btn-secondary:hover{background:var(--neutral-tertiary-medium); color:var(--heading);}
+    .btn-ghost:hover{background:rgba(255,255,255,0.1);}
+    .breadcrumb a:hover{text-decoration:underline;}
+    .input:hover{border-color:var(--border-default-strong);}
+    .admin-toggle:hover{color:var(--gray);}
+    .inquiry-wa-btn:hover{background:#1FB855;}
+    .game-addon-row:hover{background:var(--neutral-secondary-soft); border-color:var(--border-default-strong);}
+    .drawer-close:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+    .cart-line-remove:hover{text-decoration:underline;}
+    .wa-btn:hover{background:#1FB855;}
+    .modal-close-row button:hover{color:var(--heading); text-decoration:underline;}
+    .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
+    .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+    .admin-item-toggle.is-sold:hover{background:var(--danger-strong);}
+    .pay-method-tab:not(.active):hover{background:var(--neutral-tertiary-medium); border-color:var(--border-default-strong);}
+  }
 
   @media(prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important;}}
   /* ============================================================

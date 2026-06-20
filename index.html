@@ -171,7 +171,7 @@
     flex-shrink:0;
     z-index:3; position:relative;
   }
-  .hamburger-btn:hover{background:rgba(255,255,255,0.18);}
+  
   .hamburger-btn:active{transform:scale(0.92);}
   .hamburger-btn svg{width:20px; height:20px;}
 
@@ -289,7 +289,7 @@
     transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .filter-sort-btn:hover{background:var(--neutral-tertiary-medium);}
+  
   .filter-sort-btn:active{transform:scale(0.96);}
   .filter-sort-btn svg{width:16px; height:16px; flex-shrink:0;}
   .count-bar-total{
@@ -353,7 +353,7 @@
     cursor:pointer; font-size:18px; line-height:1;
     transition:background 150ms ease, transform 120ms ease;
   }
-  .nav-drawer-close:hover{background:rgba(255,255,255,0.15);}
+  
   .nav-drawer-close:active{transform:scale(0.9);}
 
   /* Search inside nav drawer */
@@ -403,7 +403,7 @@
     text-align:left;
     transition:background 150ms ease, color 150ms ease, border-color 150ms ease, transform 120ms ease;
   }
-  .nav-btn:hover{background:rgba(255,255,255,0.13); color:var(--white);}
+  
   .nav-btn:active{transform:scale(0.97);}
   .nav-btn.active{
     background:var(--brand);
@@ -443,7 +443,7 @@
     margin-top:4px;
     transition:background 150ms ease, color 150ms ease, transform 120ms ease;
   }
-  .nav-sub-btn:hover{background:rgba(255,255,255,0.1); color:var(--white);}
+  
   .nav-sub-btn:active{transform:scale(0.97);}
   .nav-sub-btn.active{background:var(--brand); border-color:var(--brand); color:var(--dark-strong);}
 
@@ -469,7 +469,7 @@
     text-decoration:none;
     transition:background 150ms ease, border-color 150ms ease, transform 120ms ease;
   }
-  .nav-contact-btn:hover{background:rgba(37,211,102,0.22); border-color:#25D366;}
+  
   .nav-contact-btn:active{transform:scale(0.97);}
   .nav-contact-btn img{
     width:20px; height:20px; flex-shrink:0; display:block;
@@ -524,7 +524,7 @@
     border:1px solid var(--border-default);
     color:var(--heading);
   }
-  .filter-drawer-close-btn:hover{ background:var(--neutral-tertiary-medium); }
+  
   .filter-drawer-close-btn:active{ transform:translateY(-50%) scale(0.9); }
 
   .filter-drawer-body{
@@ -629,7 +629,7 @@
     cursor:pointer;
     padding:6px 0;
   }
-  .price-clear-btn:hover{ color:var(--heading); }
+  
   .price-apply-btn{
     background:var(--dark-strong);
     color:var(--white);
@@ -641,7 +641,7 @@
     cursor:pointer;
     transition:background 150ms ease, transform 120ms ease;
   }
-  .price-apply-btn:hover{ background:#2a2f36; }
+  
   .price-apply-btn:active{ transform:scale(0.95); }
 
   /* page loader removed */
@@ -666,13 +666,13 @@
   .btn-sm{font-size:12px; padding:6px 12px;}
   .btn-lg{font-size:14px; padding:10px 16px;}
   .btn-brand{background:var(--brand); border-color:transparent; color:var(--dark-strong);}
-  .btn-brand:hover{background:var(--brand-strong); color:var(--white);}
+  
   .btn-secondary{background:var(--neutral-secondary-medium); border-color:var(--border-default-medium); color:var(--body);}
-  .btn-secondary:hover{background:var(--neutral-tertiary-medium); color:var(--heading);}
+  
   .btn-tertiary{background:var(--neutral-primary-soft); border-color:var(--border-default); color:var(--body);}
-  .btn-tertiary:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  
   .btn-ghost{background:transparent; border-color:transparent; color:var(--white); box-shadow:none;}
-  .btn-ghost:hover{background:rgba(255,255,255,0.1);}
+  
   .btn-icon{width:16px; height:16px; flex-shrink:0;}
 
   .cart-btn{position:relative;}
@@ -780,7 +780,46 @@
     will-change:transform;
     cursor:pointer;
   }
+  /* Entrance: opacity + translateY, capped stagger via --card-i (set inline, 0-5).
+     Transition fires once on mount because .card-enter is removed next frame. */
+  .card.card-enter{
+    opacity:0; transform:translateY(8px);
+    transition:opacity 220ms cubic-bezier(0.215,0.61,0.355,1),
+               transform 220ms cubic-bezier(0.215,0.61,0.355,1);
+    transition-delay:calc(var(--card-i, 0) * 30ms);
+  }
+  @media(prefers-reduced-motion:reduce){
+    .card.card-enter{transform:none; transition:opacity 220ms ease; transition-delay:0ms;}
+  }
   @media(hover:hover) and (pointer:fine){
+    .hamburger-btn:hover{background:rgba(255,255,255,0.18);}
+    .filter-sort-btn:hover{background:var(--neutral-tertiary-medium);}
+    .nav-drawer-close:hover{background:rgba(255,255,255,0.15);}
+    .nav-btn:hover{background:rgba(255,255,255,0.13); color:var(--white);}
+    .nav-sub-btn:hover{background:rgba(255,255,255,0.1); color:var(--white);}
+    .nav-contact-btn:hover{background:rgba(37,211,102,0.22); border-color:#25D366;}
+    .filter-drawer-close-btn:hover{background:var(--neutral-tertiary-medium);}
+    .price-clear-btn:hover{color:var(--heading);}
+    .price-apply-btn:hover{background:#2a2f36;}
+    .btn-brand:hover{background:var(--brand-strong); color:var(--white);}
+    .btn-secondary:hover{background:var(--neutral-tertiary-medium); color:var(--heading);}
+    .btn-tertiary:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+    .btn-ghost:hover{background:rgba(255,255,255,0.1);}
+    .input:hover{border-color:var(--border-default-strong);}
+    .admin-toggle:hover{color:var(--gray);}
+    .inquiry-wa-btn:hover{background:#1FB855;}
+    .drawer-close:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+    .cart-line-remove:hover{text-decoration:underline;}
+    .wa-btn:hover{background:#1FB855;}
+    .modal-close-row button:hover{color:var(--heading); text-decoration:underline;}
+    .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
+    .game-addon-row:hover{background:var(--neutral-secondary-soft); border-color:var(--border-default-strong);}
+    .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+    .admin-item-toggle.is-sold:hover{background:var(--danger-strong);}
+    .login-box-close:hover{color:var(--heading); background:var(--neutral-secondary-medium);}
+    .admin-panel-close:hover{background:var(--neutral-tertiary-medium);}
+    .admin-toolbar-btn:hover{background:#000;}
+    .pay-method-tab:not(.active):hover{background:var(--neutral-tertiary-medium); border-color:var(--border-default-strong);}
     .card:hover{box-shadow:var(--shadow-md); transform:translateY(-3px);}
   }
   .card:active{transform:scale(0.97) translateY(0) !important; box-shadow:var(--shadow-2xs) !important;}
@@ -849,7 +888,7 @@
   }
   select.input{padding:6px 8px; font-size:12px;}
   .input::placeholder{color:var(--body);}
-  .input:hover{border-color:var(--border-default-strong);}
+  
   .input:focus{outline:none; border-color:var(--border-brand); box-shadow:0 0 0 1px var(--brand);}
   label.input-label{display:block; font-size:13px; font-weight:500; color:var(--heading); margin-bottom:6px;}
 
@@ -885,7 +924,7 @@
   footer p{font-size:12px; color:var(--gray);}
   .footer-logo{height:64px; width:auto; display:block; opacity:0.85;}
   .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
-  .admin-toggle:hover{color:var(--gray);}
+  
   .footer-slogan{
     font-size:12px; font-weight:700; color:var(--gray); font-family:"NintendoSwitchUI",sans-serif;
     letter-spacing:0.4px; text-align:center;
@@ -907,7 +946,7 @@
     transition:background 150ms ease, transform 120ms ease;
     white-space:nowrap; flex-shrink:0;
   }
-  .inquiry-wa-btn:hover{background:#1FB855;}
+  
   .inquiry-wa-btn:active{transform:scale(0.95);}
 
   /* ============================================================
@@ -934,7 +973,7 @@
     display:flex; align-items:center; justify-content:center;
     transition:background 150ms ease, transform 120ms ease;
   }
-  .drawer-close:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  
   .drawer-close:active{transform:scale(0.9);}
   .drawer-body{flex:1; overflow-y:auto; padding:8px 20px;}
   .drawer-empty{color:var(--body-subtle); font-size:13px; text-align:center; padding:60px 20px;}
@@ -943,7 +982,7 @@
   .cart-line-meta{color:var(--body-subtle); font-size:12px; margin-top:2px;}
   .cart-line-price{font-weight:600; font-size:13px; color:var(--heading); white-space:nowrap;}
   .cart-line-remove{background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer; margin-top:6px; padding:0; font-weight:500; font-family:"NintendoSwitchUI", sans-serif;}
-  .cart-line-remove:hover{text-decoration:underline;}
+  
   .drawer-foot{border-top:1px solid var(--border-default); padding:16px 20px 20px;}
   .drawer-row{display:flex; justify-content:space-between; font-size:13px; color:var(--body); margin-bottom:8px;}
   .drawer-row.total{color:var(--heading); font-weight:700; font-size:16px; margin-top:8px; padding-top:8px; border-top:1px solid var(--border-light);}
@@ -1001,12 +1040,12 @@
     transition:background-color 150ms ease, transform 120ms ease;
     font-family:"NintendoSwitchUI", sans-serif;
   }
-  .wa-btn:hover{background:#1FB855;}
+  
   .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
   .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;}
-  .modal-close-row button:hover{color:var(--heading); text-decoration:underline;}
+  
 
   /* ============================================================
      CONTROLLER ADDON MODAL
@@ -1048,7 +1087,7 @@
     font-family:"NintendoSwitchUI", sans-serif;
     transition:color 150ms ease;
   }
-  .ctrl-no-thanks:hover{color:var(--heading); text-decoration:underline;}
+  
 
   /* Game add-on rows inside Switch modal */
   .ctrl-games-section{ margin-bottom:10px; }
@@ -1061,7 +1100,7 @@
     margin-bottom:6px; cursor:pointer;
     transition:background 120ms ease, border-color 120ms ease;
   }
-  .game-addon-row:hover{ background:var(--neutral-secondary-soft); border-color:var(--border-default-strong); }
+  
   .game-addon-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex-shrink:0; }
   .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"NintendoSwitchUI",sans-serif; }
   .game-addon-price{ font-size:12px; font-weight:600; color:var(--fg-brand-strong); white-space:nowrap; }
@@ -1081,10 +1120,10 @@
     border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
     transition:background 150ms ease, transform 120ms ease;
   }
-  .admin-item-toggle:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
+  
   .admin-item-toggle:active{transform:scale(0.95);}
   .admin-item-toggle.is-sold{background:var(--danger); color:var(--white); border-color:transparent;}
-  .admin-item-toggle.is-sold:hover{background:var(--danger-strong);}
+  
   .login-box{
     position:fixed; top:60px; left:16px; background:var(--neutral-primary-soft);
     border:1px solid var(--border-default); border-radius:var(--radius-base);
@@ -1096,7 +1135,7 @@
     background:none; border:none; cursor:pointer; font-size:20px; line-height:1;
     color:var(--neutral-secondary); padding:0 2px; border-radius:4px;
   }
-  .login-box-close:hover{color:var(--heading); background:var(--neutral-secondary-medium);}
+  
 
   /* ============================================================
      ADMIN PRODUCT PANEL (Add / Delete)
@@ -1128,7 +1167,7 @@
     cursor:pointer; font-size:16px; line-height:1; color:var(--body);
     flex-shrink:0;
   }
-  .admin-panel-close:hover{ background:var(--neutral-tertiary-medium); }
+  
   .admin-tabs{ display:flex; gap:8px; margin-bottom:18px; border-bottom:1px solid var(--border-light); }
   .admin-tab{
     padding:8px 4px 10px; font-size:14px; font-weight:600; color:var(--body-subtle);
@@ -1175,7 +1214,7 @@
     font-size:11px; font-weight:600; padding:6px 12px;
     border-radius:var(--radius-default); cursor:pointer; font-family:"NintendoSwitchUI", sans-serif;
   }
-  .admin-toolbar-btn:hover{ background:#000; }
+  
 
   /* ============================================================
      PAYMENT METHOD TABS (checkout modal)
@@ -1199,10 +1238,6 @@
     background:var(--brand);
     border-color:var(--brand);
     color:var(--dark-strong);
-  }
-  .pay-method-tab:not(.active):hover{
-    background:var(--neutral-tertiary-medium);
-    border-color:var(--border-default-strong);
   }
 
   @media(prefers-reduced-motion:reduce){

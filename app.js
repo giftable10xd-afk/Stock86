@@ -201,6 +201,8 @@ function loadCartState() {
 
 // ---------- PRODUCT CARD (index page) ----------
 
+let cardEnterIndex = 0;
+
 function renderProductCard(item) {
   const soldClass = item.sold ? "is-sold" : "";
   const icon = ICONS[item.icon] || ICONS.console;
@@ -235,7 +237,7 @@ function renderProductCard(item) {
   const showConditionOnCard = item.icon !== "game" && item.condition;
 
   return `
-    <div class="card ${soldClass}" id="card-${item.id}">
+    <div class="card card-enter ${soldClass}" id="card-${item.id}" style="--card-i:${(typeof cardEnterIndex !== "undefined" ? cardEnterIndex++ % 6 : 0)}">
       <a class="card-media-link" href="product.html?id=${item.id}" aria-label="View ${item.name}">
         <div class="card-media ${item.image ? 'has-photo' : ''}">
           ${mediaHtml}
@@ -869,7 +871,15 @@ function renderAll() {
     if (filtered.length === 0) {
       gridEl.innerHTML = `<div class="no-results">No listings match your search.</div>`;
     } else {
+      cardEnterIndex = 0;
       gridEl.innerHTML = filtered.map(sec.renderFn).join("");
+      // Force the .card-enter starting state to paint, then strip it next
+      // frame so the transition actually runs (instead of snapping in).
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          gridEl.querySelectorAll(".card-enter").forEach(c => c.classList.remove("card-enter"));
+        });
+      });
     }
 
     grandTotal += filtered.length;
