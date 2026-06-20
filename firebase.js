@@ -23,6 +23,28 @@ const db  = getDatabase(app);
 
 const CATS = ["switches", "games", "consoles", "laptops", "phones"];
 
+// ── Local cache (instant paint + no "Loading…" blink on revisits) ──
+// We mirror every confirmed Firebase snapshot into localStorage. On the
+// very next page load (e.g. tapping a product card, or coming back from
+// product.html) we paint from this cache immediately — including any
+// admin-added items — instead of waiting on a fresh network round trip.
+// The live onValue() listener still re-syncs right after, silently.
+
+const CACHE_KEY = "stock86_inventory_cache_v1";
+
+function readInventoryCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+function writeInventoryCache(snap) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(snap)); }
+  catch (e) { /* ignore quota errors — cache is a nice-to-have */ }
+}
+
 // ── Serialise current INVENTORY into a plain object ───────────
 
 function buildInventorySnapshot() {
@@ -54,7 +76,7 @@ function buildSoldMap() {
 
 // ── Apply Firebase snapshot → INVENTORY (Firebase wins entirely) ─
 
-function applySnapshot(snap) {
+function applySnapshot(snap, opts) {
   if (!snap) return;
   CATS.forEach(cat => {
     if (snap[cat]) {
@@ -62,21 +84,42 @@ function applySnapshot(snap) {
       INVENTORY[cat] = Object.values(snap[cat]);
     }
   });
+  // Keep the local cache fresh so the next page load (or the back/forward
+  // trip from product.html) can paint instantly, admin items included.
+  if (!opts || !opts.fromCache) writeInventoryCache(snap);
 }
 
-function applySoldMap(map) {
+const SOLD_CACHE_KEY = "stock86_sold_cache_v1";
+
+function readSoldCache() {
+  try {
+    const raw = localStorage.getItem(SOLD_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+function writeSoldCache(map) {
+  try { localStorage.setItem(SOLD_CACHE_KEY, JSON.stringify(map)); }
+  catch (e) { /* ignore quota errors */ }
+}
+
+function applySoldMap(map, opts) {
   if (!map) return;
   CATS.forEach(cat => {
     (INVENTORY[cat] || []).forEach(item => {
       if (map.hasOwnProperty(item.id)) item.sold = map[item.id];
     });
   });
+  if (!opts || !opts.fromCache) writeSoldCache(map);
 }
 
 // ── Public save functions called by app.js ────────────────────
 
 window.fbSaveSoldState = function() {
-  set(ref(db, "soldState"), buildSoldMap())
+  const map = buildSoldMap();
+  writeSoldCache(map);
+  set(ref(db, "soldState"), map)
     .catch(e => console.error("Firebase soldState write failed:", e));
 };
 
@@ -94,6 +137,12 @@ window.fbSaveInventory = function(callback, removedIds) {
   // (never a one-shot, possibly-stale get()), so it's already the most
   // current view of the server plus this device's own local edit.
   const snapshot = buildInventorySnapshot();
+
+  // Cache immediately (don't wait on the network round trip) so that if
+  // the admin taps straight into the new product, or simply navigates
+  // away and back, this device already has it — no "Loading…" state.
+  writeInventoryCache(snapshot);
+  writeSoldCache(buildSoldMap());
 
   set(ref(db, "inventory"), snapshot)
     .then(() => set(ref(db, "soldState"), buildSoldMap()))
@@ -120,10 +169,37 @@ function fbInit() {
   let inventoryReady = false;
   let soldReady = false;
 
+  // ── Instant paint from cache ──────────────────────────────────
+  // If we have a cached snapshot from a previous visit (this device),
+  // apply it and render right away — before Firebase even responds.
+  // This is what makes admin-added items appear immediately instead
+  // of behind a "Loading…" state, and removes the blink on navigation
+  // since product.html already has real content for its first paint.
+  const cached = readInventoryCache();
+  if (cached) {
+    applySnapshot(cached, { fromCache: true });
+    const cachedSold = readSoldCache();
+    if (cachedSold) applySoldMap(cachedSold, { fromCache: true });
+    inventoryReady = true;
+    window.fbInventoryReady = true;
+    if (typeof renderAll === "function") renderAll();
+    if (typeof renderProductPage === "function") renderProductPage();
+    // Grid contents may have just changed (e.g. an admin-added item now
+    // exists), which can shift page height — re-apply the remembered
+    // scroll position so "← All listings" still lands in the same spot.
+    if (typeof restoreIndexScroll === "function") restoreIndexScroll();
+  }
+
+  let scrollRestoredOnce = !!cached; // already restored once above if we had a cache
+
   function rerenderIfReady() {
     if (!inventoryReady) return; // wait for at least the first real inventory snapshot
     if (typeof renderAll === "function") renderAll();
     if (typeof renderProductPage === "function") renderProductPage();
+    if (!scrollRestoredOnce) {
+      scrollRestoredOnce = true;
+      if (typeof restoreIndexScroll === "function") restoreIndexScroll();
+    }
   }
 
   onValue(ref(db, "inventory"), snapshot => {

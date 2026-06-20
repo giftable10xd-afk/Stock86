@@ -1193,19 +1193,26 @@
     *{animation:none !important; transition:none !important;}
   }
   /* ============================================================
-     SMOOTH PAGE NAVIGATION (View Transitions, with fallback)
+     SMOOTH PAGE NAVIGATION (native cross-document View Transitions)
+     This opts the whole page into the browser's built-in MPA view
+     transition. No JS needed to trigger it — the browser handles the
+     cross-fade itself on real <a> navigations and the Back button,
+     which is what avoids the blink/flash you get from faking it with
+     window.location.href.
      ============================================================ */
+  @view-transition {
+    navigation: auto;
+  }
   @media not (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root){ animation: page-fade-out 180ms ease both; }
+    ::view-transition-old(root){ animation: page-fade-out 160ms ease both; }
     ::view-transition-new(root){ animation: page-fade-in 220ms ease both; }
   }
-  @keyframes page-fade-out{ to{ opacity:0; transform:scale(0.992); } }
-  @keyframes page-fade-in{ from{ opacity:0; transform:scale(1.008); } }
+  @keyframes page-fade-out{ to{ opacity:0; } }
+  @keyframes page-fade-in{ from{ opacity:0; } }
 
   /* Fallback fade for browsers without View Transitions support */
   body.page-fade-fallback{ animation: page-fade-in-fallback 220ms ease both; }
   @keyframes page-fade-in-fallback{ from{ opacity:0; } to{ opacity:1; } }
-  body.page-leaving{ opacity:0; transition:opacity 160ms ease; }
 </style>
 </head>
 <body>
@@ -1964,6 +1971,7 @@
     renderAll(); // renders with data.js immediately so the page isn't blank; firebase.js re-renders once live data arrives
     updateAddToCartButtons();
     updateNavActive("all");
+    restoreIndexScroll(); // jump back to where the person was browsing, if returning from a product
   });
 
   // Re-sync cart when user navigates back from product.html (browser back button restores from cache)

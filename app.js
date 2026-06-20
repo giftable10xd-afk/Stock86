@@ -10,43 +10,74 @@ let cart = [];
 let adminMode = false;
 
 // ---------- SMOOTH PAGE NAVIGATION ----------
-// Uses the native View Transitions API where supported (Chrome/Edge/Safari 18+)
-// for a smooth cross-fade between index.html and product.html. Falls back to a
-// simple opacity fade for other browsers. Works with plain <a href> links —
-// no SPA rewrite needed.
+// The cross-fade itself is now handled entirely by the browser's native
+// cross-document View Transition (see the `@view-transition { navigation:
+// auto; }` CSS rule in both pages). That only fires for *real* navigations
+// — actual <a> clicks and the Back/Forward buttons — not for navigations
+// triggered from JS via window.location.href. So we deliberately let plain
+// <a href="..."> clicks go through untouched; we don't preventDefault or
+// fake the fade in JS anymore, since that's what caused the blink (a fake
+// fade-out on the old page, then a fresh unstyled paint underneath with no
+// real connecting animation).
 
-const supportsViewTransitions = typeof document.startViewTransition === "function";
+// Browsers without cross-document View Transition support get a plain,
+// instant navigation — no transition, but also no blink, since nothing
+// is being faked in JS. We only add a gentle fallback fade-in for very
+// old browsers that don't even support view transitions at all.
+let hasViewTransitionSupport = false;
+try {
+  hasViewTransitionSupport = CSS.supports("selector(::view-transition-old(root))");
+} catch (e) { /* very old browser — CSS.supports selector() syntax itself unsupported */ }
 
-if (!supportsViewTransitions) {
-  document.documentElement.classList.add("no-view-transitions");
+if (!hasViewTransitionSupport) {
   document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.add("page-fade-fallback");
   });
 }
 
-function navigateWithFade(url) {
-  if (supportsViewTransitions) {
-    document.startViewTransition(() => { window.location.href = url; });
-  } else {
-    document.body.classList.add("page-leaving");
-    setTimeout(() => { window.location.href = url; }, 150);
+// ---------- SCROLL MEMORY (index.html ⇄ product.html) ----------
+// Remembers exactly where the person was on the grid so "← All listings"
+// returns to the same spot instead of resetting to the top.
+const SCROLL_MEMORY_KEY = "stock86_index_scroll_v1";
+
+function rememberIndexScroll() {
+  try { sessionStorage.setItem(SCROLL_MEMORY_KEY, String(window.scrollY)); }
+  catch (e) { /* ignore */ }
+}
+
+let _pendingScrollRestoreY = null;
+let _pendingScrollRestoreRead = false;
+
+function restoreIndexScroll() {
+  if (!_pendingScrollRestoreRead) {
+    _pendingScrollRestoreRead = true;
+    try {
+      _pendingScrollRestoreY = parseInt(sessionStorage.getItem(SCROLL_MEMORY_KEY), 10) || 0;
+      sessionStorage.removeItem(SCROLL_MEMORY_KEY);
+    } catch (e) { _pendingScrollRestoreY = 0; }
+  }
+  if (_pendingScrollRestoreY > 0) {
+    // Jump instantly (no smooth animation) and do it pre-paint so there's
+    // no visible scroll-then-snap — the page simply opens already there.
+    window.scrollTo(0, _pendingScrollRestoreY);
   }
 }
 
-// Intercept clicks on same-origin links between index.html and product.html
-// so the navigation gets a smooth transition instead of the default blank flash.
+// Note: no click interception anymore — links navigate natively so the
+// browser's own cross-document view transition can run. We only listen
+// (not intercept) to record the scroll position before leaving the grid.
 function wireSmoothNav() {
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a[href]');
     if (!link) return;
     const href = link.getAttribute("href");
     if (!href) return;
-    // Only intercept our own product/index links, not external/anchor/admin links
-    if (!/^(product\.html(\?|$)|index\.html(\?|$)?)/.test(href)) return;
-    if (link.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    e.preventDefault();
-    navigateWithFade(href);
-  });
+    if (!/^product\.html(\?|$)/.test(href)) return;
+    const leavingIndex = !!document.getElementById("section-switches");
+    if (leavingIndex) rememberIndexScroll();
+    // No preventDefault — let the browser handle the navigation and its
+    // own native view transition.
+  }, { capture: true });
 }
 
 // ---------- ICONS ----------
@@ -736,7 +767,12 @@ function renderAll() {
       return matchPrice && matchAvail && matchSearch;
     });
 
-    // (no sorting — sort feature removed)
+    // Available items first (highest price → lowest), sold items always
+    // pushed below available ones (also highest → lowest within that group).
+    filtered = filtered.slice().sort((a, b) => {
+      if (a.sold !== b.sold) return a.sold ? 1 : -1;
+      return b.price - a.price;
+    });
 
     if (filtered.length === 0 && (query || availability !== "all" || priceRange.from != null || priceRange.to != null)) {
       if (sectionEl) sectionEl.style.display = "none";
