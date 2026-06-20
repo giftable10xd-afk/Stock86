@@ -215,4 +215,4 @@ const INVENTORY = {
 // ----------------------------------------------------------
 const WHATSAPP_NUMBER = "9617655382" + "9"; // +961 76 553 829
 const DELIVERY_FEE    = 5;
-const ADMIN_CODE      = "stock86";
+const ADMIN_CODE      = "50441440";

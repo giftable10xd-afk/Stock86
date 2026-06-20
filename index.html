@@ -135,7 +135,9 @@
     background-image: url("assets/wallpaper.jpg");
     background-size:cover;
     background-position:center;
-    position:relative;
+    position:sticky;
+    top:0;
+    z-index:40;
     overflow:hidden;
   }
   /* Darkened overlay on wallpaper */
@@ -209,7 +211,7 @@
     border-radius:var(--radius-base);
     color:var(--white);
     font-family:"NintendoSwitchUI", sans-serif;
-    font-size:16px;
+    font-size:14px;
     padding:10px 10px 10px 34px;
     transition:background 150ms ease, border-color 150ms ease;
     -webkit-appearance:none;
@@ -262,7 +264,8 @@
   .count-bar-outer{
     background:var(--white);
     border-bottom:1px solid var(--border-light);
-    position:sticky; top:0; z-index:50;
+    position:relative;
+    z-index:10;
   }
   .filter-sort-btn{
     display:flex; align-items:center; gap:8px;
@@ -677,8 +680,23 @@
   }
 
   /* ============================================================
-     HERO BAND
+     HERO BAND — scrollable section below sticky header
      ============================================================ */
+  .hero-band{
+    background:var(--dark);
+    background-image: url("assets/wallpaper.jpg");
+    background-size:cover;
+    background-position:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-band-overlay{
+    content:"";
+    position:absolute; inset:0;
+    background:rgba(6,8,14,0.78);
+    pointer-events:none;
+    z-index:1;
+  }
   .hero{position:relative; z-index:2; padding:28px 0 20px;}
   @media(min-width:1024px){.hero{padding:36px 0 18px;}}
   .hero h1{color:var(--white); max-width:14ch;}
@@ -1289,7 +1307,14 @@
       </div>
     </div>
 
-    <!-- HERO -->
+
+  </div>
+</header>
+
+<!-- HERO BAND — scrolls with page, shares wallpaper look -->
+<div class="hero-band">
+  <div class="hero-band-overlay"></div>
+  <div class="container" style="position:relative;z-index:2;">
     <div class="hero">
       <h1>Used consoles &amp; handhelds, checked by hand</h1>
       <p class="lead">Modded Switches, handheld PCs, and last-gen consoles — each listing is the actual unit, actual condition. Cash on delivery or Whish Money at checkout.</p>
@@ -1308,9 +1333,8 @@
         <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $5 — all of Lebanon</span>
       </div>
     </div>
-
   </div>
-</header>
+</div>
 
 <!-- COUNT BAR — solid white strip, sticky below header -->
 <div class="count-bar-outer">
