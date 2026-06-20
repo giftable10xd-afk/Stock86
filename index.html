@@ -713,6 +713,25 @@
   }
 
   /* ============================================================
+     HERO ANIMATION — text reveals word by word like the pitch copy deserves
+     ============================================================ */
+  .hero-animate > * {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: hero-rise 500ms cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  }
+  .hero-animate h1       { animation-delay: 0ms; }
+  .hero-animate p.lead   { animation-delay: 120ms; }
+  .hero-animate .hero-badges { animation-delay: 260ms; }
+
+  @keyframes hero-rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media(prefers-reduced-motion: reduce) {
+    .hero-animate > * { animation: none; opacity: 1; transform: none; }
+  }
+
+  /* ============================================================
      HERO BAND — scrollable section below sticky header
      ============================================================ */
   .hero-band{
@@ -831,10 +850,10 @@
   /* Entrance: opacity + translateY, capped stagger via --card-i (set inline, 0-5).
      Transition fires once on mount because .card-enter is removed next frame. */
   .card.card-enter{
-    opacity:0; transform:translateY(8px);
-    transition:opacity 220ms cubic-bezier(0.215,0.61,0.355,1),
-               transform 220ms cubic-bezier(0.215,0.61,0.355,1);
-    transition-delay:calc(var(--card-i, 0) * 30ms);
+    opacity:0; transform:translateY(16px);
+    transition:opacity 420ms cubic-bezier(0.215,0.61,0.355,1),
+               transform 420ms cubic-bezier(0.215,0.61,0.355,1);
+    transition-delay:calc(var(--card-i, 0) * 60ms);
   }
   @media(prefers-reduced-motion:reduce){
     .card.card-enter{transform:none; transition:opacity 220ms ease; transition-delay:0ms;}
@@ -1319,6 +1338,14 @@
   #productView{ display:none; }
   body.showing-product #productView{ display:block; }
   body.showing-product #gridView{ display:none; }
+  /* Hide hero band + count bar when in product view — they belong to index only */
+  body.showing-product .hero-band{ display:none; }
+  body.showing-product .count-bar-outer{ display:none; }
+  /* Prevent flash: if URL has ?id=, add showing-product immediately via inline script
+     before DOMContentLoaded so no grid paint happens before product view */
+  body.pre-product #gridView{ display:none; }
+  body.pre-product .hero-band{ display:none; }
+  body.pre-product .count-bar-outer{ display:none; }
 
   .detail-section{padding:32px 0 48px;}
   @media(min-width:768px){.detail-section{padding:40px 0 64px;}}
@@ -1399,6 +1426,15 @@
 </style>
 </head>
 <body>
+<script>
+  // Apply pre-product class immediately (before any paint) if URL has ?id=
+  // This prevents the grid from flashing before the product view takes over.
+  (function(){
+    if (new URLSearchParams(window.location.search).get("id")) {
+      document.body.classList.add("pre-product");
+    }
+  })();
+</script>
 <script>
   // Runs synchronously before any of #gridView/#productView below is
   // parsed or painted. Without this, a fresh load of index.html?id=X
@@ -1536,7 +1572,7 @@
 <div class="hero-band">
   <div class="hero-band-overlay"></div>
   <div class="container" style="position:relative;z-index:2;">
-    <div class="hero">
+    <div class="hero hero-animate">
       <h1>Used consoles &amp; handhelds, checked by hand</h1>
       <p class="lead">Modded Switches, handheld PCs, and last-gen consoles — each listing is the actual unit, actual condition. Cash on delivery or Whish Money at checkout.</p>
       <div class="hero-badges">
@@ -2230,10 +2266,12 @@
     const bootParams = new URLSearchParams(window.location.search);
     const bootId = bootParams.get("id");
     if (bootId) {
+      document.body.classList.remove("pre-product");
       document.body.classList.add("showing-product");
       renderProductPage(bootId);
       history.replaceState({ stock86View: "product", id: bootId }, "", `product.html?id=${encodeURIComponent(bootId)}`);
     } else {
+      document.body.classList.remove("pre-product");
       history.replaceState({ stock86View: "grid" }, "", "index.html");
       restoreIndexScroll(); // jump back to where the person was browsing, if returning from a product
     }

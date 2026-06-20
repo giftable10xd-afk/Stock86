@@ -114,40 +114,6 @@ function applySoldMap(map, opts) {
   if (!opts || !opts.fromCache) writeSoldCache(map);
 }
 
-// ── Condition options (admin-manageable list) ──────────────────
-
-const CONDITIONS_CACHE_KEY = "stock86_conditions_cache_v1";
-
-function readConditionsCache() {
-  try {
-    const raw = localStorage.getItem(CONDITIONS_CACHE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) { return null; }
-}
-
-function writeConditionsCache(list) {
-  try { localStorage.setItem(CONDITIONS_CACHE_KEY, JSON.stringify(list)); }
-  catch (e) { /* ignore quota errors */ }
-}
-
-function applyConditions(list, opts) {
-  if (!Array.isArray(list)) return;
-  CUSTOM_CONDITIONS = list;
-  if (!opts || !opts.fromCache) writeConditionsCache(list);
-}
-
-window.fbSaveConditions = function(callback) {
-  const list = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS) || [];
-  writeConditionsCache(list);
-  set(ref(db, "conditions"), list)
-    .then(() => { if (typeof callback === "function") callback(); })
-    .catch(e => {
-      console.error("Firebase conditions write failed:", e);
-      alert("Save failed — check your internet connection.");
-    });
-};
-
 // ── Public save functions called by app.js ────────────────────
 
 window.fbSaveSoldState = function() {
@@ -223,8 +189,6 @@ function fbInit() {
     // scroll position so "← All listings" still lands in the same spot.
     if (typeof restoreIndexScroll === "function") restoreIndexScroll();
   }
-  const cachedConditions = readConditionsCache();
-  if (cachedConditions) applyConditions(cachedConditions, { fromCache: true });
 
   let scrollRestoredOnce = !!cached; // already restored once above if we had a cache
 
@@ -271,22 +235,6 @@ function fbInit() {
     console.error("Firebase soldState listener error:", e);
     soldReady = true;
     rerenderIfReady();
-  });
-
-  onValue(ref(db, "conditions"), snapshot => {
-    if (snapshot.exists()) {
-      applyConditions(snapshot.val());
-    } else {
-      // First ever run — seed Firebase with the default list from data.js.
-      const seedList = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS) || ["Like New", "Excellent", "Good"];
-      applyConditions(seedList, { fromCache: true });
-      set(ref(db, "conditions"), seedList)
-        .catch(e => console.error("Firebase conditions seed failed:", e));
-    }
-    if (typeof refreshConditionDropdowns === "function") refreshConditionDropdowns();
-    if (typeof renderAdminConditionsList === "function") renderAdminConditionsList();
-  }, e => {
-    console.error("Firebase conditions listener error:", e);
   });
 }
 
