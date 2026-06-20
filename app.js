@@ -36,45 +36,85 @@ if (!hasViewTransitionSupport) {
 }
 
 // ---------- SCROLL MEMORY (index.html ⇄ product.html) ----------
-// Remembers exactly where the person was on the grid so "← All listings"
-// returns to the same spot instead of resetting to the top.
-const SCROLL_MEMORY_KEY = "stock86_index_scroll_v1";
+// Remembers exactly which product card the person was looking at, so
+// "← All listings" can scroll back to that exact card — not a raw pixel
+// offset. A pixel offset drifts because card images (especially admin
+// photos, which are large base64 data-URIs) finish loading and decoding
+// at different times, reflowing the grid; anchoring to the actual card
+// element sidesteps that entirely.
+const SCROLL_MEMORY_KEY = "stock86_index_scroll_anchor_v2";
 
-function rememberIndexScroll() {
-  try { sessionStorage.setItem(SCROLL_MEMORY_KEY, String(window.scrollY)); }
-  catch (e) { /* ignore */ }
+function rememberIndexScroll(productId) {
+  try {
+    sessionStorage.setItem(SCROLL_MEMORY_KEY, JSON.stringify({ id: productId || null, y: window.scrollY }));
+  } catch (e) { /* ignore */ }
 }
 
-let _pendingScrollRestoreY = null;
-let _pendingScrollRestoreRead = false;
+let _pendingScrollAnchor = undefined; // undefined = not yet read this page load
+
+function readScrollAnchorOnce() {
+  if (_pendingScrollAnchor !== undefined) return _pendingScrollAnchor;
+  try {
+    const raw = sessionStorage.getItem(SCROLL_MEMORY_KEY);
+    sessionStorage.removeItem(SCROLL_MEMORY_KEY);
+    _pendingScrollAnchor = raw ? JSON.parse(raw) : null;
+  } catch (e) { _pendingScrollAnchor = null; }
+  return _pendingScrollAnchor;
+}
 
 function restoreIndexScroll() {
-  if (!_pendingScrollRestoreRead) {
-    _pendingScrollRestoreRead = true;
-    try {
-      _pendingScrollRestoreY = parseInt(sessionStorage.getItem(SCROLL_MEMORY_KEY), 10) || 0;
-      sessionStorage.removeItem(SCROLL_MEMORY_KEY);
-    } catch (e) { _pendingScrollRestoreY = 0; }
+  const anchor = readScrollAnchorOnce();
+  if (!anchor) return;
+
+  function applyAnchor() {
+    if (anchor.id) {
+      const cardEl = document.getElementById(`card-${anchor.id}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ block: "center", inline: "nearest" });
+        return true;
+      }
+    }
+    if (anchor.y > 0) window.scrollTo(0, anchor.y);
+    return false;
   }
-  if (_pendingScrollRestoreY > 0) {
-    // Jump instantly (no smooth animation) and do it pre-paint so there's
-    // no visible scroll-then-snap — the page simply opens already there.
-    window.scrollTo(0, _pendingScrollRestoreY);
+
+  applyAnchor();
+
+  // Images (especially large admin photos) can finish decoding after this
+  // first pass and shift the grid's layout, drifting the page away from
+  // the card. Re-apply the anchor once images currently in the viewport
+  // area have settled, and once more after a short delay as a safety net.
+  const imgs = Array.from(document.querySelectorAll(".product-grid img"));
+  let remaining = imgs.filter(img => !img.complete).length;
+  if (remaining > 0) {
+    imgs.forEach(img => {
+      if (img.complete) return;
+      const onDone = () => {
+        remaining--;
+        if (remaining <= 0) applyAnchor();
+      };
+      img.addEventListener("load", onDone, { once: true });
+      img.addEventListener("error", onDone, { once: true });
+    });
   }
+  // Belt-and-suspenders: one more pass shortly after, in case something
+  // else (fonts, late reflow) shifted things.
+  setTimeout(applyAnchor, 300);
 }
 
 // Note: no click interception anymore — links navigate natively so the
 // browser's own cross-document view transition can run. We only listen
-// (not intercept) to record the scroll position before leaving the grid.
+// (not intercept) to record which card was clicked before leaving the grid.
 function wireSmoothNav() {
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a[href]');
     if (!link) return;
     const href = link.getAttribute("href");
     if (!href) return;
-    if (!/^product\.html(\?|$)/.test(href)) return;
+    const match = /^product\.html\?id=([^&]+)/.exec(href);
+    if (!match) return;
     const leavingIndex = !!document.getElementById("section-switches");
-    if (leavingIndex) rememberIndexScroll();
+    if (leavingIndex) rememberIndexScroll(decodeURIComponent(match[1]));
     // No preventDefault — let the browser handle the navigation and its
     // own native view transition.
   }, { capture: true });
