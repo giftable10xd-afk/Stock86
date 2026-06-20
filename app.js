@@ -36,32 +36,16 @@ function findItemById(id) {
 }
 
 // ---------- SOLD STATE PERSISTENCE ----------
+// Actual save/load handled by firebase.js
 
-function loadSoldState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const soldMap = JSON.parse(raw);
-    allLists().forEach(list => {
-      list.forEach(item => {
-        if (soldMap.hasOwnProperty(item.id)) item.sold = soldMap[item.id];
-      });
-    });
-  } catch (e) { console.warn("Could not load sold state:", e); }
-}
-
-function saveSoldState() {
-  const soldMap = {};
-  allLists().forEach(list => list.forEach(item => { soldMap[item.id] = item.sold; }));
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(soldMap)); }
-  catch (e) { console.warn("Could not save sold state:", e); }
-}
+function loadSoldState() { /* firebase.js handles this */ }
+function saveSoldState()  { /* firebase.js handles this */ }
 
 function toggleSold(id) {
   const item = findItemById(id);
   if (!item) return;
   item.sold = !item.sold;
-  saveSoldState();
+  if (typeof window.fbSaveSoldState === "function") window.fbSaveSoldState();
   if (typeof renderAll === "function") renderAll();
   if (typeof renderProductPage === "function") renderProductPage();
 }
@@ -515,8 +499,7 @@ function exitAdmin() {
 // ---------- COMMON EVENT WIRING ----------
 
 function wireCommonUI() {
-  loadSoldState();
-  loadCartState();   // ← restore cart from localStorage
+  loadCartState();
   renderCart();
 
   document.getElementById("cartOpenBtn").addEventListener("click", openDrawer);
@@ -877,116 +860,55 @@ function resetAdminAddForm() {
 }
 
 function adminAddProduct() {
-  const category = document.getElementById("apCategory").value;
-  const name = document.getElementById("apName").value.trim();
-  const price = parseFloat(document.getElementById("apPrice").value);
+  const category  = document.getElementById("apCategory").value;
+  const name      = document.getElementById("apName").value.trim();
+  const price     = parseFloat(document.getElementById("apPrice").value);
   const condition = document.getElementById("apCondition").value || null;
   const description = document.getElementById("apDescription").value.trim();
-  const specsRaw = document.getElementById("apSpecs").value;
-  const specs = specsRaw.split("\n").map(s => s.trim()).filter(Boolean);
+  const specsRaw  = document.getElementById("apSpecs").value;
+  const specs     = specsRaw.split("\n").map(s => s.trim()).filter(Boolean);
 
-  if (!name)            { alert("Please enter a product name."); return; }
-  if (isNaN(price))     { alert("Please enter a valid price."); return; }
+  if (!name)               { alert("Please enter a product name."); return; }
+  if (isNaN(price))        { alert("Please enter a valid price."); return; }
   if (!apPendingImageData) { alert("Please add a photo."); return; }
 
-  const iconMap = { switches: "switch", games: "game", consoles: "console", laptops: "laptop", phones: "phone" };
+  const iconMap = { switches:"switch", games:"game", consoles:"console", laptops:"laptop", phones:"phone" };
 
   const newItem = {
     id: adminNextId(category),
-    name,
-    price,
-    condition,
+    name, price, condition,
     sold: false,
     icon: iconMap[category] || "switch",
     image: apPendingImageData,
-    description,
-    specs
+    description, specs
   };
 
   if (!INVENTORY[category]) INVENTORY[category] = [];
   INVENTORY[category].push(newItem);
 
-  if (typeof renderAll === "function") renderAll();
-  alert(`"${name}" added. Now click "Save & download data.js" to make it permanent.`);
-  resetAdminAddForm();
-}
-
-function escapeForJs(str) {
-  return String(str).replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
-}
-
-function generateDataJsSource() {
-  const sectionOrder = [
-    ["switches", "NINTENDO SWITCH"],
-    ["games", "SWITCH GAMES"],
-    ["consoles", "HANDHELDS & CONSOLES"],
-    ["laptops", "LAPTOPS"],
-    ["phones", "PHONES"]
-  ];
-
-  function serializeItem(item) {
-    const lines = [];
-    lines.push(`    {`);
-    lines.push(`      id: ${JSON.stringify(item.id)},`);
-    lines.push(`      name: \`${escapeForJs(item.name)}\`,`);
-    lines.push(`      price: ${Number(item.price)},`);
-    lines.push(`      condition: ${item.condition ? JSON.stringify(item.condition) : "null"},`);
-    lines.push(`      sold: ${!!item.sold},`);
-    lines.push(`      icon: ${JSON.stringify(item.icon || "switch")},`);
-    lines.push(`      image: \`${escapeForJs(item.image || "")}\`,`);
-    lines.push(`      description: \`${escapeForJs(item.description || "")}\`,`);
-    if (item.hasControllerAddon) {
-      lines.push(`      specs: ${JSON.stringify(item.specs || [])},`);
-      lines.push(`      hasControllerAddon: true`);
-    } else {
-      lines.push(`      specs: ${JSON.stringify(item.specs || [])}`);
-    }
-    lines.push(`    }`);
-    return lines.join("\n");
+  // Save to Firebase
+  if (typeof window.fbSaveInventory === "function") {
+    window.fbSaveInventory(() => {
+      if (typeof renderAll === "function") renderAll();
+      renderAdminDeleteList();
+      resetAdminAddForm();
+      const btn = document.getElementById("apSaveBtn");
+      const note = document.getElementById("apSaveNote");
+      btn.textContent = "✓ Saved!";
+      btn.disabled = true;
+      if (note) note.textContent = "Product saved and live on all devices.";
+      setTimeout(() => { btn.textContent = "Save product"; btn.disabled = false; if (note) note.textContent = ""; }, 2500);
+    });
+  } else {
+    if (typeof renderAll === "function") renderAll();
+    renderAdminDeleteList();
+    resetAdminAddForm();
   }
-
-  function serializeSection(key, label) {
-    const list = INVENTORY[key] || [];
-    const body = list.map(serializeItem).join(",\n");
-    return `  // ----------------------------------------------------------\n  // ${label}\n  // ----------------------------------------------------------\n  ${key}: [\n${body}${body ? "\n" : ""}  ]`;
-  }
-
-  const blocks = [];
-
-  // switches, then controllerAddons (kept adjacent to switches, matching original file)
-  blocks.push(serializeSection("switches", "NINTENDO SWITCH"));
-  if (INVENTORY.controllerAddons) {
-    const addonsJson = JSON.stringify(INVENTORY.controllerAddons, null, 4).replace(/\n/g, "\n  ");
-    blocks.push(`  // ----------------------------------------------------------\n  // CONTROLLER ADD-ONS\n  // ----------------------------------------------------------\n  controllerAddons: ${addonsJson}`);
-  }
-  blocks.push(serializeSection("games",    "SWITCH GAMES"));
-  blocks.push(serializeSection("consoles", "HANDHELDS & CONSOLES"));
-  blocks.push(serializeSection("laptops",  "LAPTOPS"));
-  blocks.push(serializeSection("phones",   "PHONES"));
-
-  let out = `// ============================================================\n// STOCK/86 — INVENTORY DATA\n// ============================================================\n\nconst INVENTORY = {\n\n`;
-  out += blocks.join(",\n\n");
-  out += `\n};\n\n// ----------------------------------------------------------\n// SITE CONFIG\n// ----------------------------------------------------------\nconst WHATSAPP_NUMBER = ${JSON.stringify(WHATSAPP_NUMBER)};\nconst DELIVERY_FEE    = ${JSON.stringify(DELIVERY_FEE)};\nconst ADMIN_CODE      = ${JSON.stringify(ADMIN_CODE)};\n`;
-
-  return out;
-}
-
-function adminDownloadDataJs() {
-  const src = generateDataJsSource();
-  const blob = new Blob([src], { type: "text/javascript" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "data.js";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 }
 
 function wireAdminPanel() {
   const manageBtn = document.getElementById("adminManageBtn");
-  if (!manageBtn) return; // panel only exists on index.html
+  if (!manageBtn) return;
 
   manageBtn.addEventListener("click", openAdminPanel);
   document.getElementById("adminPanelClose").addEventListener("click", closeAdminPanel);
@@ -995,7 +917,18 @@ function wireAdminPanel() {
   });
   document.getElementById("tabAdd").addEventListener("click", () => adminSwitchTab("add"));
   document.getElementById("tabDelete").addEventListener("click", () => adminSwitchTab("delete"));
-  document.getElementById("apSaveBtn").addEventListener("click", () => { adminAddProduct(); adminDownloadDataJs(); });
-  document.getElementById("apSaveBtn2").addEventListener("click", adminDownloadDataJs);
+  document.getElementById("apSaveBtn").addEventListener("click", adminAddProduct);
+  document.getElementById("apSaveBtn2").addEventListener("click", () => {
+    if (typeof window.fbSaveInventory === "function") {
+      window.fbSaveInventory(() => {
+        window.fbSaveSoldState();
+        const btn = document.getElementById("apSaveBtn2");
+        const orig = btn.textContent;
+        btn.textContent = "✓ Saved!";
+        btn.disabled = true;
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2500);
+      });
+    }
+  });
   wireAdminImageInput();
 }

@@ -691,7 +691,6 @@
     overflow:hidden;
   }
   .hero-band-overlay{
-    content:"";
     position:absolute; inset:0;
     background:rgba(6,8,14,0.78);
     pointer-events:none;
@@ -1307,11 +1306,10 @@
       </div>
     </div>
 
-
   </div>
 </header>
 
-<!-- HERO BAND — scrolls with page, shares wallpaper look -->
+<!-- HERO BAND -->
 <div class="hero-band">
   <div class="hero-band-overlay"></div>
   <div class="container" style="position:relative;z-index:2;">
@@ -1346,7 +1344,7 @@
           <line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/>
           <line x1="4" y1="18" x2="20" y2="18"/><circle cx="11" cy="18" r="2" fill="currentColor" stroke="none"/>
         </svg>
-        <span>Filter and sort</span>
+        <span>Filter</span>
       </button>
       <span class="count-bar-total" id="countBarTotal"></span>
     </div>
@@ -1357,13 +1355,13 @@
 <div class="filter-backdrop" id="filterBackdrop"></div>
 
 <!-- FILTER & SORT PANEL — right-side slide-in drawer -->
-<div class="filter-panel-wrap" id="filterPanelWrap" role="dialog" aria-label="Filter and sort">
+<div class="filter-panel-wrap" id="filterPanelWrap" role="dialog" aria-label="Filter">
   <div class="filter-drawer-head">
     <div class="filter-drawer-head-text">
-      <h3>Filter and sort</h3>
+      <h3>Filter</h3>
       <span class="filter-drawer-count" id="filterDrawerCount"></span>
     </div>
-    <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter and sort">&times;</button>
+    <button class="nav-drawer-close filter-drawer-close-btn" id="filterDrawerClose" aria-label="Close filter">&times;</button>
   </div>
 
   <div class="filter-drawer-body">
@@ -1675,7 +1673,7 @@
 
 <!-- ADMIN BAR -->
 <div class="admin-bar" id="adminBar">
-  <span>Admin mode — click any listing to toggle sold / available</span>
+  <span>Admin mode — tap any listing to toggle sold / available</span>
   <div style="display:flex; gap:8px; align-items:center;">
     <button class="admin-toolbar-btn" id="adminManageBtn">Manage products</button>
     <button class="admin-item-toggle" id="adminExitBtn">Exit admin</button>
@@ -1741,24 +1739,26 @@
         <textarea id="apSpecs" placeholder="256GB storage&#10;Original box&#10;AC charger included"></textarea>
       </div>
       <div class="admin-panel-actions">
-        <button class="btn btn-brand" id="apSaveBtn">Save &amp; download data.js</button>
+        <button class="btn btn-brand" id="apSaveBtn">Save product</button>
       </div>
-      <p class="admin-save-note">This downloads an updated <strong>data.js</strong> with your new product (photo included) plus everything currently on the site. Drag it into your GitHub repo, replacing the old data.js, then commit.</p>
+      <p class="admin-save-note" id="apSaveNote">Saving…</p>
     </div>
 
     <!-- DELETE/RESTORE TAB -->
     <div id="adminTabDelete" style="display:none;">
       <div id="adminDeleteList"></div>
       <div class="admin-panel-actions">
-        <button class="btn btn-brand" id="apSaveBtn2">Save &amp; download data.js</button>
+        <button class="btn btn-brand" id="apSaveBtn2">Save changes</button>
       </div>
-      <p class="admin-save-note">Marking a product sold hides it as "Sold" (matches normal sold/available). Download data.js afterward to make the change permanent on GitHub — otherwise it only updates in this browser.</p>
+      <p class="admin-save-note">Changes sync instantly across all devices.</p>
     </div>
   </div>
 </div>
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<!-- Firebase — loads after app.js so renderAll is defined -->
+<script type="module" src="firebase.js"></script>
 <script>
   // ── Nav drawer (LEFT side) ─────────────────────────────────
   const hamburgerBtn  = document.getElementById("hamburgerBtn");
@@ -1965,7 +1965,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     wireCommonUI();
     wireAdminPanel();
-    renderAll();
+    renderAll(); // renders with data.js immediately; firebase.js re-renders once Firebase data loads
     updateAddToCartButtons();
     updateNavActive("all");
   });
