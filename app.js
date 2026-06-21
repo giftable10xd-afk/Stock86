@@ -126,18 +126,6 @@ function readScrollAnchorOnce() {
 }
 
 function restoreIndexScroll() {
-  // Only restore the scroll position when the user is genuinely returning
-  // from a product page via the in-app back navigation. On a hard refresh
-  // (or a brand-new visit) history.state is null, so we discard any stale
-  // anchor that may have been left over from a previous browsing session.
-  const state = history.state;
-  const returningFromProduct = state && (state.stock86View === "grid" || state.stock86View === "product");
-  if (!returningFromProduct) {
-    // Discard stale anchor so firebase.js re-renders don't jump the page.
-    try { sessionStorage.removeItem(SCROLL_MEMORY_KEY); } catch (e) { /* ignore */ }
-    _pendingScrollAnchor = null;
-    return;
-  }
   const anchor = readScrollAnchorOnce();
   if (!anchor) return;
 
@@ -891,23 +879,6 @@ function setCategory(cat) {
     btn.classList.toggle("active", btn.dataset.cat === cat);
   });
   renderAll();
-  if (cat !== "all") {
-    const sectionIdMap = {
-      switches: "section-switches",
-      games:    "section-games",
-      consoles: "section-consoles",
-      laptops:  "section-laptops",
-      phones:   "section-phones",
-    };
-    const sectionEl = document.getElementById(sectionIdMap[cat]);
-    if (sectionEl) {
-      // Offset by the sticky header height so the section heading isn't hidden behind it
-      const headerEl = document.querySelector(".header");
-      const headerH  = headerEl ? headerEl.offsetHeight : 60;
-      const top = sectionEl.getBoundingClientRect().top + window.scrollY - headerH - 8;
-      window.scrollTo({ top, behavior: "instant" });
-    }
-  }
 }
 
 // Score tiers, highest wins. Product name is checked before anything else
@@ -1204,12 +1175,12 @@ function closeAdminPanel() {
 function adminSwitchTab(tab) {
   document.getElementById("tabAdd").classList.toggle("active", tab === "add");
   document.getElementById("tabDelete").classList.toggle("active", tab === "delete");
-  document.getElementById("tabConditions").classList.toggle("active", tab === "conditions");
-  document.getElementById("adminTabAdd").style.display        = tab === "add"        ? "" : "none";
-  document.getElementById("adminTabDelete").style.display      = tab === "delete"     ? "" : "none";
-  document.getElementById("adminTabConditions").style.display  = tab === "conditions" ? "" : "none";
+  document.getElementById("tabEdit").classList.toggle("active", tab === "edit");
+  document.getElementById("adminTabAdd").style.display    = tab === "add"    ? "" : "none";
+  document.getElementById("adminTabDelete").style.display = tab === "delete" ? "" : "none";
+  document.getElementById("adminTabEdit").style.display   = tab === "edit"   ? "" : "none";
   if (tab === "delete") renderAdminDeleteList();
-  if (tab === "conditions") renderAdminConditionsList();
+  if (tab === "edit")   renderAdminEditProductSelect();
 }
 
 function renderAdminDeleteList() {
@@ -1241,71 +1212,132 @@ function renderAdminDeleteList() {
   `).join("");
 }
 
-// ---------- CONDITION OPTIONS (admin-manageable) ----------
-// CUSTOM_CONDITIONS is declared with `let` in data.js, seeded there, and
-// kept in sync by firebase.js exactly like INVENTORY — every admin edit
-// here is synced to all visitors, the same as adding/removing a product.
+// ---------- EDIT PRODUCT (admin) ----------
 
 function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// Repaints every <select id="apCondition"> on the page (just the one
-// today, but this stays correct if more appear) from the current
-// condition list, preserving whatever was already selected if it still
-// exists in the list.
-function refreshConditionDropdowns() {
-  const list = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS) || [];
-  document.querySelectorAll("#apCondition").forEach(select => {
-    const prevValue = select.value;
-    const options = list.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-    select.innerHTML = options + `<option value="">No condition (games)</option>`;
-    const stillExists = prevValue && (list.includes(prevValue) || prevValue === "");
-    select.value = stillExists ? prevValue : (list[0] || "");
+let epPendingImageData = null;
+
+function renderAdminEditProductSelect() {
+  const select = document.getElementById("epProductSelect");
+  if (!select) return;
+  const allItems = [];
+  ["switches","games","consoles","laptops","phones"].forEach(cat => {
+    (INVENTORY[cat] || []).forEach(item => allItems.push(item));
   });
-}
-
-function renderAdminConditionsList() {
-  const wrap = document.getElementById("adminConditionsList");
-  if (!wrap) return;
-  const list = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS) || [];
-  if (!list.length) {
-    wrap.innerHTML = `<div class="admin-empty">No conditions yet — add one above.</div>`;
-    return;
+  const prev = select.value;
+  select.innerHTML = '<option value="">— choose a product —</option>' +
+    allItems.map(i => '<option value="' + escapeHtml(i.id) + '">' + escapeHtml(i.name) + ' (' + i.id + ')</option>').join("");
+  if (prev && allItems.some(i => i.id === prev)) select.value = prev;
+  const form = document.getElementById("epForm");
+  if (select.value) {
+    adminLoadProductForEdit(select.value);
+  } else {
+    if (form) form.style.display = "none";
   }
-  wrap.innerHTML = list.map(cond => `
-    <div class="admin-condition-row">
-      <span class="admin-condition-name">${escapeHtml(cond)}</span>
-      <button class="admin-item-toggle" style="background:var(--danger);color:var(--white);border-color:transparent;" onclick="removeCondition('${escapeForJs(cond)}')">
-        Remove
-      </button>
-    </div>
-  `).join("");
 }
 
-function addCondition() {
-  const input = document.getElementById("apNewCondition");
-  const val = input.value.trim();
-  if (!val) return;
-  if (typeof CUSTOM_CONDITIONS === "undefined" || !CUSTOM_CONDITIONS) CUSTOM_CONDITIONS = [];
-  if (CUSTOM_CONDITIONS.some(c => c.toLowerCase() === val.toLowerCase())) {
-    alert("That condition already exists.");
-    return;
+function adminLoadProductForEdit(id) {
+  const item = findItemById(id);
+  const form = document.getElementById("epForm");
+  if (!item || !form) return;
+  form.style.display = "";
+  document.getElementById("epName").value        = item.name || "";
+  document.getElementById("epPrice").value       = item.price != null ? item.price : "";
+  document.getElementById("epCondition").value   = item.condition || "";
+  document.getElementById("epDescription").value = item.description || "";
+  document.getElementById("epSpecs").value       = (item.specs || []).join("\n");
+  const preview = document.getElementById("epImgPreview");
+  if (item.image) {
+    preview.src = item.image;
+    preview.classList.add("show");
+  } else {
+    preview.src = "";
+    preview.classList.remove("show");
   }
-  CUSTOM_CONDITIONS.push(val);
-  input.value = "";
-  renderAdminConditionsList();
-  refreshConditionDropdowns();
-  if (typeof window.fbSaveConditions === "function") window.fbSaveConditions();
+  document.getElementById("epImgDrop").textContent = item.image ? "Tap to change photo, or drag one here" : "Tap to choose a photo, or drag one here";
+  epPendingImageData = null;
+  const note = document.getElementById("epSaveNote");
+  if (note) note.textContent = "";
 }
 
-function removeCondition(cond) {
-  if (typeof CUSTOM_CONDITIONS === "undefined" || !CUSTOM_CONDITIONS) return;
-  if (!confirm(`Remove "${cond}" from the condition list? Products already using it keep their condition — this only affects new products.`)) return;
-  CUSTOM_CONDITIONS = CUSTOM_CONDITIONS.filter(c => c !== cond);
-  renderAdminConditionsList();
-  refreshConditionDropdowns();
-  if (typeof window.fbSaveConditions === "function") window.fbSaveConditions();
+function adminSaveProductEdit() {
+  const id = document.getElementById("epProductSelect").value;
+  if (!id) { alert("Please select a product."); return; }
+  const item = findItemById(id);
+  if (!item) { alert("Product not found."); return; }
+
+  const name        = document.getElementById("epName").value.trim();
+  const price       = parseFloat(document.getElementById("epPrice").value);
+  const condition   = document.getElementById("epCondition").value || null;
+  const description = document.getElementById("epDescription").value.trim();
+  const specsRaw    = document.getElementById("epSpecs").value;
+  const specs       = specsRaw.split("\n").map(s => s.trim()).filter(Boolean);
+
+  if (!name)        { alert("Please enter a product name."); return; }
+  if (isNaN(price)) { alert("Please enter a valid price."); return; }
+
+  item.name        = name;
+  item.price       = price;
+  item.condition   = condition;
+  item.description = description;
+  item.specs       = specs;
+  if (epPendingImageData) item.image = epPendingImageData;
+
+  const btn  = document.getElementById("epSaveBtn");
+  const note = document.getElementById("epSaveNote");
+
+  if (typeof window.fbSaveInventory === "function") {
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    window.fbSaveInventory(() => {
+      if (typeof renderAll === "function") renderAll();
+      btn.textContent = "Saved!";
+      if (note) note.textContent = "Changes live on all devices.";
+      setTimeout(() => { btn.textContent = "Save changes"; btn.disabled = false; if (note) note.textContent = ""; }, 2500);
+    });
+  } else {
+    if (typeof renderAll === "function") renderAll();
+    btn.textContent = "Saved!";
+    setTimeout(() => { btn.textContent = "Save changes"; }, 2500);
+  }
+}
+
+function wireAdminEditImageInput() {
+  const drop      = document.getElementById("epImgDrop");
+  const fileInput = document.getElementById("epImgFile");
+  const preview   = document.getElementById("epImgPreview");
+  if (!drop) return;
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    drop.textContent = "Processing photo…";
+    resizeImageForUpload(file, 1280, (dataUrl) => {
+      if (!dataUrl) {
+        alert("Couldn't process that photo — please try a different image.");
+        drop.textContent = "Tap to change photo, or drag one here";
+        return;
+      }
+      epPendingImageData = dataUrl;
+      preview.src = dataUrl;
+      preview.classList.add("show");
+      drop.textContent = file.name + " — tap to change";
+    });
+  }
+
+  drop.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+  ["dragenter","dragover"].forEach(evt =>
+    drop.addEventListener(evt, (e) => { e.preventDefault(); drop.classList.add("drag-over"); })
+  );
+  ["dragleave","drop"].forEach(evt =>
+    drop.addEventListener(evt, (e) => { e.preventDefault(); drop.classList.remove("drag-over"); })
+  );
+  drop.addEventListener("drop", (e) => {
+    handleFile(e.dataTransfer.files && e.dataTransfer.files[0]);
+  });
 }
 
 // Resizes/recompresses an image so the resulting base64 string stays safely
@@ -1385,7 +1417,7 @@ function wireAdminImageInput() {
 function resetAdminAddForm() {
   document.getElementById("apName").value = "";
   document.getElementById("apPrice").value = "";
-  document.getElementById("apCondition").value = (typeof CUSTOM_CONDITIONS !== "undefined" && CUSTOM_CONDITIONS[0]) || "";
+  document.getElementById("apCondition").value = "Like New";
   document.getElementById("apCategory").value = "switches";
   document.getElementById("apDescription").value = "";
   document.getElementById("apSpecs").value = "";
@@ -1461,7 +1493,7 @@ function wireAdminPanel() {
   });
   document.getElementById("tabAdd").addEventListener("click", () => adminSwitchTab("add"));
   document.getElementById("tabDelete").addEventListener("click", () => adminSwitchTab("delete"));
-  document.getElementById("tabConditions").addEventListener("click", () => adminSwitchTab("conditions"));
+  document.getElementById("tabEdit").addEventListener("click", () => adminSwitchTab("edit"));
   document.getElementById("apSaveBtn").addEventListener("click", adminAddProduct);
   document.getElementById("apSaveBtn2").addEventListener("click", () => {
     if (typeof window.fbSaveInventory === "function") {
@@ -1476,19 +1508,12 @@ function wireAdminPanel() {
     }
   });
 
-  const manageConditionsBtn = document.getElementById("apManageConditionsBtn");
-  if (manageConditionsBtn) manageConditionsBtn.addEventListener("click", () => adminSwitchTab("conditions"));
+  // Edit tab — product picker + save
+  const epSelect = document.getElementById("epProductSelect");
+  if (epSelect) epSelect.addEventListener("change", () => adminLoadProductForEdit(epSelect.value));
+  const epSaveBtn = document.getElementById("epSaveBtn");
+  if (epSaveBtn) epSaveBtn.addEventListener("click", adminSaveProductEdit);
 
-  const addConditionBtn = document.getElementById("apAddConditionBtn");
-  if (addConditionBtn) addConditionBtn.addEventListener("click", addCondition);
-
-  const newConditionInput = document.getElementById("apNewCondition");
-  if (newConditionInput) {
-    newConditionInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") { e.preventDefault(); addCondition(); }
-    });
-  }
-
-  refreshConditionDropdowns();
   wireAdminImageInput();
+  wireAdminEditImageInput();
 }
