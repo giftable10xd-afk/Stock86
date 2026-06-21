@@ -126,6 +126,18 @@ function readScrollAnchorOnce() {
 }
 
 function restoreIndexScroll() {
+  // Only restore the scroll position when the user is genuinely returning
+  // from a product page via the in-app back navigation. On a hard refresh
+  // (or a brand-new visit) history.state is null, so we discard any stale
+  // anchor that may have been left over from a previous browsing session.
+  const state = history.state;
+  const returningFromProduct = state && (state.stock86View === "grid" || state.stock86View === "product");
+  if (!returningFromProduct) {
+    // Discard stale anchor so firebase.js re-renders don't jump the page.
+    try { sessionStorage.removeItem(SCROLL_MEMORY_KEY); } catch (e) { /* ignore */ }
+    _pendingScrollAnchor = null;
+    return;
+  }
   const anchor = readScrollAnchorOnce();
   if (!anchor) return;
 
