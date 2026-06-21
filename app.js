@@ -879,6 +879,23 @@ function setCategory(cat) {
     btn.classList.toggle("active", btn.dataset.cat === cat);
   });
   renderAll();
+  if (cat !== "all") {
+    const sectionIdMap = {
+      switches: "section-switches",
+      games:    "section-games",
+      consoles: "section-consoles",
+      laptops:  "section-laptops",
+      phones:   "section-phones",
+    };
+    const sectionEl = document.getElementById(sectionIdMap[cat]);
+    if (sectionEl) {
+      // Offset by the sticky header height so the section heading isn't hidden behind it
+      const headerEl = document.querySelector(".header");
+      const headerH  = headerEl ? headerEl.offsetHeight : 60;
+      const top = sectionEl.getBoundingClientRect().top + window.scrollY - headerH - 8;
+      window.scrollTo({ top, behavior: "instant" });
+    }
+  }
 }
 
 // Score tiers, highest wins. Product name is checked before anything else
