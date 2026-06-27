@@ -69,6 +69,31 @@
     --shadow-lg:0 6px 12px -3px rgb(0 0 0 / 0.08), 0 3px 5px -3px rgb(0 0 0 / 0.06);
   }
 
+  /* ============================================================
+     DARK MODE — overrides only the "light surface" tokens.
+     The header, hero band, footer, and nav drawer already use a
+     permanently dark, photo-backed treatment in both modes (they're
+     never white to begin with), so they're untouched here. Only the
+     white page/card surfaces and their text + border tokens flip.
+     ============================================================ */
+  body.dark-mode{
+    color-scheme:dark;
+    --neutral-primary-soft:#181B1F;
+    --neutral-secondary-soft:#1E2227;
+    --neutral-secondary-medium:#262B31;
+    --neutral-tertiary-soft:#2C3137;
+    --neutral-tertiary-medium:#333A42;
+    --neutral-quaternary:#4A515B;
+    --gray:#9098A1;
+    --heading:#F2F3F4;
+    --body:#C7CBD2;
+    --body-subtle:#8E96A0;
+    --border-light:#262B31;
+    --border-default:#353C44;
+    --border-default-medium:#353C44;
+    --border-default-strong:#4A525C;
+  }
+
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
@@ -175,6 +200,34 @@
   .hamburger-btn:active{transform:scale(0.92);}
   .hamburger-btn svg{width:20px; height:20px;}
 
+  /* Dark mode toggle — sits next to the search bar */
+  .theme-toggle-btn{
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:var(--radius-default);
+    color:var(--white);
+    width:42px; height:42px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition:background 150ms ease, transform 120ms ease;
+    flex-shrink:0;
+    z-index:3; position:relative;
+  }
+  .theme-toggle-btn:active{transform:scale(0.92);}
+  .theme-toggle-btn svg{width:19px; height:19px;}
+  .theme-toggle-btn .theme-icon-moon{display:none;}
+  body.dark-mode .theme-toggle-btn .theme-icon-sun{display:none;}
+  body.dark-mode .theme-toggle-btn .theme-icon-moon{display:block;}
+  @media(hover:hover) and (pointer:fine){
+    .theme-toggle-btn:hover{background:rgba(255,255,255,0.18);}
+  }
+  /* Shrink the toggle a touch first on very tight phone widths, before
+     the search box itself has to give up any more room. */
+  @media(max-width:380px){
+    .theme-toggle-btn{ width:38px; height:38px; }
+    .theme-toggle-btn svg{ width:17px; height:17px; }
+  }
+
   /* Logo — only the image, no text */
   .brand-mark{
     display:flex; align-items:center; gap:0;
@@ -195,10 +248,24 @@
     position:relative;
     z-index:4;
   }
-  /* Maximize search width on small/mobile viewports since filter icon was removed from header */
+  /* Maximize search width on small/mobile viewports. Shrunk further here
+     than before since the dark-mode toggle now also lives in this row —
+     tighter gap, smaller icon, smaller side padding, so everything
+     (hamburger, logo, search, toggle, cart) fits on one line without
+     wrapping or overflowing on narrow phones. */
   @media(max-width:499px){
-    .topbar{ flex-wrap:nowrap; }
+    .topbar{ flex-wrap:nowrap; gap:6px; }
     .header-search-wrap{ flex:1 1 auto; }
+    .header-search-wrap svg{ width:14px; height:14px; }
+    .header-search-wrap .search-icon-btn{ width:24px; height:24px; left:4px; }
+    .header-search-input{
+      font-size:13px;
+      padding:9px 8px 9px 28px;
+    }
+  }
+  @media(max-width:380px){
+    .brand-mark .logo-img{ height:36px; }
+    .header-search-input{ padding:8px 6px 8px 26px; }
   }
   .header-search-wrap svg{
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
@@ -267,9 +334,9 @@
     padding:10px 0 18px;
     gap:12px;
   }
-  /* Solid white strip anchored under the header */
+  /* Solid surface strip anchored under the header */
   .count-bar-outer{
-    background:var(--white);
+    background:var(--neutral-primary-soft);
     border-bottom:1px solid var(--border-light);
     position:relative;
     z-index:10;
@@ -512,7 +579,7 @@
   .filter-panel-wrap{
     position:fixed; top:0; right:0; bottom:0;
     width:min(340px,92vw);
-    background:var(--white);
+    background:var(--neutral-primary-soft);
     border-left:1px solid var(--border-light);
     box-shadow:var(--shadow-lg);
     z-index:210;
@@ -1466,6 +1533,20 @@
     document.body.className = "showing-product";
   }
 </script>
+<script>
+  // Apply the saved (or system-default) theme immediately, before paint,
+  // so there's no flash of the wrong theme while the rest of the page
+  // loads. Runs after the scripts above on purpose — they assign
+  // document.body.className outright on a product deep link, which would
+  // otherwise wipe this class right back off.
+  (function(){
+    var saved = null;
+    try { saved = localStorage.getItem("stock86_theme_v1"); } catch (e) {}
+    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var dark = saved === "dark" || (saved === null && prefersDark);
+    if (dark) document.body.classList.add("dark-mode");
+  })();
+</script>
 
 
 <!-- NAV BACKDROP -->
@@ -1575,6 +1656,20 @@
         </button>
         <input class="header-search-input" type="text" id="searchInput" placeholder="Search listings…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
+
+      <!-- Dark mode toggle -->
+      <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle dark mode" aria-pressed="false">
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="4"/>
+          <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
 
       <!-- Cart -->
       <div class="header-actions">
@@ -2115,6 +2210,27 @@
 <!-- Firebase — loads after app.js so renderAll is defined -->
 <script type="module" src="firebase.js"></script>
 <script>
+  // ── Dark mode toggle ─────────────────────────────────────────
+  // The class itself was already applied pre-paint (see the early script
+  // in <head>/<body> above) to avoid a flash; this just wires the button
+  // up to flip it and remember the choice.
+  const themeToggleBtn = document.getElementById("themeToggleBtn");
+  const THEME_STORAGE_KEY = "stock86_theme_v1";
+
+  function setTheme(isDark) {
+    document.body.classList.toggle("dark-mode", isDark);
+    if (themeToggleBtn) themeToggleBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
+    try { localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light"); } catch (e) { /* ignore */ }
+  }
+
+  if (themeToggleBtn) {
+    themeToggleBtn.setAttribute("aria-pressed", document.body.classList.contains("dark-mode") ? "true" : "false");
+    themeToggleBtn.addEventListener("click", () => {
+      setTheme(!document.body.classList.contains("dark-mode"));
+    });
+  }
+</script>
+<script>
   // ── Nav drawer (LEFT side) ─────────────────────────────────
   const hamburgerBtn  = document.getElementById("hamburgerBtn");
   const navDrawer     = document.getElementById("navDrawer");
@@ -2161,12 +2277,16 @@
   // in the same kind of position as every other category rather than
   // jumping to the hero banner above it.
   function scrollToCategorySection(cat) {
-    const sectionId  = "section-" + (cat === "all" ? "switches" : cat);
-    const sectionEl  = document.getElementById(sectionId);
-    if (!sectionEl) return;
+    // The Filter/count bar sits once, right above whichever section is
+    // currently visible — it never moves or hides per category — so
+    // anchoring the scroll to it (instead of the section heading itself)
+    // lands in the same spot for every category: Filter bar flush under
+    // the sticky header, with the category heading visible just below it.
+    const anchorEl = document.querySelector(".count-bar-outer");
+    if (!anchorEl) return;
     const headerEl     = document.querySelector(".header");
     const headerHeight  = headerEl ? headerEl.offsetHeight : 0;
-    const targetTop = sectionEl.getBoundingClientRect().top + window.scrollY - headerHeight;
+    const targetTop = anchorEl.getBoundingClientRect().top + window.scrollY - headerHeight;
     window.scrollTo({ top: Math.max(targetTop, 0), behavior: "instant" });
   }
 
