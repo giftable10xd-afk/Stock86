@@ -2154,10 +2154,27 @@
     NAV_BUTTONS[cat] && NAV_BUTTONS[cat].classList.add("active");
   }
 
+  // Scrolls so the clicked category's section heading sits flush under the
+  // sticky header — every time, regardless of where the page happened to be
+  // scrolled before the tap. "All listings" targets the first section
+  // (Nintendo Switch) instead of the literal top of the page, so it lands
+  // in the same kind of position as every other category rather than
+  // jumping to the hero banner above it.
+  function scrollToCategorySection(cat) {
+    const sectionId  = "section-" + (cat === "all" ? "switches" : cat);
+    const sectionEl  = document.getElementById(sectionId);
+    if (!sectionEl) return;
+    const headerEl     = document.querySelector(".header");
+    const headerHeight  = headerEl ? headerEl.offsetHeight : 0;
+    const targetTop = sectionEl.getBoundingClientRect().top + window.scrollY - headerHeight;
+    window.scrollTo({ top: Math.max(targetTop, 0), behavior: "instant" });
+  }
+
   NAV_BUTTONS.all.addEventListener("click", () => {
     setCategory("all"); updateNavActive("all");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
+    scrollToCategorySection("all");
     closeNav();
   });
 
@@ -2165,10 +2182,12 @@
     const subOpen = switchSub.classList.toggle("open");
     NAV_BUTTONS.switches.classList.toggle("open", subOpen);
     setCategory("switches"); updateNavActive("switches");
+    scrollToCategorySection("switches");
   });
 
   NAV_BUTTONS.games.addEventListener("click", () => {
     setCategory("games"); updateNavActive("games");
+    scrollToCategorySection("games");
     closeNav();
   });
 
@@ -2176,6 +2195,7 @@
     setCategory("consoles"); updateNavActive("consoles");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
+    scrollToCategorySection("consoles");
     closeNav();
   });
 
@@ -2183,6 +2203,7 @@
     setCategory("laptops"); updateNavActive("laptops");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
+    scrollToCategorySection("laptops");
     closeNav();
   });
 
@@ -2190,6 +2211,7 @@
     setCategory("phones"); updateNavActive("phones");
     switchSub.classList.remove("open");
     NAV_BUTTONS.switches.classList.remove("open");
+    scrollToCategorySection("phones");
     closeNav();
   });
 
