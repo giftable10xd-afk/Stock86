@@ -183,6 +183,18 @@
     z-index:1;
   }
 
+  /* Looping background video — sits behind the dark/whitewash overlay
+     and above the CSS background-image (which stays as the poster/
+     fallback frame while the video loads, or if it fails). Injected by
+     app.js's initBgVideo() so it's shared across index.html/product.html. */
+  .bg-video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    z-index:0;
+    pointer-events:none;
+  }
+
   /* ============================================================
      TOPBAR — hamburger LEFT, logo center-left, cart RIGHT
      ============================================================ */
@@ -1595,25 +1607,10 @@
     color:var(--heading);
   }
 
-  /* ── Logo — keep true logo colors (incl. the blue) in both modes.
-     Previously this inverted the logo to solid black in light mode,
-     which also flattened the blue. Instead, give it a small dark
-     backdrop chip so any light/white parts of the mark stay legible
-     against the light header, without touching the logo's own colors. ── */
-  body:not(.dark-mode) .brand-mark .logo-img{
-    filter:none;
-  }
-  body:not(.dark-mode) .brand-mark{
-    background:rgba(15,17,17,0.85);
-    border-radius:var(--radius-default);
-    padding:4px 8px;
-  }
-  body:not(.dark-mode) .nav-drawer-logo{
-    filter:none;
-    background:rgba(15,17,17,0.85);
-    border-radius:var(--radius-default);
-    padding:4px 8px;
-  }
+  /* ── Logo — the header/nav-drawer <img src> is swapped at runtime
+     (see updateLogoSrcs() in app.js) between the original white+cyan
+     file and a black+cyan variant, so the cyan stays cyan and only the
+     white part flips to black in light mode. No filter needed here. ── */
 
   /* ── Hero band background (same wallpaper.jpg as dark mode, white overlay handles the light look) ── */
   body:not(.dark-mode) .hero-band{
@@ -1748,7 +1745,6 @@
     color:var(--body);
   }
   body:not(.dark-mode) .footer-logo{
-    filter:brightness(0);
     opacity:0.8;
   }
 </style>
@@ -2461,6 +2457,7 @@
     document.body.classList.toggle("dark-mode", isDark);
     if (themeToggleBtn) themeToggleBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
     try { localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light"); } catch (e) { /* ignore */ }
+    if (typeof updateLogoSrcs === "function") updateLogoSrcs();
   }
 
   if (themeToggleBtn) {

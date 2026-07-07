@@ -823,8 +823,32 @@ function exitAdmin() {
 
 // ---------- COMMON EVENT WIRING ----------
 
+// ============================================================
+// LOGO — swap the actual image file between the original (white text
+// + cyan accents, for dark surfaces) and a light-mode variant (black
+// text, cyan accents kept unchanged) instead of using a CSS filter,
+// since brightness()/invert() would flatten the cyan along with the
+// white. Only pages with a light/dark toggle (index.html) flip; a
+// page without a toggle (product.html) always keeps the original.
+// ============================================================
+
+const LOGO_SRC_DARK  = "assets/stock86-logo.png";
+const LOGO_SRC_LIGHT = "assets/stock86-logo-light.png";
+
+function updateLogoSrcs() {
+  const hasThemeToggle = !!document.getElementById("themeToggleBtn");
+  if (!hasThemeToggle) return; // e.g. product.html — always the original file
+  const isDark = document.body.classList.contains("dark-mode");
+  const src = isDark ? LOGO_SRC_DARK : LOGO_SRC_LIGHT;
+  document.querySelectorAll(".logo-img, .nav-drawer-logo, .footer-logo").forEach(img => {
+    if (img.getAttribute("src") !== src) img.setAttribute("src", src);
+  });
+}
+
 function wireCommonUI() {
   initTopTicker();
+  initBgVideo();
+  updateLogoSrcs();
   loadCartState();
   renderCart();
   wireSmoothNav();
@@ -1572,7 +1596,11 @@ function initTopTicker() {
       font-weight:normal; font-style:normal; font-display:swap;
     }
     .top-ticker{
-      position:sticky; top:0; z-index:9999;
+      /* Sits above the header/hero, but *below* the nav-drawer, filter
+         drawer, cart drawer and modal overlays (all z-index 90+), so
+         those panels draw cleanly over it instead of the ticker
+         overlapping their top edge while they're open. */
+      position:sticky; top:0; z-index:45;
       height:${TICKER_HEIGHT_PX}px;
       background:#0F1111;
       border-bottom:1px solid rgba(255,255,255,0.12);
@@ -1630,4 +1658,46 @@ function initTopTicker() {
   if (headerEl && getComputedStyle(headerEl).position === "sticky") {
     headerEl.style.top = TICKER_HEIGHT_PX + "px";
   }
+}
+
+// ============================================================
+// LOOPING BACKGROUND VIDEO — replaces the static wallpaper.jpg
+// behind the header / hero band with a muted, autoplaying, looping
+// video. wallpaper.jpg stays in the CSS as the poster/fallback frame
+// (shows instantly, and covers any browser that blocks video).
+// Name the file "assets/wallpaper.mp4" — same folder, same base name
+// as the existing wallpaper.jpg.
+// ============================================================
+
+const BG_VIDEO_SRC = "assets/wallpaper.mp4";
+
+function initBgVideo() {
+  // .header exists on both pages; .hero-band only on index.html
+  const targets = document.querySelectorAll(".header, .hero-band");
+  targets.forEach(el => {
+    if (el.querySelector(".bg-video")) return; // already injected
+    const video = document.createElement("video");
+    video.className = "bg-video";
+    video.src = BG_VIDEO_SRC;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.loop = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("preload", "auto");
+    video.setAttribute("aria-hidden", "true");
+    // If the file is missing or the browser can't play it, quietly fall
+    // back to the existing wallpaper.jpg CSS background — no broken UI.
+    video.addEventListener("error", () => video.remove());
+    el.insertBefore(video, el.firstChild);
+    // Some mobile browsers still refuse autoplay until a play() call
+    // happens in response to a user gesture; this catches that case
+    // instead of throwing an unhandled promise rejection.
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => { /* stays on poster frame, fine */ });
+    }
+  });
 }
