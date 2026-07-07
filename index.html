@@ -268,13 +268,13 @@
     .header-search-wrap svg{ width:14px; height:14px; }
     .header-search-wrap .search-icon-btn{ width:24px; height:24px; left:4px; }
     .header-search-input{
-      font-size:12px;
+      font-size:11px;
       padding:9px 8px 9px 28px;
     }
   }
   @media(max-width:380px){
     .brand-mark .logo-img{ height:36px; }
-    .header-search-input{ font-size:11px; padding:8px 6px 8px 26px; }
+    .header-search-input{ font-size:10px; padding:8px 6px 8px 24px; }
   }
   .header-search-wrap svg{
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
@@ -1530,10 +1530,9 @@
      the body.dark-mode overrides at the bottom of each group.
      ============================================================ */
 
-  /* ── Header background (swap wallpaper for light image) ── */
+  /* ── Header background (same wallpaper as dark mode, light overlay below) ── */
   body:not(.dark-mode) .header{
-    background:#f0f2f2;
-    background-image:url("assets/225882.jpg");
+    background-color:#e8eaed;
   }
 
   /* ── Header overlay — semi-transparent white veil, wallpaper visible below ── */
@@ -1587,10 +1586,9 @@
     filter:brightness(0);
   }
 
-  /* ── Hero band background ── */
+  /* ── Hero band background (same wallpaper.jpg as dark mode, white overlay handles the light look) ── */
   body:not(.dark-mode) .hero-band{
-    background:#f0f2f2;
-    background-image:url("assets/225882.jpg");
+    background-color:#e8eaed;
   }
 
   /* ── Hero band overlay — lighter wash, wallpaper visible ── */
@@ -1707,6 +1705,22 @@
     color:var(--heading) !important;
     background:rgba(0,0,0,0.06) !important;
     border-color:rgba(0,0,0,0.15) !important;
+  }
+
+  /* ── Footer — light mode ── */
+  body:not(.dark-mode) footer{
+    background:var(--neutral-secondary-soft);
+    border-top:1px solid var(--border-light);
+  }
+  body:not(.dark-mode) footer p{
+    color:var(--body);
+  }
+  body:not(.dark-mode) .footer-slogan{
+    color:var(--body);
+  }
+  body:not(.dark-mode) .footer-logo{
+    filter:brightness(0);
+    opacity:0.8;
   }
 </style>
 </head>
