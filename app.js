@@ -113,20 +113,26 @@ function rememberIndexScroll(productId) {
   } catch (e) { /* ignore */ }
 }
 
-let _pendingScrollAnchor = undefined; // undefined = not yet read this page load
-
-function readScrollAnchorOnce() {
-  if (_pendingScrollAnchor !== undefined) return _pendingScrollAnchor;
+// NOTE: this used to be memoized behind a "read once per page load" guard.
+// Because this is a single-document SPA (product ⇄ grid swaps happen via
+// pushState, never a real reload), that guard meant sessionStorage was only
+// ever consulted on the very first call in the whole session — every later
+// "← All listings" tap re-used that same first result (often null once the
+// first read had nothing to restore), so after the first product visit the
+// page silently stopped returning to the correct card at all. Read fresh
+// from sessionStorage on every call instead, so every return-to-grid uses
+// the anchor that was just written for THAT product.
+function readScrollAnchor() {
   try {
     const raw = sessionStorage.getItem(SCROLL_MEMORY_KEY);
+    if (!raw) return null;
     sessionStorage.removeItem(SCROLL_MEMORY_KEY);
-    _pendingScrollAnchor = raw ? JSON.parse(raw) : null;
-  } catch (e) { _pendingScrollAnchor = null; }
-  return _pendingScrollAnchor;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
 }
 
 function restoreIndexScroll() {
-  const anchor = readScrollAnchorOnce();
+  const anchor = readScrollAnchor();
   if (!anchor) return;
 
   function applyAnchor() {
@@ -824,24 +830,16 @@ function exitAdmin() {
 // ---------- COMMON EVENT WIRING ----------
 
 // ============================================================
-// LOGO — swap the actual image file between the original (white text
-// + cyan accents, for dark surfaces) and a light-mode variant (black
-// text, cyan accents kept unchanged) instead of using a CSS filter,
-// since brightness()/invert() would flatten the cyan along with the
-// white. Only pages with a light/dark toggle (index.html) flip; a
-// page without a toggle (product.html) always keeps the original.
+// LOGO — the site is dark-mode only now, so the logo always uses the
+// original (white text + cyan accents) file. This function is kept as
+// a no-op-safe stub since wireCommonUI() still calls it.
 // ============================================================
 
-const LOGO_SRC_DARK  = "assets/stock86-logo.png";
-const LOGO_SRC_LIGHT = "assets/stock86-logo-light.png";
+const LOGO_SRC_DARK = "assets/stock86-logo.png";
 
 function updateLogoSrcs() {
-  const hasThemeToggle = !!document.getElementById("themeToggleBtn");
-  if (!hasThemeToggle) return; // e.g. product.html — always the original file
-  const isDark = document.body.classList.contains("dark-mode");
-  const src = isDark ? LOGO_SRC_DARK : LOGO_SRC_LIGHT;
   document.querySelectorAll(".logo-img, .nav-drawer-logo, .footer-logo").forEach(img => {
-    if (img.getAttribute("src") !== src) img.setAttribute("src", src);
+    if (img.getAttribute("src") !== LOGO_SRC_DARK) img.setAttribute("src", LOGO_SRC_DARK);
   });
 }
 
