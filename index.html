@@ -103,6 +103,133 @@
     --overlay-modal-strong:rgba(15,17,17,0.65);
   }
 
+  /* ============================================================
+     LIGHT MODE — header, hero band, and nav drawer
+     In dark mode these areas are permanently photo-dark; in light
+     mode they flip to a clean white/soft surface so the whole page
+     reads as one cohesive light theme.
+     ============================================================ */
+
+  /* Header: swap dark wallpaper overlay for a bright white veil */
+  body:not(.dark-mode) .header{
+    background-color:var(--neutral-primary-soft);
+  }
+  body:not(.dark-mode) .header::before{
+    background:rgba(255,255,255,0.92);
+  }
+
+  /* Topbar controls flip from white-on-dark to dark-on-light */
+  body:not(.dark-mode) .hamburger-btn,
+  body:not(.dark-mode) .theme-toggle-btn{
+    background:rgba(0,0,0,0.06);
+    border-color:rgba(0,0,0,0.14);
+    color:var(--heading);
+  }
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .hamburger-btn:hover,
+    body:not(.dark-mode) .theme-toggle-btn:hover{
+      background:rgba(0,0,0,0.1);
+    }
+  }
+
+  /* Search input in header */
+  body:not(.dark-mode) .header-search-input{
+    background:rgba(0,0,0,0.055);
+    border-color:rgba(0,0,0,0.14);
+    color:var(--heading);
+  }
+  body:not(.dark-mode) .header-search-input::placeholder{ color:rgba(0,0,0,0.38); }
+  body:not(.dark-mode) .header-search-input:focus{
+    background:var(--neutral-primary-soft);
+    border-color:var(--brand);
+  }
+  body:not(.dark-mode) .header-search-wrap svg{ color:rgba(0,0,0,0.45); }
+
+  /* Cart button in topbar */
+  body:not(.dark-mode) .cart-btn.btn-ghost{ color:var(--heading); }
+
+  /* Hero band: lighten the wallpaper overlay so text reads on white */
+  body:not(.dark-mode) .hero-band-overlay{
+    background:rgba(255,255,255,0.82);
+  }
+  body:not(.dark-mode) .hero h1{ color:var(--heading); }
+  body:not(.dark-mode) .hero p.lead{ color:var(--body); }
+  /* Hero badges: transparent-white ones become neutral */
+  body:not(.dark-mode) .hero .badge[style*="rgba(255,255,255,0.08)"]{
+    color:var(--heading) !important;
+    background:var(--neutral-secondary-soft) !important;
+    border-color:var(--border-default) !important;
+  }
+
+  /* Nav drawer: flip from dark to light surface */
+  body:not(.dark-mode) .nav-drawer{
+    background:var(--neutral-primary-soft);
+    border-right-color:var(--border-light);
+  }
+  body:not(.dark-mode) .nav-drawer-head{
+    border-bottom-color:var(--border-light);
+  }
+  body:not(.dark-mode) .nav-drawer-close{
+    background:var(--neutral-secondary-medium);
+    border-color:var(--border-default);
+    color:var(--heading);
+  }
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .nav-drawer-close:hover{
+      background:var(--neutral-tertiary-medium);
+    }
+  }
+  /* Search inside drawer */
+  body:not(.dark-mode) .nav-drawer-search-input{
+    background:var(--neutral-secondary-medium);
+    border-color:var(--border-default);
+    color:var(--heading);
+  }
+  body:not(.dark-mode) .nav-drawer-search-input::placeholder{ color:var(--body-subtle); }
+  body:not(.dark-mode) .nav-drawer-search-input:focus{
+    background:var(--neutral-primary-soft);
+    border-color:var(--brand);
+  }
+  body:not(.dark-mode) .nav-drawer-search-wrap svg{ color:var(--body-subtle); }
+  body:not(.dark-mode) .search-icon-btn:hover svg{ color:var(--body) !important; }
+
+  /* Nav category buttons */
+  body:not(.dark-mode) .nav-btn{
+    background:var(--neutral-secondary-soft);
+    border-color:var(--border-light);
+    color:var(--body);
+  }
+  body:not(.dark-mode) .nav-btn.active{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:var(--dark-strong);
+  }
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .nav-btn:not(.active):hover{
+      background:var(--neutral-tertiary-soft);
+      color:var(--heading);
+    }
+  }
+  body:not(.dark-mode) .nav-sub-btn{
+    background:var(--neutral-tertiary-soft);
+    border-color:var(--border-light);
+    color:var(--body);
+  }
+  body:not(.dark-mode) .nav-sub-btn.active{
+    background:var(--brand);
+    border-color:var(--brand);
+    color:var(--dark-strong);
+  }
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .nav-sub-btn:not(.active):hover{
+      background:var(--neutral-quaternary);
+      color:var(--heading);
+    }
+  }
+  body:not(.dark-mode) .nav-divider{
+    background:var(--border-light);
+  }
+
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
@@ -266,15 +393,15 @@
     .topbar{ flex-wrap:nowrap; gap:6px; }
     .header-search-wrap{ flex:1 1 auto; }
     .header-search-wrap svg{ width:14px; height:14px; }
-    .header-search-wrap .search-icon-btn{ width:24px; height:24px; left:4px; }
+    .header-search-wrap .search-icon-btn{ width:22px; height:22px; left:3px; }
     .header-search-input{
-      font-size:13px;
-      padding:9px 8px 9px 28px;
+      font-size:12px;
+      padding:9px 6px 9px 25px;
     }
   }
   @media(max-width:380px){
     .brand-mark .logo-img{ height:36px; }
-    .header-search-input{ padding:8px 6px 8px 26px; }
+    .header-search-input{ font-size:11px; padding:8px 4px 8px 23px; }
   }
   .header-search-wrap svg{
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
