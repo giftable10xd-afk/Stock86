@@ -108,8 +108,6 @@
      ============================================================ */
   .header{
     background:var(--dark);
-    background-image:url("assets/wallpaper.jpg");
-    background-size:cover; background-position:center;
     position:relative; overflow:hidden;
   }
   .header::before{
@@ -117,6 +115,13 @@
     position:absolute; inset:0;
     background:rgba(6,8,14,0.78);
     pointer-events:none; z-index:1;
+  }
+  .bg-video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    z-index:0;
+    pointer-events:none;
   }
   .topbar{
     position:relative; z-index:3;

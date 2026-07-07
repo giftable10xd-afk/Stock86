@@ -162,13 +162,12 @@
   .section-head .count{font-size:13px; color:var(--body-subtle); font-weight:500;}
 
   /* ============================================================
-     HEADER — wallpaper background
+     HEADER — looping video background (assets/wallpaper.mp4),
+     injected by initBgVideo() in app.js. No static image fallback —
+     just the solid --dark color underneath until the video paints.
      ============================================================ */
   .header{
     background:var(--dark);
-    background-image: url("assets/wallpaper.jpg");
-    background-size:cover;
-    background-position:center;
     position:sticky;
     top:0;
     z-index:40;
@@ -841,9 +840,6 @@
      ============================================================ */
   .hero-band{
     background:var(--dark);
-    background-image: url("assets/wallpaper.jpg");
-    background-size:cover;
-    background-position:center;
     position:relative;
     overflow:hidden;
   }
@@ -1612,7 +1608,7 @@
      file and a black+cyan variant, so the cyan stays cyan and only the
      white part flips to black in light mode. No filter needed here. ── */
 
-  /* ── Hero band background (same wallpaper.jpg as dark mode, white overlay handles the light look) ── */
+  /* ── Hero band background — video only (no wallpaper.jpg), white overlay handles the light look ── */
   body:not(.dark-mode) .hero-band{
     background-color:#e8eaed;
   }
