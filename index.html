@@ -263,24 +263,38 @@
      (hamburger, logo, search, toggle, cart) fits on one line without
      wrapping or overflowing on narrow phones. */
   @media(max-width:499px){
-    .topbar{ flex-wrap:nowrap; gap:6px; }
-    .header-search-wrap{ flex:1 1 auto; }
-    .header-search-wrap svg{ width:14px; height:14px; }
-    .header-search-wrap .search-icon-btn{ width:24px; height:24px; left:4px; }
+    .topbar{ flex-wrap:nowrap; gap:5px; }
+    /* Shrink the surrounding controls too, not just the input, so the
+       search box actually gets more real room instead of just smaller text. */
+    .hamburger-btn{ width:36px; height:36px; }
+    .hamburger-btn svg{ width:18px; height:18px; }
+    .theme-toggle-btn{ width:36px; height:36px; }
+    .theme-toggle-btn svg{ width:17px; height:17px; }
+    .brand-mark .logo-img{ height:32px; }
+    .header-actions{ gap:4px; }
+    .header-actions .cart-btn{ padding:8px 10px; }
+    .header-search-wrap{ flex:1 1 auto; min-width:0; }
+    .header-search-wrap svg{ width:13px; height:13px; }
+    .header-search-wrap .search-icon-btn{ width:22px; height:22px; left:3px; }
     .header-search-input{
       font-size:11px;
-      padding:9px 8px 9px 28px;
+      padding:9px 6px 9px 24px;
     }
   }
   @media(max-width:380px){
-    .brand-mark .logo-img{ height:36px; }
-    .header-search-input{ font-size:10px; padding:8px 6px 8px 24px; }
+    .brand-mark .logo-img{ height:28px; }
+    .hamburger-btn{ width:32px; height:32px; }
+    .hamburger-btn svg{ width:16px; height:16px; }
+    .theme-toggle-btn{ width:32px; height:32px; }
+    .header-actions .cart-btn{ padding:7px 8px; }
+    .header-search-input{ font-size:10px; padding:8px 5px 8px 22px; }
   }
   .header-search-wrap svg{
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
   }
   .header-search-input{
     width:100%;
+    min-width:0;
     background:rgba(255,255,255,0.12);
     border:1px solid rgba(255,255,255,0.2);
     border-radius:var(--radius-base);
@@ -297,6 +311,9 @@
     user-select:text;
     position:relative;
     z-index:5;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .header-search-input::placeholder{color:rgba(255,255,255,0.4);}
   .header-search-input:focus{outline:none; background:rgba(255,255,255,0.2); border-color:var(--brand);}
@@ -1537,7 +1554,7 @@
 
   /* ── Header overlay — semi-transparent white veil, wallpaper visible below ── */
   body:not(.dark-mode) .header::before{
-    background:rgba(255,255,255,0.72);
+    background:rgba(255,255,255,0.9);
   }
 
   /* ── Hamburger button ── */
@@ -1578,12 +1595,24 @@
     color:var(--heading);
   }
 
-  /* ── Logo — invert white PNG to dark in light mode ── */
+  /* ── Logo — keep true logo colors (incl. the blue) in both modes.
+     Previously this inverted the logo to solid black in light mode,
+     which also flattened the blue. Instead, give it a small dark
+     backdrop chip so any light/white parts of the mark stay legible
+     against the light header, without touching the logo's own colors. ── */
   body:not(.dark-mode) .brand-mark .logo-img{
-    filter:brightness(0);
+    filter:none;
+  }
+  body:not(.dark-mode) .brand-mark{
+    background:rgba(15,17,17,0.85);
+    border-radius:var(--radius-default);
+    padding:4px 8px;
   }
   body:not(.dark-mode) .nav-drawer-logo{
-    filter:brightness(0);
+    filter:none;
+    background:rgba(15,17,17,0.85);
+    border-radius:var(--radius-default);
+    padding:4px 8px;
   }
 
   /* ── Hero band background (same wallpaper.jpg as dark mode, white overlay handles the light look) ── */
@@ -1593,7 +1622,7 @@
 
   /* ── Hero band overlay — lighter wash, wallpaper visible ── */
   body:not(.dark-mode) .hero-band-overlay{
-    background:rgba(255,255,255,0.72);
+    background:rgba(255,255,255,0.9);
   }
 
   /* ── Hero text — flip white to dark ── */
