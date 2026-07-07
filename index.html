@@ -1536,9 +1536,9 @@
     background-image:url("assets/225882.jpg");
   }
 
-  /* ── Header overlay — near-opaque white veil, wallpaper shows faintly ── */
+  /* ── Header overlay — semi-transparent white veil, wallpaper visible below ── */
   body:not(.dark-mode) .header::before{
-    background:rgba(255,255,255,0.88);
+    background:rgba(255,255,255,0.72);
   }
 
   /* ── Hamburger button ── */
@@ -1579,9 +1579,12 @@
     color:var(--heading);
   }
 
-  /* ── Logo — no brightness boost needed on a light surface ── */
+  /* ── Logo — invert white PNG to dark in light mode ── */
   body:not(.dark-mode) .brand-mark .logo-img{
-    filter:none;
+    filter:brightness(0);
+  }
+  body:not(.dark-mode) .nav-drawer-logo{
+    filter:brightness(0);
   }
 
   /* ── Hero band background ── */
@@ -1590,9 +1593,9 @@
     background-image:url("assets/225882.jpg");
   }
 
-  /* ── Hero band overlay — lighter wash ── */
+  /* ── Hero band overlay — lighter wash, wallpaper visible ── */
   body:not(.dark-mode) .hero-band-overlay{
-    background:rgba(255,255,255,0.82);
+    background:rgba(255,255,255,0.72);
   }
 
   /* ── Hero text — flip white to dark ── */
@@ -1683,6 +1686,27 @@
     body:not(.dark-mode) .nav-drawer-body .search-icon-btn:hover svg{
       color:var(--body);
     }
+  }
+
+  /* ── Contact us button — white text is invisible on light nav drawer ── */
+  body:not(.dark-mode) .nav-contact-btn{
+    background:rgba(37,211,102,0.18);
+    border-color:rgba(37,211,102,0.5);
+    color:#0a3d1a;
+  }
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .nav-contact-btn:hover{
+      background:rgba(37,211,102,0.3);
+      border-color:#25D366;
+      color:#0a3d1a;
+    }
+  }
+
+  /* ── Hero badges with inline white styles — override with !important ── */
+  body:not(.dark-mode) .hero .badge[style]{
+    color:var(--heading) !important;
+    background:rgba(0,0,0,0.06) !important;
+    border-color:rgba(0,0,0,0.15) !important;
   }
 </style>
 </head>
