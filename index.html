@@ -103,133 +103,6 @@
     --overlay-modal-strong:rgba(15,17,17,0.65);
   }
 
-  /* ============================================================
-     LIGHT MODE — header, hero band, and nav drawer
-     In dark mode these areas are permanently photo-dark; in light
-     mode they flip to a clean white/soft surface so the whole page
-     reads as one cohesive light theme.
-     ============================================================ */
-
-  /* Header: swap dark wallpaper overlay for a bright white veil */
-  body:not(.dark-mode) .header{
-    background-color:var(--neutral-primary-soft);
-  }
-  body:not(.dark-mode) .header::before{
-    background:rgba(255,255,255,0.92);
-  }
-
-  /* Topbar controls flip from white-on-dark to dark-on-light */
-  body:not(.dark-mode) .hamburger-btn,
-  body:not(.dark-mode) .theme-toggle-btn{
-    background:rgba(0,0,0,0.06);
-    border-color:rgba(0,0,0,0.14);
-    color:var(--heading);
-  }
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .hamburger-btn:hover,
-    body:not(.dark-mode) .theme-toggle-btn:hover{
-      background:rgba(0,0,0,0.1);
-    }
-  }
-
-  /* Search input in header */
-  body:not(.dark-mode) .header-search-input{
-    background:rgba(0,0,0,0.055);
-    border-color:rgba(0,0,0,0.14);
-    color:var(--heading);
-  }
-  body:not(.dark-mode) .header-search-input::placeholder{ color:rgba(0,0,0,0.38); }
-  body:not(.dark-mode) .header-search-input:focus{
-    background:var(--neutral-primary-soft);
-    border-color:var(--brand);
-  }
-  body:not(.dark-mode) .header-search-wrap svg{ color:rgba(0,0,0,0.45); }
-
-  /* Cart button in topbar */
-  body:not(.dark-mode) .cart-btn.btn-ghost{ color:var(--heading); }
-
-  /* Hero band: lighten the wallpaper overlay so text reads on white */
-  body:not(.dark-mode) .hero-band-overlay{
-    background:rgba(255,255,255,0.82);
-  }
-  body:not(.dark-mode) .hero h1{ color:var(--heading); }
-  body:not(.dark-mode) .hero p.lead{ color:var(--body); }
-  /* Hero badges: transparent-white ones become neutral */
-  body:not(.dark-mode) .hero .badge[style*="rgba(255,255,255,0.08)"]{
-    color:var(--heading) !important;
-    background:var(--neutral-secondary-soft) !important;
-    border-color:var(--border-default) !important;
-  }
-
-  /* Nav drawer: flip from dark to light surface */
-  body:not(.dark-mode) .nav-drawer{
-    background:var(--neutral-primary-soft);
-    border-right-color:var(--border-light);
-  }
-  body:not(.dark-mode) .nav-drawer-head{
-    border-bottom-color:var(--border-light);
-  }
-  body:not(.dark-mode) .nav-drawer-close{
-    background:var(--neutral-secondary-medium);
-    border-color:var(--border-default);
-    color:var(--heading);
-  }
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .nav-drawer-close:hover{
-      background:var(--neutral-tertiary-medium);
-    }
-  }
-  /* Search inside drawer */
-  body:not(.dark-mode) .nav-drawer-search-input{
-    background:var(--neutral-secondary-medium);
-    border-color:var(--border-default);
-    color:var(--heading);
-  }
-  body:not(.dark-mode) .nav-drawer-search-input::placeholder{ color:var(--body-subtle); }
-  body:not(.dark-mode) .nav-drawer-search-input:focus{
-    background:var(--neutral-primary-soft);
-    border-color:var(--brand);
-  }
-  body:not(.dark-mode) .nav-drawer-search-wrap svg{ color:var(--body-subtle); }
-  body:not(.dark-mode) .search-icon-btn:hover svg{ color:var(--body) !important; }
-
-  /* Nav category buttons */
-  body:not(.dark-mode) .nav-btn{
-    background:var(--neutral-secondary-soft);
-    border-color:var(--border-light);
-    color:var(--body);
-  }
-  body:not(.dark-mode) .nav-btn.active{
-    background:var(--brand);
-    border-color:var(--brand);
-    color:var(--dark-strong);
-  }
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .nav-btn:not(.active):hover{
-      background:var(--neutral-tertiary-soft);
-      color:var(--heading);
-    }
-  }
-  body:not(.dark-mode) .nav-sub-btn{
-    background:var(--neutral-tertiary-soft);
-    border-color:var(--border-light);
-    color:var(--body);
-  }
-  body:not(.dark-mode) .nav-sub-btn.active{
-    background:var(--brand);
-    border-color:var(--brand);
-    color:var(--dark-strong);
-  }
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .nav-sub-btn:not(.active):hover{
-      background:var(--neutral-quaternary);
-      color:var(--heading);
-    }
-  }
-  body:not(.dark-mode) .nav-divider{
-    background:var(--border-light);
-  }
-
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
@@ -393,15 +266,15 @@
     .topbar{ flex-wrap:nowrap; gap:6px; }
     .header-search-wrap{ flex:1 1 auto; }
     .header-search-wrap svg{ width:14px; height:14px; }
-    .header-search-wrap .search-icon-btn{ width:22px; height:22px; left:3px; }
+    .header-search-wrap .search-icon-btn{ width:24px; height:24px; left:4px; }
     .header-search-input{
       font-size:12px;
-      padding:9px 6px 9px 25px;
+      padding:9px 8px 9px 28px;
     }
   }
   @media(max-width:380px){
     .brand-mark .logo-img{ height:36px; }
-    .header-search-input{ font-size:11px; padding:8px 4px 8px 23px; }
+    .header-search-input{ font-size:11px; padding:8px 6px 8px 26px; }
   }
   .header-search-wrap svg{
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
@@ -1647,6 +1520,170 @@
   /* Fallback fade for browsers without View Transitions support */
   body.page-fade-fallback{ animation: page-fade-in-fallback 220ms ease both; }
   @keyframes page-fade-in-fallback{ from{ opacity:0; } to{ opacity:1; } }
+
+  /* ============================================================
+     LIGHT MODE — header, hero band & nav drawer
+     These three zones were previously hardcoded to a permanently
+     dark, photo-backed treatment in both modes.  The rules below
+     flip them to a clean light surface when dark-mode is OFF.
+     Dark-mode still gets the original dark wallpaper treatment via
+     the body.dark-mode overrides at the bottom of each group.
+     ============================================================ */
+
+  /* ── Header background (swap wallpaper for light image) ── */
+  body:not(.dark-mode) .header{
+    background:#f0f2f2;
+    background-image:url("assets/225882.jpg");
+  }
+
+  /* ── Header overlay — near-opaque white veil, wallpaper shows faintly ── */
+  body:not(.dark-mode) .header::before{
+    background:rgba(255,255,255,0.88);
+  }
+
+  /* ── Hamburger button ── */
+  body:not(.dark-mode) .hamburger-btn{
+    background:rgba(0,0,0,0.05);
+    border-color:rgba(0,0,0,0.14);
+    color:var(--heading);
+  }
+
+  /* ── Theme toggle button ── */
+  body:not(.dark-mode) .theme-toggle-btn{
+    background:rgba(0,0,0,0.05);
+    border-color:rgba(0,0,0,0.14);
+    color:var(--heading);
+  }
+
+  /* ── Header search icon ── */
+  body:not(.dark-mode) .header-search-wrap svg{
+    color:rgba(0,0,0,0.4);
+  }
+
+  /* ── Header search input ── */
+  body:not(.dark-mode) .header-search-input{
+    background:rgba(0,0,0,0.05);
+    border-color:rgba(0,0,0,0.14);
+    color:var(--heading);
+  }
+  body:not(.dark-mode) .header-search-input::placeholder{
+    color:rgba(0,0,0,0.38);
+  }
+  body:not(.dark-mode) .header-search-input:focus{
+    background:rgba(0,0,0,0.07);
+    border-color:var(--brand);
+  }
+
+  /* ── Cart button (btn-ghost in header) ── */
+  body:not(.dark-mode) .header-actions .btn-ghost{
+    color:var(--heading);
+  }
+
+  /* ── Logo — no brightness boost needed on a light surface ── */
+  body:not(.dark-mode) .brand-mark .logo-img{
+    filter:none;
+  }
+
+  /* ── Hero band background ── */
+  body:not(.dark-mode) .hero-band{
+    background:#f0f2f2;
+    background-image:url("assets/225882.jpg");
+  }
+
+  /* ── Hero band overlay — lighter wash ── */
+  body:not(.dark-mode) .hero-band-overlay{
+    background:rgba(255,255,255,0.82);
+  }
+
+  /* ── Hero text — flip white to dark ── */
+  body:not(.dark-mode) .hero h1{
+    color:var(--heading);
+  }
+  body:not(.dark-mode) .hero p.lead{
+    color:var(--body);
+  }
+
+  /* ── Hover states for header buttons in light mode ── */
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .hamburger-btn:hover{
+      background:rgba(0,0,0,0.1);
+    }
+    body:not(.dark-mode) .theme-toggle-btn:hover{
+      background:rgba(0,0,0,0.1);
+    }
+    body:not(.dark-mode) .header-actions .btn-ghost:hover{
+      background:rgba(0,0,0,0.06);
+    }
+    body:not(.dark-mode) .header-search-wrap .search-icon-btn:hover{
+      background:rgba(0,0,0,0.08);
+    }
+    body:not(.dark-mode) .header-search-wrap .search-icon-btn:hover svg{
+      color:rgba(0,0,0,0.7);
+    }
+  }
+
+  /* ── Nav drawer — light surface ── */
+  body:not(.dark-mode) .nav-drawer{
+    background:var(--white);
+    border-right-color:var(--border-default);
+  }
+  body:not(.dark-mode) .nav-drawer-head{
+    border-bottom-color:var(--border-default);
+  }
+  body:not(.dark-mode) .nav-drawer-close{
+    background:var(--neutral-secondary-medium);
+    border-color:var(--border-default);
+    color:var(--heading);
+  }
+  body:not(.dark-mode) .nav-drawer-search-wrap svg{
+    color:var(--body-subtle);
+  }
+  body:not(.dark-mode) .nav-drawer-search-input{
+    background:var(--neutral-secondary-medium);
+    border-color:var(--border-default);
+    color:var(--heading);
+  }
+  body:not(.dark-mode) .nav-drawer-search-input::placeholder{
+    color:var(--body);
+  }
+  body:not(.dark-mode) .nav-drawer-search-input:focus{
+    background:var(--neutral-primary-soft);
+    border-color:var(--brand);
+  }
+  body:not(.dark-mode) .nav-btn{
+    background:var(--neutral-secondary-soft);
+    border-color:var(--border-default);
+    color:var(--body);
+  }
+  body:not(.dark-mode) .nav-sub-btn{
+    background:var(--neutral-tertiary-soft);
+    border-color:var(--border-default);
+    color:var(--body);
+  }
+  body:not(.dark-mode) .nav-divider{
+    background:var(--border-default);
+  }
+  /* Nav drawer hover overrides in light mode */
+  @media(hover:hover) and (pointer:fine){
+    body:not(.dark-mode) .nav-drawer-close:hover{
+      background:var(--neutral-tertiary-medium);
+      color:var(--heading);
+    }
+    body:not(.dark-mode) .nav-btn:hover{
+      background:var(--neutral-tertiary-medium);
+      color:var(--heading);
+    }
+    body:not(.dark-mode) .nav-sub-btn:hover{
+      background:var(--neutral-tertiary-medium);
+      color:var(--heading);
+    }
+    body:not(.dark-mode) .nav-drawer-body .search-icon-btn:hover{
+      background:rgba(0,0,0,0.06);
+    }
+    body:not(.dark-mode) .nav-drawer-body .search-icon-btn:hover svg{
+      color:var(--body);
+    }
+  }
 </style>
 </head>
 <body>
