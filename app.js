@@ -1661,7 +1661,7 @@ function initTopTicker() {
 // ============================================================
 // LOOPING BACKGROUND VIDEO — the header/hero background is now the
 // video only (assets/wallpaper.mp4); there's no static image fallback,
-// just the solid --dark/light color underneath until it loads.
+// just the solid --dark color underneath until it loads.
 // Name the file "assets/wallpaper.mp4".
 // ============================================================
 
