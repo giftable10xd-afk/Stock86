@@ -391,7 +391,7 @@ function showMaxOneToast() {
     toast.style.cssText = `
       position:fixed; bottom:24px; left:50%;
       background:var(--dark); color:var(--white);
-      font-family:"NintendoSwitchUI",sans-serif; font-size:13px; font-weight:500;
+      font-family:"W95FA",sans-serif; font-size:13px; font-weight:500;
       padding:10px 18px; border-radius:var(--radius-base);
       box-shadow:var(--shadow-lg); z-index:9999;
       pointer-events:none; white-space:nowrap;
@@ -1622,7 +1622,7 @@ function initTopTicker() {
       image-rendering:pixelated;
     }
     .top-ticker-text{
-      font-family:"PerfectDOSVGA","NintendoSwitchUI",monospace;
+      font-family:"PerfectDOSVGA","W95FA",monospace;
       font-size:12px; letter-spacing:0.5px;
       color:#F3A848;
       line-height:1;
@@ -1661,7 +1661,7 @@ function initTopTicker() {
 // ============================================================
 // LOOPING BACKGROUND VIDEO — the header/hero background is now the
 // video only (assets/wallpaper.mp4); there's no static image fallback,
-// just the solid --dark color underneath until it loads.
+// just the solid --dark/light color underneath until it loads.
 // Name the file "assets/wallpaper.mp4".
 // ============================================================
 
