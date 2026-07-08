@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STOCK/86 — Used Gaming Hardware, Koura</title>
+<!-- Starts the video download immediately, in parallel with CSS/JS, instead
+     of waiting for app.js's initBgVideo() to inject a <video> tag after
+     DOMContentLoaded. Requires the file to be H.264 MP4 with the "faststart"
+     flag (moov atom at the front) so playback can begin before the whole
+     file finishes downloading. -->
+<link rel="preload" href="assets/wallpaper.mp4" as="video" type="video/mp4" fetchpriority="high">
 <style>
   @font-face {
     font-family: "W95FA";
@@ -195,27 +201,31 @@
   .hamburger-btn:active{transform:scale(0.92);}
   .hamburger-btn svg{width:20px; height:20px;}
 
-  /* Logo — only the image, no text */
+  /* Logo — only the image, no text. flex:1 lets it fill the exact space
+     between the hamburger and the search box, and justify-content:center
+     centers the image within that space, so it sits dead-center between
+     the two neighbors regardless of their widths. */
   .brand-mark{
-    display:flex; align-items:center; gap:0;
+    display:flex; align-items:center; justify-content:center; gap:0;
     text-decoration:none;
-    flex-shrink:0;
-    margin-right:16px;
+    flex:1 1 auto;
+    min-width:0;
   }
   .brand-mark .logo-img{
-    height:68px;
+    height:80px;
     width:auto;
     display:block;
     filter:brightness(1.05);
   }
 
-  /* Search input in header (next to logo) — sized to its content rather
-     than stretching to fill the row, and centered in the leftover space
-     between the logo and the cart button. */
+  /* Search input in header — sized a bit larger, nudged right (it's no
+     longer auto-centered in leftover space now that the logo owns that
+     job; a small left margin plus its own fixed size positions it
+     slightly right of true-center, closer to the cart). */
   .header-search-wrap{
-    flex:0 1 150px;
-    max-width:150px;
-    margin:0 auto;
+    flex:0 0 180px;
+    max-width:180px;
+    margin:0 0 0 18px;
     min-width:0;
     position:relative;
     z-index:4;
@@ -223,7 +233,7 @@
     align-items:center;
     justify-content:center;
     gap:6px;
-    height:38px;
+    height:42px;
     background:rgba(255,255,255,0.12);
     border:1px solid rgba(255,255,255,0.2);
     border-radius:var(--radius-base);
@@ -248,9 +258,9 @@
   }
   .header-search-wrap .search-icon-btn:active{ transform:scale(0.92); }
   .header-search-input{
-    flex:1 1 auto;
+    flex:0 1 auto;
     min-width:0;
-    width:auto;
+    width:88px;
     /* No explicit line-height — the custom pixel font's quirky internal
        ascent/descent made a line-height-based vertical center land a
        couple px off. Leaving line-height at its default lets the browser
@@ -294,28 +304,27 @@
        search box actually gets more real room instead of just smaller text. */
     .hamburger-btn{ width:36px; height:36px; }
     .hamburger-btn svg{ width:18px; height:18px; }
-    .brand-mark{ margin-right:8px; }
-    .brand-mark .logo-img{ height:48px; }
+    .brand-mark .logo-img{ height:54px; }
     .header-actions{ gap:4px; }
     .header-actions .cart-btn{ padding:8px 10px; }
     .header-search-wrap{
-      flex:0 1 130px; max-width:130px; margin:0 auto;
-      height:34px; padding:0 6px; gap:4px;
+      flex:0 0 150px; max-width:150px; margin:0 0 0 12px;
+      height:38px; padding:0 6px; gap:4px;
     }
     .header-search-wrap svg{ width:13px; height:13px; }
     .header-search-wrap .search-icon-btn{ width:16px; height:16px; }
     .header-search-input{
+      width:62px;
       font-size:11px;
     }
   }
   @media(max-width:380px){
-    .brand-mark{ margin-right:6px; }
-    .brand-mark .logo-img{ height:40px; }
+    .brand-mark .logo-img{ height:46px; }
     .hamburger-btn{ width:32px; height:32px; }
     .hamburger-btn svg{ width:16px; height:16px; }
     .header-actions .cart-btn{ padding:7px 8px; }
-    .header-search-wrap{ flex:0 1 100px; max-width:100px; height:32px; padding:0 5px; }
-    .header-search-input{ font-size:10px; }
+    .header-search-wrap{ flex:0 0 118px; max-width:118px; margin:0 0 0 8px; height:34px; padding:0 5px; }
+    .header-search-input{ width:48px; font-size:10px; }
   }
 
   /* Header right-side: cart button */
