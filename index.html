@@ -16,14 +16,20 @@
   /* ============================================================
      DESIGN TOKENS
      ============================================================ */
+  /* ============================================================
+     DESIGN TOKENS — dark mode only. The site no longer offers a
+     light-mode alternative, so the dark palette lives directly in
+     :root as the single, permanent theme.
+     ============================================================ */
   :root{
-    --neutral-primary-soft:#FFFFFF;
-    --neutral-secondary-soft:#F7F8F8;
-    --neutral-secondary-medium:#F0F2F2;
-    --neutral-tertiary-soft:#EAEDED;
-    --neutral-tertiary-medium:#E3E6E6;
-    --neutral-quaternary:#D5D9D9;
-    --gray:#BBBFBF;
+    color-scheme:dark;
+    --neutral-primary-soft:#181B1F;
+    --neutral-secondary-soft:#1E2227;
+    --neutral-secondary-medium:#262B31;
+    --neutral-tertiary-soft:#2C3137;
+    --neutral-tertiary-medium:#333A42;
+    --neutral-quaternary:#4A515B;
+    --gray:#9098A1;
     --brand-softer:#FEF7ED;
     --brand-soft:#FCECD3;
     --brand:#F3A848;
@@ -42,19 +48,19 @@
     --dark:#131A22;
     --dark-strong:#0F1111;
     --disabled:#EAEDED;
-    --heading:#0F1111;
-    --body:#565959;
-    --body-subtle:#767676;
+    --heading:#F2F3F4;
+    --body:#C7CBD2;
+    --body-subtle:#8E96A0;
     --fg-brand:#D4882A;
     --fg-brand-strong:#B87320;
     --fg-disabled:#949494;
     --white:#FFFFFF;
     --border-buffer:#FFFFFF;
-    --border-light:#EAEDED;
+    --border-light:#262B31;
     --border-default-subtle:#D5D9D9;
-    --border-default:#D5D9D9;
-    --border-default-medium:#D5D9D9;
-    --border-default-strong:#BBBFBF;
+    --border-default:#353C44;
+    --border-default-medium:#353C44;
+    --border-default-strong:#4A525C;
     --border-danger-subtle:#FECDD3;
     --border-brand:#D4882A;
     --border-brand-subtle:#F8D4A0;
@@ -67,37 +73,6 @@
     --shadow-sm:0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
     --shadow-md:0 2px 4px -1px rgb(0 0 0 / 0.06), 0 1px 3px -1px rgb(0 0 0 / 0.06);
     --shadow-lg:0 6px 12px -3px rgb(0 0 0 / 0.08), 0 3px 5px -3px rgb(0 0 0 / 0.06);
-    /* Backdrop behind drawers/modals — lighter by default (light mode);
-       dark mode restores the original, stronger value below since a
-       light backdrop reads poorly against an already-dark page. */
-    --overlay-backdrop:rgba(6,8,14,0.35);
-    --overlay-modal:rgba(15,17,17,0.4);
-    --overlay-modal-strong:rgba(15,17,17,0.42);
-  }
-
-  /* ============================================================
-     DARK MODE — overrides only the "light surface" tokens.
-     The header, hero band, footer, and nav drawer already use a
-     permanently dark, photo-backed treatment in both modes (they're
-     never white to begin with), so they're untouched here. Only the
-     white page/card surfaces and their text + border tokens flip.
-     ============================================================ */
-  body.dark-mode{
-    color-scheme:dark;
-    --neutral-primary-soft:#181B1F;
-    --neutral-secondary-soft:#1E2227;
-    --neutral-secondary-medium:#262B31;
-    --neutral-tertiary-soft:#2C3137;
-    --neutral-tertiary-medium:#333A42;
-    --neutral-quaternary:#4A515B;
-    --gray:#9098A1;
-    --heading:#F2F3F4;
-    --body:#C7CBD2;
-    --body-subtle:#8E96A0;
-    --border-light:#262B31;
-    --border-default:#353C44;
-    --border-default-medium:#353C44;
-    --border-default-strong:#4A525C;
     --overlay-backdrop:rgba(6,8,14,0.55);
     --overlay-modal:rgba(15,17,17,0.6);
     --overlay-modal-strong:rgba(15,17,17,0.65);
@@ -220,34 +195,6 @@
   .hamburger-btn:active{transform:scale(0.92);}
   .hamburger-btn svg{width:20px; height:20px;}
 
-  /* Dark mode toggle — sits next to the search bar */
-  .theme-toggle-btn{
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.2);
-    border-radius:var(--radius-default);
-    color:var(--white);
-    width:42px; height:42px;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer;
-    transition:background 150ms ease, transform 120ms ease;
-    flex-shrink:0;
-    z-index:3; position:relative;
-  }
-  .theme-toggle-btn:active{transform:scale(0.92);}
-  .theme-toggle-btn svg{width:19px; height:19px;}
-  .theme-toggle-btn .theme-icon-moon{display:none;}
-  body.dark-mode .theme-toggle-btn .theme-icon-sun{display:none;}
-  body.dark-mode .theme-toggle-btn .theme-icon-moon{display:block;}
-  @media(hover:hover) and (pointer:fine){
-    .theme-toggle-btn:hover{background:rgba(255,255,255,0.18);}
-  }
-  /* Shrink the toggle a touch first on very tight phone widths, before
-     the search box itself has to give up any more room. */
-  @media(max-width:380px){
-    .theme-toggle-btn{ width:38px; height:38px; }
-    .theme-toggle-btn svg{ width:17px; height:17px; }
-  }
-
   /* Logo — only the image, no text */
   .brand-mark{
     display:flex; align-items:center; gap:0;
@@ -268,19 +215,16 @@
     position:relative;
     z-index:4;
   }
-  /* Maximize search width on small/mobile viewports. Shrunk further here
-     than before since the dark-mode toggle now also lives in this row —
-     tighter gap, smaller icon, smaller side padding, so everything
-     (hamburger, logo, search, toggle, cart) fits on one line without
-     wrapping or overflowing on narrow phones. */
+  /* Maximize search width on small/mobile viewports — tighter gap,
+     smaller icon, smaller side padding, so everything (hamburger, logo,
+     search, cart) fits on one line without wrapping or overflowing on
+     narrow phones. */
   @media(max-width:499px){
     .topbar{ flex-wrap:nowrap; gap:5px; }
     /* Shrink the surrounding controls too, not just the input, so the
        search box actually gets more real room instead of just smaller text. */
     .hamburger-btn{ width:36px; height:36px; }
     .hamburger-btn svg{ width:18px; height:18px; }
-    .theme-toggle-btn{ width:36px; height:36px; }
-    .theme-toggle-btn svg{ width:17px; height:17px; }
     .brand-mark .logo-img{ height:32px; }
     .header-actions{ gap:4px; }
     .header-actions .cart-btn{ padding:8px 10px; }
@@ -290,7 +234,6 @@
     .header-search-input{
       font-size:11px;
       height:36px;
-      line-height:34px;
       padding:0 6px 0 24px;
     }
   }
@@ -298,9 +241,8 @@
     .brand-mark .logo-img{ height:28px; }
     .hamburger-btn{ width:32px; height:32px; }
     .hamburger-btn svg{ width:16px; height:16px; }
-    .theme-toggle-btn{ width:32px; height:32px; }
     .header-actions .cart-btn{ padding:7px 8px; }
-    .header-search-input{ font-size:10px; height:32px; line-height:30px; padding:0 5px 0 22px; }
+    .header-search-input{ font-size:10px; height:32px; padding:0 5px 0 22px; }
   }
   .header-search-wrap svg{
     width:16px; height:16px; color:rgba(255,255,255,0.5); pointer-events:none;
@@ -308,14 +250,12 @@
   .header-search-input{
     width:100%;
     min-width:0;
-    /* Fixed height + matching line-height (rather than vertical padding
-       alone) is what actually centers the text — the custom pixel font
-       has its own quirky internal ascent/descent, so equal top/bottom
-       padding doesn't reliably center it the way it would with a normal
-       font. Pinning line-height to the content-box height sidesteps
-       that font-metric quirk entirely. */
+    /* No explicit line-height — the custom pixel font's quirky internal
+       ascent/descent made a line-height-based vertical center land a
+       couple px off. Leaving line-height at its default lets the browser
+       center the text within the padding box using the font's own
+       metrics, which tracks true-center more reliably across fonts. */
     height:42px;
-    line-height:40px;
     background:rgba(255,255,255,0.12);
     border:1px solid rgba(255,255,255,0.2);
     border-radius:var(--radius-base);
@@ -481,7 +421,6 @@
   .nav-drawer-search-input{
     width:100%;
     height:42px;
-    line-height:40px;
     background:rgba(255,255,255,0.08);
     border:1px solid rgba(255,255,255,0.15);
     border-radius:var(--radius-base);
@@ -1558,203 +1497,6 @@
   body.page-fade-fallback{ animation: page-fade-in-fallback 220ms ease both; }
   @keyframes page-fade-in-fallback{ from{ opacity:0; } to{ opacity:1; } }
 
-  /* ============================================================
-     LIGHT MODE — header, hero band & nav drawer
-     These three zones were previously hardcoded to a permanently
-     dark, photo-backed treatment in both modes.  The rules below
-     flip them to a clean light surface when dark-mode is OFF.
-     Dark-mode still gets the original dark wallpaper treatment via
-     the body.dark-mode overrides at the bottom of each group.
-     ============================================================ */
-
-  /* ── Header background (same wallpaper as dark mode, light overlay below) ── */
-  body:not(.dark-mode) .header{
-    background-color:#e8eaed;
-  }
-
-  /* ── Header overlay — semi-transparent white veil, wallpaper visible below ── */
-  body:not(.dark-mode) .header::before{
-    background:rgba(255,255,255,0.9);
-  }
-
-  /* ── Hamburger button ── */
-  body:not(.dark-mode) .hamburger-btn{
-    background:rgba(0,0,0,0.05);
-    border-color:rgba(0,0,0,0.14);
-    color:var(--heading);
-  }
-
-  /* ── Theme toggle button ── */
-  body:not(.dark-mode) .theme-toggle-btn{
-    background:rgba(0,0,0,0.05);
-    border-color:rgba(0,0,0,0.14);
-    color:var(--heading);
-  }
-
-  /* ── Header search icon ── */
-  body:not(.dark-mode) .header-search-wrap svg{
-    color:rgba(0,0,0,0.4);
-  }
-
-  /* ── Header search input ── */
-  body:not(.dark-mode) .header-search-input{
-    background:rgba(0,0,0,0.05);
-    border-color:rgba(0,0,0,0.14);
-    color:var(--heading);
-  }
-  body:not(.dark-mode) .header-search-input::placeholder{
-    color:rgba(0,0,0,0.38);
-  }
-  body:not(.dark-mode) .header-search-input:focus{
-    background:rgba(0,0,0,0.07);
-    border-color:var(--brand);
-  }
-
-  /* ── Cart button (btn-ghost in header) ── */
-  body:not(.dark-mode) .header-actions .btn-ghost{
-    color:var(--heading);
-  }
-
-  /* ── Logo — the header/nav-drawer <img src> is swapped at runtime
-     (see updateLogoSrcs() in app.js) between the original white+cyan
-     file and a black+cyan variant, so the cyan stays cyan and only the
-     white part flips to black in light mode. No filter needed here. ── */
-
-  /* ── Hero band background — video only (no wallpaper.jpg), white overlay handles the light look ── */
-  body:not(.dark-mode) .hero-band{
-    background-color:#e8eaed;
-  }
-
-  /* ── Hero band overlay — lighter wash, wallpaper visible ── */
-  body:not(.dark-mode) .hero-band-overlay{
-    background:rgba(255,255,255,0.9);
-  }
-
-  /* ── Hero text — flip white to dark ── */
-  body:not(.dark-mode) .hero h1{
-    color:var(--heading);
-  }
-  body:not(.dark-mode) .hero p.lead{
-    color:var(--body);
-  }
-
-  /* ── Hover states for header buttons in light mode ── */
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .hamburger-btn:hover{
-      background:rgba(0,0,0,0.1);
-    }
-    body:not(.dark-mode) .theme-toggle-btn:hover{
-      background:rgba(0,0,0,0.1);
-    }
-    body:not(.dark-mode) .header-actions .btn-ghost:hover{
-      background:rgba(0,0,0,0.06);
-    }
-    body:not(.dark-mode) .header-search-wrap .search-icon-btn:hover{
-      background:rgba(0,0,0,0.08);
-    }
-    body:not(.dark-mode) .header-search-wrap .search-icon-btn:hover svg{
-      color:rgba(0,0,0,0.7);
-    }
-  }
-
-  /* ── Nav drawer — light surface ── */
-  body:not(.dark-mode) .nav-drawer{
-    background:var(--white);
-    border-right-color:var(--border-default);
-  }
-  body:not(.dark-mode) .nav-drawer-head{
-    border-bottom-color:var(--border-default);
-  }
-  body:not(.dark-mode) .nav-drawer-close{
-    background:var(--neutral-secondary-medium);
-    border-color:var(--border-default);
-    color:var(--heading);
-  }
-  body:not(.dark-mode) .nav-drawer-search-wrap svg{
-    color:var(--body-subtle);
-  }
-  body:not(.dark-mode) .nav-drawer-search-input{
-    background:var(--neutral-secondary-medium);
-    border-color:var(--border-default);
-    color:var(--heading);
-  }
-  body:not(.dark-mode) .nav-drawer-search-input::placeholder{
-    color:var(--body);
-  }
-  body:not(.dark-mode) .nav-drawer-search-input:focus{
-    background:var(--neutral-primary-soft);
-    border-color:var(--brand);
-  }
-  body:not(.dark-mode) .nav-btn{
-    background:var(--neutral-secondary-soft);
-    border-color:var(--border-default);
-    color:var(--body);
-  }
-  body:not(.dark-mode) .nav-sub-btn{
-    background:var(--neutral-tertiary-soft);
-    border-color:var(--border-default);
-    color:var(--body);
-  }
-  body:not(.dark-mode) .nav-divider{
-    background:var(--border-default);
-  }
-  /* Nav drawer hover overrides in light mode */
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .nav-drawer-close:hover{
-      background:var(--neutral-tertiary-medium);
-      color:var(--heading);
-    }
-    body:not(.dark-mode) .nav-btn:hover{
-      background:var(--neutral-tertiary-medium);
-      color:var(--heading);
-    }
-    body:not(.dark-mode) .nav-sub-btn:hover{
-      background:var(--neutral-tertiary-medium);
-      color:var(--heading);
-    }
-    body:not(.dark-mode) .nav-drawer-body .search-icon-btn:hover{
-      background:rgba(0,0,0,0.06);
-    }
-    body:not(.dark-mode) .nav-drawer-body .search-icon-btn:hover svg{
-      color:var(--body);
-    }
-  }
-
-  /* ── Contact us button — white text is invisible on light nav drawer ── */
-  body:not(.dark-mode) .nav-contact-btn{
-    background:rgba(37,211,102,0.18);
-    border-color:rgba(37,211,102,0.5);
-    color:#0a3d1a;
-  }
-  @media(hover:hover) and (pointer:fine){
-    body:not(.dark-mode) .nav-contact-btn:hover{
-      background:rgba(37,211,102,0.3);
-      border-color:#25D366;
-      color:#0a3d1a;
-    }
-  }
-
-  /* ── Hero badges with inline white styles — override with !important ── */
-  body:not(.dark-mode) .hero .badge[style]{
-    color:var(--heading) !important;
-    background:rgba(0,0,0,0.06) !important;
-    border-color:rgba(0,0,0,0.15) !important;
-  }
-
-  /* ── Footer — light mode ── */
-  body:not(.dark-mode) footer{
-    background:var(--neutral-secondary-soft);
-    border-top:1px solid var(--border-light);
-  }
-  body:not(.dark-mode) footer p{
-    color:var(--body);
-  }
-  body:not(.dark-mode) .footer-slogan{
-    color:var(--body);
-  }
-  body:not(.dark-mode) .footer-logo{
-    opacity:0.8;
-  }
 </style>
 </head>
 <body>
@@ -1776,20 +1518,6 @@
   if (new URLSearchParams(window.location.search).get("id")) {
     document.body.className = "showing-product";
   }
-</script>
-<script>
-  // Apply the saved (or system-default) theme immediately, before paint,
-  // so there's no flash of the wrong theme while the rest of the page
-  // loads. Runs after the scripts above on purpose — they assign
-  // document.body.className outright on a product deep link, which would
-  // otherwise wipe this class right back off.
-  (function(){
-    var saved = null;
-    try { saved = localStorage.getItem("stock86_theme_v1"); } catch (e) {}
-    var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    var dark = saved === "dark" || (saved === null && prefersDark);
-    if (dark) document.body.classList.add("dark-mode");
-  })();
 </script>
 
 
@@ -1900,20 +1628,6 @@
         </button>
         <input class="header-search-input" type="text" id="searchInput" placeholder="Search listings…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       </div>
-
-      <!-- Dark mode toggle -->
-      <button type="button" class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle dark mode" aria-pressed="false">
-        <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="4"/>
-          <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-        </svg>
-      </button>
 
       <!-- Cart -->
       <div class="header-actions">
@@ -2453,28 +2167,6 @@
 <script src="app.js"></script>
 <!-- Firebase — loads after app.js so renderAll is defined -->
 <script type="module" src="firebase.js"></script>
-<script>
-  // ── Dark mode toggle ─────────────────────────────────────────
-  // The class itself was already applied pre-paint (see the early script
-  // in <head>/<body> above) to avoid a flash; this just wires the button
-  // up to flip it and remember the choice.
-  const themeToggleBtn = document.getElementById("themeToggleBtn");
-  const THEME_STORAGE_KEY = "stock86_theme_v1";
-
-  function setTheme(isDark) {
-    document.body.classList.toggle("dark-mode", isDark);
-    if (themeToggleBtn) themeToggleBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
-    try { localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light"); } catch (e) { /* ignore */ }
-    if (typeof updateLogoSrcs === "function") updateLogoSrcs();
-  }
-
-  if (themeToggleBtn) {
-    themeToggleBtn.setAttribute("aria-pressed", document.body.classList.contains("dark-mode") ? "true" : "false");
-    themeToggleBtn.addEventListener("click", () => {
-      setTheme(!document.body.classList.contains("dark-mode"));
-    });
-  }
-</script>
 <script>
   // ── Nav drawer (LEFT side) ─────────────────────────────────
   const hamburgerBtn  = document.getElementById("hamburgerBtn");
