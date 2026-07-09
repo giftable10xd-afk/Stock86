@@ -945,16 +945,6 @@
     pointer-events:none;
     filter:drop-shadow(0 8px 18px rgba(0,0,0,0.45));
   }
-  .hero-category-img{
-    position:absolute;
-    top:var(--hole-y,50%); left:var(--hole-x,50%);
-    width:var(--hole-size,58%); height:var(--hole-size,58%);
-    transform:translate(-50%,-50%);
-    object-fit:cover;
-    border-radius:50%;
-    z-index:1;
-  }
-
   /* Per-category glow behind the frame — gives each category its own
      colour identity instead of a single uniform tint across all four. */
   .hero-frame-wrap::before{
@@ -2056,9 +2046,8 @@
       <!-- Slide 1: Nintendo Switch -->
       <div class="hero-slide hero-slide-category" data-slide-index="1" data-category="nintendo-switch">
         <a class="hero-cat-link" href="#" data-filter-category="switches">
-          <div class="hero-frame-wrap" style="--hole-size:62%; --hole-x:50%; --hole-y:50%;">
-            <img class="hero-frame-img" src="assets/frame-nintendo-switch.png" alt="">
-            <img class="hero-category-img" src="assets/category-nintendo-switch.png" alt="Nintendo Switch" onerror="this.style.visibility='hidden'">
+          <div class="hero-frame-wrap">
+            <img class="hero-frame-img" src="assets/switchesss.png" alt="Nintendo Switch">
           </div>
           <span class="hero-shop-cta">Shop Now</span>
         </a>
@@ -2067,9 +2056,8 @@
       <!-- Slide 2: Handhelds & Consoles -->
       <div class="hero-slide hero-slide-category" data-slide-index="2" data-category="handhelds-consoles">
         <a class="hero-cat-link" href="#" data-filter-category="consoles">
-          <div class="hero-frame-wrap" style="--hole-size:59%; --hole-x:50%; --hole-y:50.5%;">
-            <img class="hero-frame-img" src="assets/frame-handhelds-consoles.png" alt="">
-            <img class="hero-category-img" src="assets/category-handhelds-consoles.png" alt="Handhelds &amp; Consoles" onerror="this.style.visibility='hidden'">
+          <div class="hero-frame-wrap">
+            <img class="hero-frame-img" src="assets/pcsss.png" alt="Handhelds &amp; Consoles">
           </div>
           <span class="hero-shop-cta">Browse Now</span>
         </a>
@@ -2078,9 +2066,8 @@
       <!-- Slide 3: Laptops -->
       <div class="hero-slide hero-slide-category" data-slide-index="3" data-category="laptops">
         <a class="hero-cat-link" href="#" data-filter-category="laptops">
-          <div class="hero-frame-wrap" style="--hole-size:47%; --hole-x:50%; --hole-y:50.5%;">
-            <img class="hero-frame-img" src="assets/frame-laptops.png" alt="">
-            <img class="hero-category-img" src="assets/category-laptops.png" alt="Laptops" onerror="this.style.visibility='hidden'">
+          <div class="hero-frame-wrap">
+            <img class="hero-frame-img" src="assets/laptopsss.png" alt="Laptops">
           </div>
           <span class="hero-shop-cta">Explore Now</span>
         </a>
@@ -2089,9 +2076,8 @@
       <!-- Slide 4: Phones -->
       <div class="hero-slide hero-slide-category" data-slide-index="4" data-category="phones">
         <a class="hero-cat-link" href="#" data-filter-category="phones">
-          <div class="hero-frame-wrap" style="--hole-size:57%; --hole-x:50%; --hole-y:49%;">
-            <img class="hero-frame-img" src="assets/frame-phones.png" alt="">
-            <img class="hero-category-img" src="assets/category-phones.png" alt="Phones" onerror="this.style.visibility='hidden'">
+          <div class="hero-frame-wrap">
+            <img class="hero-frame-img" src="assets/phonesss.png" alt="Phones">
           </div>
           <span class="hero-shop-cta">Grab Yours</span>
         </a>
