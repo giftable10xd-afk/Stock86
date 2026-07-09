@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STOCK/86 — Used Gaming Hardware, Koura</title>
+<title>RetroStation — Used Gaming Hardware, Koura</title>
 <!-- Starts the video download immediately, in parallel with CSS/JS, instead
      of waiting for app.js's initBgVideo() to inject a <video> tag after
      DOMContentLoaded. Requires the file to be H.264 MP4 with the "faststart"
@@ -16,8 +16,8 @@
 <link rel="preload" href="assets/intro.mp4" as="video" type="video/mp4" fetchpriority="high">
 <style>
   @font-face {
-    font-family: "PixelForge3D";
-    src: url("assets/PixelForge3D.otf") format("opentype");
+    font-family: "Rimouski";
+    src: url("assets/rimouski_sb.otf") format("opentype");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -34,13 +34,13 @@
      ============================================================ */
   :root{
     color-scheme:dark;
-    --neutral-primary-soft:#0D1917;
-    --neutral-secondary-soft:#122622;
-    --neutral-secondary-medium:#1A332C;
-    --neutral-tertiary-soft:#1F3D35;
-    --neutral-tertiary-medium:#284A40;
-    --neutral-quaternary:#3D6B5C;
-    --gray:#7FA89C;
+    --neutral-primary-soft:#120F1B;
+    --neutral-secondary-soft:#181425;
+    --neutral-secondary-medium:#221C33;
+    --neutral-tertiary-soft:#2B2340;
+    --neutral-tertiary-medium:#372C4F;
+    --neutral-quaternary:#4E4070;
+    --gray:#9C90B3;
     --brand-softer:#FEF7ED;
     --brand-soft:#FCECD3;
     --brand:#F3A848;
@@ -56,12 +56,12 @@
     --danger-strong:#A30028;
     --warning-soft:#FFF7ED;
     --warning:#F97316;
-    --dark:#0A1815;
-    --dark-strong:#05100D;
+    --dark:#130F1D;
+    --dark-strong:#08060D;
     --disabled:#EAEDED;
-    --heading:#EAF6F1;
-    --body:#BFDCD3;
-    --body-subtle:#82A99C;
+    --heading:#F6F0FC;
+    --body:#CDC2DE;
+    --body-subtle:#8F82A6;
     --fg-brand:#D4882A;
     --fg-brand-strong:#B87320;
     --fg-disabled:#949494;
@@ -69,12 +69,23 @@
     --neon:#39FF9C;
     --neon-dim:#1FB87E;
     --neon-glow:rgba(57,255,156,0.35);
+    /* Multi-hue bright accents for a colourful-but-dark theme — used for
+       hero CTA lettering, dots, and other small colourful accents, all
+       tuned to stay legible/bright against the dark surfaces above. */
+    --accent-cyan:#33E6FF;
+    --accent-pink:#FF4FA3;
+    --accent-purple:#B67CFF;
+    --accent-yellow:#FFD23D;
+    --accent-red:#FF5C5C;
+    --accent-green:#39FF9C;
+    --accent-orange:#FF9640;
+    --accent-blue:#6C8CFF;
     --border-buffer:#FFFFFF;
-    --border-light:#1A332C;
+    --border-light:#221C33;
     --border-default-subtle:#D5D9D9;
-    --border-default:#2C4F44;
-    --border-default-medium:#2C4F44;
-    --border-default-strong:#3F6C5C;
+    --border-default:#382C52;
+    --border-default-medium:#382C52;
+    --border-default-strong:#4E4070;
     --border-danger-subtle:#FECDD3;
     --border-brand:#D4882A;
     --border-brand-subtle:#F8D4A0;
@@ -95,7 +106,7 @@
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
-    font-family:"PixelForge3D", "Open Sans", sans-serif;
+    font-family:"Rimouski", "Open Sans", sans-serif;
     background:var(--neutral-primary-soft);
     color:var(--body);
     -webkit-font-smoothing:antialiased;
@@ -124,7 +135,7 @@
   /* ============================================================
      TYPOGRAPHY
      ============================================================ */
-  h1,h2,h3,h4,h5,h6{font-weight:600; color:var(--heading); font-family:"PixelForge3D", sans-serif;}
+  h1,h2,h3,h4,h5,h6{font-weight:600; color:var(--heading); font-family:"Rimouski", sans-serif;}
   h1{font-size:24px; line-height:1.15; letter-spacing:-0.4px; margin-bottom:16px;}
   h2{font-size:20px; line-height:1.2;}
   h3{font-size:18px; line-height:1.25;}
@@ -278,7 +289,7 @@
     background:transparent;
     border:none;
     color:var(--white);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:14px;
     text-align:center;
     padding:0;
@@ -390,7 +401,7 @@
     border:1px solid var(--border-default);
     border-radius:var(--radius-base);
     color:var(--heading);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:13px; font-weight:500;
     padding:9px 12px;
     cursor:pointer;
@@ -404,7 +415,7 @@
   .count-bar-total{
     font-size:13px;
     color:var(--body-subtle);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     white-space:nowrap;
   }
 
@@ -481,7 +492,7 @@
     border:1px solid rgba(255,255,255,0.15);
     border-radius:var(--radius-base);
     color:var(--white);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:14px;
     padding:0 10px 0 34px;
   }
@@ -523,7 +534,7 @@
     background:rgba(255,255,255,0.06);
     border:1px solid rgba(255,255,255,0.1);
     color:rgba(255,255,255,0.7);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:14px; font-weight:500;
     padding:11px 14px;
     border-radius:var(--radius-base);
@@ -562,7 +573,7 @@
     background:rgba(255,255,255,0.04);
     border:1px solid rgba(255,255,255,0.08);
     color:rgba(255,255,255,0.55);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:13px; font-weight:500;
     padding:9px 14px;
     border-radius:var(--radius-base);
@@ -588,7 +599,7 @@
     background:rgba(37,211,102,0.12);
     border:1px solid rgba(37,211,102,0.4);
     color:var(--white);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:14px; font-weight:500;
     padding:11px 16px;
     border-radius:var(--radius-full);
@@ -666,7 +677,7 @@
     display:flex; align-items:center; justify-content:space-between;
     background:none; border:none;
     padding:16px 20px;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:15px; font-weight:600; color:var(--heading);
     cursor:pointer;
   }
@@ -735,7 +746,7 @@
     width:100%;
     border:none; outline:none;
     padding:10px 0;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:14px; color:var(--heading);
     background:transparent;
     -moz-appearance:textfield;
@@ -750,7 +761,7 @@
   }
   .price-clear-btn{
     background:none; border:none;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:13px; font-weight:500;
     color:var(--body);
     text-decoration:underline;
@@ -763,7 +774,7 @@
     color:var(--white);
     border:none;
     border-radius:var(--radius-default);
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:13px; font-weight:600;
     padding:10px 22px;
     cursor:pointer;
@@ -779,7 +790,7 @@
      ============================================================ */
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    font-family:"PixelForge3D", sans-serif; font-weight:500;
+    font-family:"Rimouski", sans-serif; font-weight:500;
     border-radius:var(--radius-base);
     border:1px solid transparent;
     box-shadow:var(--shadow-xs);
@@ -871,10 +882,11 @@
      ============================================================ */
   .hero-carousel{
     position:relative;
-    min-height:440px;
+    min-height:460px;
   }
-  @media(min-width:640px){ .hero-carousel{ min-height:400px; } }
-  @media(min-width:1024px){ .hero-carousel{ min-height:380px; } }
+  @media(min-width:480px){ .hero-carousel{ min-height:500px; } }
+  @media(min-width:640px){ .hero-carousel{ min-height:460px; } }
+  @media(min-width:1024px){ .hero-carousel{ min-height:480px; } }
 
   .hero-slide{
     position:absolute; inset:0;
@@ -903,10 +915,11 @@
 
   .hero-frame-wrap{
     position:relative;
-    width:180px; height:180px;
+    width:260px; height:260px;
     margin-bottom:14px;
   }
-  @media(min-width:768px){ .hero-frame-wrap{ width:220px; height:220px; } }
+  @media(min-width:480px){ .hero-frame-wrap{ width:300px; height:300px; } }
+  @media(min-width:768px){ .hero-frame-wrap{ width:340px; height:340px; } }
 
   .hero-frame-img{
     position:absolute; inset:0;
@@ -929,18 +942,30 @@
 
   .hero-shop-cta{
     display:inline-block;
-    font-family:"PixelForge3D", sans-serif;
-    font-size:16px; letter-spacing:0.5px;
-    color:var(--white);
-    background:var(--fg-brand-strong);
-    padding:9px 22px;
-    border-radius:var(--radius-default);
-    box-shadow:var(--shadow-xs);
+    font-family:"Rimouski", sans-serif;
+    font-size:20px; letter-spacing:1px;
+    background:none;
+    padding:6px 4px;
     transition:transform 150ms ease, filter 150ms ease;
   }
-  @media(min-width:768px){ .hero-shop-cta{ font-size:18px; padding:10px 26px; } }
-  .hero-cat-link:hover .hero-shop-cta{ transform:translateY(-2px); filter:brightness(1.08); }
+  @media(min-width:768px){ .hero-shop-cta{ font-size:26px; } }
+  .hero-cat-link:hover .hero-shop-cta{ transform:translateY(-2px); filter:brightness(1.15); }
   .hero-cat-link:active .hero-shop-cta{ transform:translateY(0); }
+  /* Each letter gets its own bright accent colour (assigned by JS via
+     nth-child so it cycles through the palette) + a soft glow so it stays
+     readable against the dark hero background. */
+  .hero-shop-cta .letter{
+    display:inline-block;
+    text-shadow:0 0 10px currentColor, 0 2px 3px rgba(0,0,0,0.6);
+  }
+  .hero-shop-cta .letter:nth-child(8n+1){ color:var(--accent-cyan); }
+  .hero-shop-cta .letter:nth-child(8n+2){ color:var(--accent-pink); }
+  .hero-shop-cta .letter:nth-child(8n+3){ color:var(--accent-yellow); }
+  .hero-shop-cta .letter:nth-child(8n+4){ color:var(--accent-green); }
+  .hero-shop-cta .letter:nth-child(8n+5){ color:var(--accent-purple); }
+  .hero-shop-cta .letter:nth-child(8n+6){ color:var(--accent-orange); }
+  .hero-shop-cta .letter:nth-child(8n+7){ color:var(--accent-blue); }
+  .hero-shop-cta .letter:nth-child(8n){ color:var(--accent-red); }
 
   .hero-dots{
     position:absolute; left:50%; bottom:6px; transform:translateX(-50%);
@@ -953,6 +978,32 @@
   }
   .hero-dots button.is-active{ background:var(--white); transform:scale(1.25); }
 
+  /* Prev/next arrows — let people manually step between hero slides
+     instead of only waiting for the auto-rotate. */
+  .hero-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    z-index:3;
+    width:36px; height:36px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:var(--radius-full);
+    color:var(--white);
+    cursor:pointer;
+    transition:background 150ms ease, transform 150ms ease;
+  }
+  .hero-arrow:hover{ background:rgba(255,255,255,0.18); }
+  .hero-arrow:active{ transform:translateY(-50%) scale(0.92); }
+  .hero-arrow svg{ width:18px; height:18px; }
+  .hero-arrow-prev{ left:0; }
+  .hero-arrow-next{ right:0; }
+  @media(min-width:768px){
+    .hero-arrow{ width:44px; height:44px; }
+    .hero-arrow svg{ width:22px; height:22px; }
+    .hero-arrow-prev{ left:-4px; }
+    .hero-arrow-next{ right:-4px; }
+  }
+
   /* ============================================================
      BADGES
      ============================================================ */
@@ -960,7 +1011,7 @@
     display:inline-flex; align-items:center; gap:4px;
     border:1px solid; border-radius:var(--radius-default);
     font-weight:500; white-space:nowrap;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
   }
   .badge-default{font-size:11px; padding:2px 6px;}
   .badge-lg{font-size:12px; padding:3px 8px;}
@@ -983,7 +1034,7 @@
     padding:2px 8px;
     border-radius:var(--radius-full);
     border:1px solid;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     letter-spacing:0.2px;
     width:fit-content;
   }
@@ -1123,7 +1174,7 @@
   .card-sku{font-size:10px; color:var(--body-subtle); font-weight:500; letter-spacing:0.3px; display:none;}
   @media(min-width:640px){.card-sku{display:block;}}
   .card-title-link:hover .card-title{color:var(--fg-brand);}
-  .card-title{font-size:12px; font-weight:600; color:var(--heading); line-height:1.35; transition:color 150ms ease; font-family:"PixelForge3D", sans-serif;}
+  .card-title{font-size:12px; font-weight:600; color:var(--heading); line-height:1.35; transition:color 150ms ease; font-family:"Rimouski", sans-serif;}
   @media(min-width:640px){.card-title{font-size:14px;}}
   .card-specs{display:flex; flex-wrap:wrap; gap:4px; margin:2px 0;}
   @media(min-width:640px){.card-specs{gap:5px;}}
@@ -1142,7 +1193,7 @@
     flex-wrap:wrap; gap:6px;
     margin-top:auto; padding-top:6px;
   }
-  .card-price{font-size:16px; font-weight:700; color:var(--heading); font-family:"PixelForge3D", sans-serif;}
+  .card-price{font-size:16px; font-weight:700; color:var(--heading); font-family:"Rimouski", sans-serif;}
   @media(min-width:640px){.card-price{font-size:20px;}}
   .card-price .currency{font-size:11px; font-weight:600; margin-right:1px;}
   @media(min-width:640px){.card-price .currency{font-size:13px;}}
@@ -1171,7 +1222,7 @@
     font-size:13px; color:var(--heading);
     padding:8px 10px;
     transition:border-color 150ms ease, box-shadow 150ms ease;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
   }
   select.input{padding:6px 8px; font-size:12px;}
   .input::placeholder{color:var(--body);}
@@ -1213,7 +1264,7 @@
   .admin-toggle{background:none; border:none; color:#4A6960; font-size:11px; cursor:pointer; padding:4px;}
   
   .footer-slogan{
-    font-size:12px; font-weight:700; color:var(--gray); font-family:"PixelForge3D",sans-serif;
+    font-size:12px; font-weight:700; color:var(--gray); font-family:"Rimouski",sans-serif;
     letter-spacing:0.4px; text-align:center;
   }
   @media(max-width:600px){
@@ -1225,7 +1276,7 @@
   .inquiry-wa-btn{
     display:inline-flex; align-items:center; gap:8px;
     background:#25D366; color:#0a2a14;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     font-size:13px; font-weight:600;
     padding:9px 16px; border-radius:var(--radius-base);
     border:none; cursor:pointer; text-decoration:none;
@@ -1268,7 +1319,7 @@
   .cart-line-name{font-weight:600; font-size:13px; color:var(--heading);}
   .cart-line-meta{color:var(--body-subtle); font-size:12px; margin-top:2px;}
   .cart-line-price{font-weight:600; font-size:13px; color:var(--heading); white-space:nowrap;}
-  .cart-line-remove{background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer; margin-top:6px; padding:0; font-weight:500; font-family:"PixelForge3D", sans-serif;}
+  .cart-line-remove{background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer; margin-top:6px; padding:0; font-weight:500; font-family:"Rimouski", sans-serif;}
   
   .drawer-foot{border-top:1px solid var(--border-default); padding:16px 20px 20px;}
   .drawer-row{display:flex; justify-content:space-between; font-size:13px; color:var(--body); margin-bottom:8px;}
@@ -1308,7 +1359,7 @@
     border-radius:var(--radius-default); padding:16px; display:flex; justify-content:center; margin-bottom:16px;
   }
   .qr-box img{width:180px; height:180px;}
-  .modal-total{text-align:center; font-size:24px; font-weight:700; color:var(--fg-brand-strong); margin-bottom:18px; font-family:"PixelForge3D", sans-serif;}
+  .modal-total{text-align:center; font-size:24px; font-weight:700; color:var(--fg-brand-strong); margin-bottom:18px; font-family:"Rimouski", sans-serif;}
   .steps{margin-bottom:18px;}
   .step{display:flex; gap:10px; margin-bottom:12px; align-items:flex-start;}
   .step-num{
@@ -1325,13 +1376,13 @@
     padding:12px; border-radius:var(--radius-base); border:1px solid transparent;
     cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs);
     transition:background-color 150ms ease, transform 120ms ease;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
   }
   
   .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
-  .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"PixelForge3D", sans-serif;}
+  .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"Rimouski", sans-serif;}
   
 
   /* ============================================================
@@ -1371,7 +1422,7 @@
   .ctrl-no-thanks{
     width:100%; text-align:center; padding:10px;
     background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; margin-top:4px;
-    font-family:"PixelForge3D", sans-serif;
+    font-family:"Rimouski", sans-serif;
     transition:color 150ms ease;
   }
   
@@ -1389,7 +1440,7 @@
   }
   
   .game-addon-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex-shrink:0; }
-  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"PixelForge3D",sans-serif; }
+  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"Rimouski",sans-serif; }
   .game-addon-price{ font-size:12px; font-weight:600; color:var(--fg-brand-strong); white-space:nowrap; }
 
   /* ============================================================
@@ -1404,7 +1455,7 @@
   .admin-item-toggle{
     background:var(--neutral-primary-soft); border:1px solid var(--border-default-medium);
     color:var(--body); font-size:11px; font-weight:500; padding:5px 10px;
-    border-radius:var(--radius-default); cursor:pointer; font-family:"PixelForge3D", sans-serif;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"Rimouski", sans-serif;
     transition:background 150ms ease, transform 120ms ease;
   }
   
@@ -1459,7 +1510,7 @@
   .admin-tab{
     padding:8px 4px 10px; font-size:14px; font-weight:600; color:var(--body-subtle);
     background:none; border:none; border-bottom:2px solid transparent;
-    cursor:pointer; font-family:"PixelForge3D", sans-serif; margin-bottom:-1px;
+    cursor:pointer; font-family:"Rimouski", sans-serif; margin-bottom:-1px;
   }
   .admin-tab.active{ color:var(--fg-brand-strong); border-bottom-color:var(--brand); }
   .admin-field{ margin-bottom:12px; }
@@ -1469,7 +1520,7 @@
   .admin-field select,
   .admin-field textarea{
     width:100%; border:1px solid var(--border-default); border-radius:var(--radius-default);
-    padding:9px 10px; font-size:14px; font-family:"PixelForge3D", sans-serif;
+    padding:9px 10px; font-size:14px; font-family:"Rimouski", sans-serif;
     background:var(--neutral-primary-soft); color:var(--heading);
   }
   .admin-field textarea{ resize:vertical; min-height:64px; }
@@ -1500,7 +1551,7 @@
   .admin-link-btn{
     background:none; border:none; padding:0; margin-top:6px;
     font-size:12px; font-weight:600; color:var(--fg-brand-strong);
-    cursor:pointer; font-family:"PixelForge3D", sans-serif;
+    cursor:pointer; font-family:"Rimouski", sans-serif;
   }
   @media(hover:hover) and (pointer:fine){
     .admin-link-btn:hover{ text-decoration:underline; }
@@ -1517,7 +1568,7 @@
   .admin-toolbar-btn{
     background:var(--dark-strong); color:var(--white); border:none;
     font-size:11px; font-weight:600; padding:6px 12px;
-    border-radius:var(--radius-default); cursor:pointer; font-family:"PixelForge3D", sans-serif;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"Rimouski", sans-serif;
   }
   
 
@@ -1529,7 +1580,7 @@
   }
   .pay-method-tab{
     flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
-    font-family:"PixelForge3D",sans-serif; font-size:13px; font-weight:500;
+    font-family:"Rimouski",sans-serif; font-size:13px; font-weight:500;
     padding:9px 10px;
     border-radius:var(--radius-base);
     border:1px solid var(--border-default);
@@ -1677,7 +1728,6 @@
   .modal{ border:2px solid var(--border-default); }
   .topbar{ border-bottom:2px solid var(--border-light); }
   .count-bar-outer{ border-bottom:2px solid var(--border-light); }
-  .hero-shop-cta{ border:2px solid var(--dark-strong); }
   .cat-tab{ border-width:2px !important; }
 
   /* ============================================================
@@ -1730,23 +1780,15 @@
   }
   #introSplash.is-hidden{ opacity:0; pointer-events:none; }
   #introSplash video{
-    width:100%; height:100%;
-    object-fit:cover;
+    /* Video is authored 1:1 — keep that square shape intact (letterboxed
+       on the shorter axis) instead of stretching/cropping to fill a
+       non-square mobile viewport. */
+    width:min(100vw, 100vh);
+    height:min(100vw, 100vh);
+    aspect-ratio:1 / 1;
+    object-fit:contain;
     display:block;
   }
-  #introSkipBtn{
-    position:absolute; right:16px; bottom:16px;
-    z-index:2;
-    font-family:"PixelForge3D", sans-serif;
-    font-size:12px; letter-spacing:0.5px;
-    color:var(--heading);
-    background:rgba(13,25,23,0.75);
-    border:2px solid var(--border-default-strong);
-    border-radius:var(--radius-default);
-    padding:7px 14px;
-    cursor:pointer;
-  }
-  @media(min-width:768px){ #introSkipBtn{ font-size:13px; padding:8px 16px; } }
 
 </style>
 </head>
@@ -1760,7 +1802,6 @@
   <video id="introVideo" autoplay muted playsinline webkit-playsinline>
     <source src="assets/intro.mp4" type="video/mp4">
   </video>
-  <button id="introSkipBtn" type="button">Skip ▶</button>
 </div>
 <script>
   // Runs synchronously, before app.js loads, so the splash is fully
@@ -1797,9 +1838,6 @@
     // Safety net: never block the site for more than 10s even if the
     // video is missing/corrupt and never fires 'ended' or 'error'.
     window.setTimeout(endIntro, 10000);
-
-    var skipBtn = document.getElementById("introSkipBtn");
-    if (skipBtn) skipBtn.addEventListener("click", endIntro);
   })();
 </script>
 <script>
@@ -1829,7 +1867,7 @@
 <!-- LEFT SIDE NAV DRAWER -->
 <nav class="nav-drawer" id="navDrawer" aria-label="Filter by category">
   <div class="nav-drawer-head">
-    <img class="nav-drawer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
+    <img class="nav-drawer-logo" src="assets/retrostation-logo.png" alt="RetroStation"
          onerror="this.style.display='none'">
     <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu">&times;</button>
   </div>
@@ -1917,8 +1955,8 @@
       </button>
 
       <!-- Logo image only — no text -->
-      <a class="brand-mark" href="index.html" aria-label="STOCK/86 home">
-        <img class="logo-img" src="assets/stock86-logo.png" alt="STOCK/86">
+      <a class="brand-mark" href="index.html" aria-label="RetroStation home">
+        <img class="logo-img" src="assets/retrostation-logo.png" alt="RetroStation">
       </a>
 
       <!-- Search bar -->
@@ -2015,6 +2053,13 @@
           <span class="hero-shop-cta">Grab Yours</span>
         </a>
       </div>
+
+      <button type="button" class="hero-arrow hero-arrow-prev" id="heroArrowPrev" aria-label="Previous slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button type="button" class="hero-arrow hero-arrow-next" id="heroArrowNext" aria-label="Next slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
 
       <div class="hero-dots" id="heroDots"></div>
     </div>
@@ -2210,7 +2255,7 @@
     <div class="footer-inner">
       <div class="footer-col-left">
         <a href="index.html" style="display:flex;align-items:center;">
-          <img class="footer-logo" src="assets/stock86-logo.png" alt="STOCK/86"
+          <img class="footer-logo" src="assets/retrostation-logo.png" alt="RetroStation"
                onerror="this.style.display='none'">
         </a>
         <button class="admin-toggle" id="adminToggleBtn" aria-label="Admin">·</button>
@@ -2776,12 +2821,12 @@
       document.body.classList.remove("pre-product");
       document.body.classList.add("showing-product");
       renderProductPage(bootId);
-      history.replaceState({ stock86View: "product", id: bootId }, "", `product.html?id=${encodeURIComponent(bootId)}`);
+      history.replaceState({ retroStationView: "product", id: bootId }, "", `product.html?id=${encodeURIComponent(bootId)}`);
       // Scroll so "← All listings" sits at the viewport bottom
       if (typeof _scrollToAllListingsBtn === "function") _scrollToAllListingsBtn();
     } else {
       document.body.classList.remove("pre-product");
-      history.replaceState({ stock86View: "grid" }, "", "index.html");
+      history.replaceState({ retroStationView: "grid" }, "", "index.html");
       restoreIndexScroll(); // jump back to where the person was browsing, if returning from a product
     }
   });

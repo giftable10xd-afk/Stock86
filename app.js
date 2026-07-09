@@ -1,10 +1,10 @@
 // ============================================================
-// STOCK/86 — SHARED APP LOGIC
+// RetroStation — SHARED APP LOGIC
 // Works on both index.html (grid) and product.html (detail page)
 // ============================================================
 
-const STORAGE_KEY      = "stock86_sold_state_v1";
-const CART_STORAGE_KEY = "stock86_cart_v1";
+const STORAGE_KEY      = "retrostation_sold_state_v1";
+const CART_STORAGE_KEY = "retrostation_cart_v1";
 
 let cart = [];
 let adminMode = false;
@@ -30,7 +30,7 @@ function showProductView(id, opts) {
   document.body.classList.add("showing-product");
   if (typeof renderProductPage === "function") renderProductPage(id);
   if (!opts.skipPush) {
-    history.pushState({ stock86View: "product", id }, "", `product.html?id=${encodeURIComponent(id)}`);
+    history.pushState({ retroStationView: "product", id }, "", `product.html?id=${encodeURIComponent(id)}`);
   }
   // Always go to top first (instant), then after the product content renders
   // scroll down so the "← All listings" button sits at the very bottom of
@@ -79,7 +79,7 @@ function showGridView(opts) {
   if (!isIndexDocument) return false;
   document.body.classList.remove("showing-product");
   if (!opts.skipPush) {
-    history.pushState({ stock86View: "grid" }, "", "index.html");
+    history.pushState({ retroStationView: "grid" }, "", "index.html");
   }
   // "← All listings" always returns to the very top of the page so the
   // customer sees the hero / full product grid from the start.
@@ -91,7 +91,7 @@ function showGridView(opts) {
 window.addEventListener("popstate", (e) => {
   if (!isIndexDocument) return;
   const state = e.state;
-  if (state && state.stock86View === "product" && state.id) {
+  if (state && state.retroStationView === "product" && state.id) {
     showProductView(state.id, { skipPush: true });
   } else {
     showGridView({ skipPush: true });
@@ -105,7 +105,7 @@ window.addEventListener("popstate", (e) => {
 // photos, which are large base64 data-URIs) finish loading and decoding
 // at different times, reflowing the grid; anchoring to the actual card
 // element sidesteps that entirely.
-const SCROLL_MEMORY_KEY = "stock86_index_scroll_anchor_v2";
+const SCROLL_MEMORY_KEY = "retrostation_index_scroll_anchor_v2";
 
 function rememberIndexScroll(productId) {
   try {
@@ -391,7 +391,7 @@ function showMaxOneToast() {
     toast.style.cssText = `
       position:fixed; bottom:24px; left:50%;
       background:var(--dark); color:var(--white);
-      font-family:"PixelForge3D",sans-serif; font-size:13px; font-weight:500;
+      font-family:"Rimouski",sans-serif; font-size:13px; font-weight:500;
       padding:10px 18px; border-radius:var(--radius-base);
       box-shadow:var(--shadow-lg); z-index:9999;
       pointer-events:none; white-space:nowrap;
@@ -728,7 +728,7 @@ function buildWhatsAppMessage() {
   const isCOD = whishBtn && whishBtn.dataset.selected !== "true";
 
   let lines = [];
-  lines.push("Order from STOCK/86 website:");
+  lines.push("Order from RetroStation website:");
   lines.push("");
   cart.forEach(line => {
     lines.push(`- ${line.name} ($${line.price})${line.meta ? " [" + line.meta + "]" : ""}`);
@@ -835,7 +835,7 @@ function exitAdmin() {
 // a no-op-safe stub since wireCommonUI() still calls it.
 // ============================================================
 
-const LOGO_SRC_DARK = "assets/stock86-logo.png";
+const LOGO_SRC_DARK = "assets/retrostation-logo.png";
 
 function updateLogoSrcs() {
   document.querySelectorAll(".logo-img, .nav-drawer-logo, .footer-logo").forEach(img => {
@@ -1092,7 +1092,7 @@ function renderProductPage(explicitId) {
     return;
   }
 
-  document.title = `${item.name} — STOCK/86`;
+  document.title = `${item.name} — RetroStation`;
   const breadcrumbEl = document.getElementById("breadcrumbName");
   if (breadcrumbEl) breadcrumbEl.textContent = item.name;
 
@@ -1588,7 +1588,7 @@ function initTopTicker() {
   if (document.getElementById("topTicker")) return;
 
   const style = document.createElement("style");
-  style.id = "stock86TickerStyles";
+  style.id = "retrostationTickerStyles";
   style.textContent = `
     @font-face{
       font-family:"PerfectDOSVGA";
@@ -1624,7 +1624,7 @@ function initTopTicker() {
       image-rendering:pixelated;
     }
     .top-ticker-text{
-      font-family:"PerfectDOSVGA","PixelForge3D",monospace;
+      font-family:"PerfectDOSVGA","Rimouski",monospace;
       font-size:12px; letter-spacing:0.5px;
       color:var(--neon, #39FF9C);
       text-shadow:0 0 6px var(--neon-glow, rgba(57,255,156,0.35));
@@ -1749,6 +1749,43 @@ function initHeroCarousel() {
     } else {
       restartHeroTimer();
     }
+  });
+
+  // Manual prev/next arrows — wrap around at either end.
+  const prevBtn = document.getElementById("heroArrowPrev");
+  const nextBtn = document.getElementById("heroArrowNext");
+  if (prevBtn) prevBtn.addEventListener("click", () => {
+    goToHeroSlide((current - 1 + slides.length) % slides.length, true);
+  });
+  if (nextBtn) nextBtn.addEventListener("click", () => {
+    goToHeroSlide((current + 1) % slides.length, true);
+  });
+
+  // Basic touch-swipe support so slides can be moved between on mobile too.
+  let touchStartX = null;
+  carousel.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  carousel.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    touchStartX = null;
+    if (Math.abs(dx) < 40) return; // ignore taps/small jitters
+    if (dx < 0) goToHeroSlide((current + 1) % slides.length, true);
+    else goToHeroSlide((current - 1 + slides.length) % slides.length, true);
+  }, { passive: true });
+
+  // Split each CTA's text into individually-colourable letter spans
+  // (colours cycle via the .letter:nth-child rules in CSS).
+  carousel.querySelectorAll(".hero-shop-cta").forEach(cta => {
+    const text = cta.textContent;
+    cta.innerHTML = "";
+    Array.from(text).forEach(ch => {
+      const span = document.createElement("span");
+      span.className = "letter";
+      span.textContent = ch === " " ? "\u00A0" : ch;
+      cta.appendChild(span);
+    });
   });
 
   // Category slides link to the shop grid filtered to that category.
