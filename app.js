@@ -1602,8 +1602,8 @@ function initTopTicker() {
          overlapping their top edge while they're open. */
       position:sticky; top:0; z-index:45;
       height:${TICKER_HEIGHT_PX}px;
-      background:var(--dark-strong, #05100D);
-      border-bottom:1px solid rgba(57,255,156,0.18);
+      background:var(--dark-strong, #09090B);
+      border-bottom:1px solid rgba(255,210,61,0.22);
       overflow:hidden;
       display:flex; align-items:center;
     }
@@ -1626,8 +1626,8 @@ function initTopTicker() {
     .top-ticker-text{
       font-family:"PerfectDOSVGA","Rimouski",monospace;
       font-size:12px; letter-spacing:0.5px;
-      color:var(--neon, #39FF9C);
-      text-shadow:0 0 6px var(--neon-glow, rgba(57,255,156,0.35));
+      color:var(--accent-yellow, #FFD23D);
+      text-shadow:0 0 6px rgba(255,210,61,0.35);
       line-height:1;
     }
     @keyframes top-ticker-scroll{
@@ -1688,13 +1688,21 @@ function initHeroCarousel() {
   if (slides.length < 2) return;
 
   const dotsWrap = document.getElementById("heroDots");
+  const CAT_DOT_VAR = {
+    "nintendo-switch": "--cat-switch",
+    "handhelds-consoles": "--cat-consoles",
+    "laptops": "--cat-laptops",
+    "phones": "--cat-phones",
+  };
   let dots = [];
   if (dotsWrap) {
     dotsWrap.innerHTML = "";
-    dots = slides.map((_, i) => {
+    dots = slides.map((slide, i) => {
       const b = document.createElement("button");
       b.type = "button";
       b.setAttribute("aria-label", `Show slide ${i + 1}`);
+      const catVar = CAT_DOT_VAR[slide.dataset.category];
+      if (catVar) b.style.setProperty("--dot-color", `var(${catVar})`);
       if (i === 0) b.classList.add("is-active");
       b.addEventListener("click", () => goToHeroSlide(i, true));
       dotsWrap.appendChild(b);
@@ -1774,6 +1782,21 @@ function initHeroCarousel() {
     if (dx < 0) goToHeroSlide((current + 1) % slides.length, true);
     else goToHeroSlide((current - 1 + slides.length) % slides.length, true);
   }, { passive: true });
+
+  // Mouse-drag equivalent for desktop/no-touch — same gesture-only nav,
+  // since the prev/next arrows are visually hidden.
+  let mouseStartX = null;
+  carousel.addEventListener("mousedown", (e) => {
+    mouseStartX = e.clientX;
+  });
+  window.addEventListener("mouseup", (e) => {
+    if (mouseStartX === null) return;
+    const dx = e.clientX - mouseStartX;
+    mouseStartX = null;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0) goToHeroSlide((current + 1) % slides.length, true);
+    else goToHeroSlide((current - 1 + slides.length) % slides.length, true);
+  });
 
   // Split each CTA's text into individually-colourable letter spans
   // (colours cycle via the .letter:nth-child rules in CSS).
