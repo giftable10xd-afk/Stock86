@@ -1839,6 +1839,23 @@ function initCrtOverlay() {
 }
 
 function initBgVideo() {
+  // On index.html, the intro splash video is still downloading/playing
+  // full-screen on top of everything at this point — injecting and
+  // auto-playing the wallpaper video right now would fight it for
+  // bandwidth and decode time, which is why both used to load slowly
+  // even though each file is small. If the splash is present and still
+  // active, wait for it to finish (rs:introEnded, fired from the inline
+  // script in index.html) before doing any wallpaper work. Pages with no
+  // splash (e.g. product.html) just run immediately as before.
+  const splash = document.getElementById("introSplash");
+  if (splash && !splash.classList.contains("is-hidden")) {
+    document.addEventListener("rs:introEnded", _injectBgVideos, { once: true });
+    return;
+  }
+  _injectBgVideos();
+}
+
+function _injectBgVideos() {
   // .header exists on both pages; .hero-band only on index.html
   const targets = document.querySelectorAll(".header, .hero-band");
   targets.forEach(el => {

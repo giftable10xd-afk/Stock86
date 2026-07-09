@@ -4,15 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetroStation — Used Gaming Hardware, Koura</title>
-<!-- Starts the video download immediately, in parallel with CSS/JS, instead
-     of waiting for app.js's initBgVideo() to inject a <video> tag after
-     DOMContentLoaded. Requires the file to be H.264 MP4 with the "faststart"
-     flag (moov atom at the front) so playback can begin before the whole
-     file finishes downloading. -->
-<link rel="preload" href="assets/wallpaper.mp4" as="video" type="video/mp4" fetchpriority="high">
 <!-- Intro splash video — plays full-screen on every load before the site
      is revealed. Same H.264 MP4 + faststart (moov atom up front)
-     requirement as wallpaper.mp4 above, so it can start immediately. -->
+     requirement as wallpaper.mp4 below, so it can start immediately.
+     This is the ONLY video preloaded eagerly/high-priority: the
+     wallpaper background video is intentionally NOT preloaded here —
+     it used to be, and competed with intro.mp4 for bandwidth on first
+     load, which is why both loaded slowly even though each file is
+     small. app.js now waits until the intro finishes before even
+     creating the wallpaper <video> element, so it only starts
+     downloading once the intro no longer needs the bandwidth. -->
 <link rel="preload" href="assets/intro.mp4" as="video" type="video/mp4" fetchpriority="high">
 <style>
   @font-face {
@@ -166,6 +167,25 @@
   }
   @media(min-width:768px){.section-head{margin-bottom:32px;}}
   .section-head .count{font-size:13px; color:var(--body-subtle); font-weight:500;}
+
+  /* Per-category colouring for home-screen section headings — same
+     accent hues as the hero glow + hamburger menu, so each category
+     reads as its own colour on the main page too, not just in the
+     drawer. A small glowing dot sits before the heading text. */
+  .section-head h2{ display:inline-flex; align-items:center; gap:10px; }
+  .section-head h2::before{
+    content:"";
+    width:10px; height:10px;
+    border-radius:3px;
+    background:var(--cat-dot, var(--brand));
+    box-shadow:0 0 10px var(--cat-dot, var(--brand));
+    flex-shrink:0;
+  }
+  #section-switches .section-head h2{ --cat-dot:var(--cat-switch); color:var(--cat-switch); }
+  #section-games    .section-head h2{ --cat-dot:var(--cat-switch); color:var(--cat-switch); }
+  #section-consoles .section-head h2{ --cat-dot:var(--cat-consoles); color:var(--cat-consoles); }
+  #section-laptops  .section-head h2{ --cat-dot:var(--cat-laptops); color:var(--cat-laptops); }
+  #section-phones   .section-head h2{ --cat-dot:var(--cat-phones); color:var(--cat-phones); }
 
   /* ============================================================
      HEADER — looping video background (assets/wallpaper.mp4),
@@ -1886,6 +1906,9 @@
       done = true;
       splash.classList.add("is-hidden");
       document.body.classList.remove("intro-active");
+      // Let app.js know the intro no longer needs bandwidth/decode time,
+      // so it can start loading the wallpaper background video now.
+      document.dispatchEvent(new Event("rs:introEnded"));
       window.setTimeout(function(){ splash.remove(); }, 500);
     }
 
