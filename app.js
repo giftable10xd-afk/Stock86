@@ -391,7 +391,7 @@ function showMaxOneToast() {
     toast.style.cssText = `
       position:fixed; bottom:24px; left:50%;
       background:var(--dark); color:var(--white);
-      font-family:"W95FA",sans-serif; font-size:13px; font-weight:500;
+      font-family:"PixelForge3D",sans-serif; font-size:13px; font-weight:500;
       padding:10px 18px; border-radius:var(--radius-base);
       box-shadow:var(--shadow-lg); z-index:9999;
       pointer-events:none; white-space:nowrap;
@@ -846,6 +846,8 @@ function updateLogoSrcs() {
 function wireCommonUI() {
   initTopTicker();
   initBgVideo();
+  initHeroCarousel();
+  initCrtOverlay();
   updateLogoSrcs();
   loadCartState();
   renderCart();
@@ -1600,8 +1602,8 @@ function initTopTicker() {
          overlapping their top edge while they're open. */
       position:sticky; top:0; z-index:45;
       height:${TICKER_HEIGHT_PX}px;
-      background:#0F1111;
-      border-bottom:1px solid rgba(255,255,255,0.12);
+      background:var(--dark-strong, #05100D);
+      border-bottom:1px solid rgba(57,255,156,0.18);
       overflow:hidden;
       display:flex; align-items:center;
     }
@@ -1622,9 +1624,10 @@ function initTopTicker() {
       image-rendering:pixelated;
     }
     .top-ticker-text{
-      font-family:"PerfectDOSVGA","W95FA",monospace;
+      font-family:"PerfectDOSVGA","PixelForge3D",monospace;
       font-size:12px; letter-spacing:0.5px;
-      color:#F3A848;
+      color:var(--neon, #39FF9C);
+      text-shadow:0 0 6px var(--neon-glow, rgba(57,255,156,0.35));
       line-height:1;
     }
     @keyframes top-ticker-scroll{
@@ -1666,6 +1669,114 @@ function initTopTicker() {
 // ============================================================
 
 const BG_VIDEO_SRC = "assets/wallpaper.mp4";
+
+// ============================================================
+// HERO CAROUSEL — cycles the intro-copy slide + 4 category slides
+// every 5s. Active slide slides left + fades out; the next slide
+// fades in from the right. Only runs on index.html (checks for
+// #heroCarousel first since product.html doesn't have a hero band).
+// ============================================================
+const HERO_SLIDE_INTERVAL_MS = 5000;
+const HERO_TRANSITION_MS = 550;
+
+function initHeroCarousel() {
+  const carousel = document.getElementById("heroCarousel");
+  if (!carousel || carousel.dataset.wired === "1") return;
+  carousel.dataset.wired = "1";
+
+  const slides = Array.from(carousel.querySelectorAll(".hero-slide"));
+  if (slides.length < 2) return;
+
+  const dotsWrap = document.getElementById("heroDots");
+  let dots = [];
+  if (dotsWrap) {
+    dotsWrap.innerHTML = "";
+    dots = slides.map((_, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", `Show slide ${i + 1}`);
+      if (i === 0) b.classList.add("is-active");
+      b.addEventListener("click", () => goToHeroSlide(i, true));
+      dotsWrap.appendChild(b);
+      return b;
+    });
+  }
+
+  let current = slides.findIndex(s => s.classList.contains("is-active"));
+  if (current < 0) current = 0;
+  let timer = null;
+
+  function goToHeroSlide(nextIndex, userTriggered) {
+    if (nextIndex === current) return;
+    const curEl = slides[current];
+    const nextEl = slides[nextIndex];
+
+    curEl.classList.remove("is-active");
+    curEl.classList.add("is-exiting");
+
+    // Force layout so the next slide's base (off-screen) state is
+    // applied before we flip it to active, otherwise the browser
+    // may coalesce both style changes and skip the entrance animation.
+    void nextEl.offsetWidth;
+    nextEl.classList.add("is-active");
+
+    window.setTimeout(() => {
+      curEl.classList.remove("is-exiting");
+    }, HERO_TRANSITION_MS);
+
+    if (dots[current]) dots[current].classList.remove("is-active");
+    if (dots[nextIndex]) dots[nextIndex].classList.add("is-active");
+
+    current = nextIndex;
+    if (userTriggered) restartHeroTimer();
+  }
+
+  function advance() {
+    goToHeroSlide((current + 1) % slides.length, false);
+  }
+
+  function restartHeroTimer() {
+    if (timer) window.clearInterval(timer);
+    timer = window.setInterval(advance, HERO_SLIDE_INTERVAL_MS);
+  }
+
+  restartHeroTimer();
+
+  // Pause while the tab isn't visible so slides don't pile up offscreen.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (timer) window.clearInterval(timer);
+    } else {
+      restartHeroTimer();
+    }
+  });
+
+  // Category slides link to the shop grid filtered to that category.
+  carousel.querySelectorAll(".hero-cat-link[data-filter-category]").forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const cat = link.getAttribute("data-filter-category");
+      if (typeof setCategory === "function") setCategory(cat);
+      const grid = document.querySelector(".product-grid, #shopGrid, .count-bar-outer");
+      grid?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
+// ============================================================
+// CRT OVERLAY — a fixed, full-viewport scanline + vignette layer
+// for the retro-terminal theme. Injected once and shared across
+// index.html/product.html, same pattern as initBgVideo(). Styling
+// (the .crt-overlay rules + flicker keyframes) lives in the page's
+// <style> block alongside the rest of the theme tokens.
+// ============================================================
+function initCrtOverlay() {
+  if (document.querySelector(".crt-overlay")) return;
+  const overlay = document.createElement("div");
+  overlay.className = "crt-overlay";
+  overlay.setAttribute("aria-hidden", "true");
+  document.body.appendChild(overlay);
+}
 
 function initBgVideo() {
   // .header exists on both pages; .hero-band only on index.html

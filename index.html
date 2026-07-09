@@ -10,10 +10,14 @@
      flag (moov atom at the front) so playback can begin before the whole
      file finishes downloading. -->
 <link rel="preload" href="assets/wallpaper.mp4" as="video" type="video/mp4" fetchpriority="high">
+<!-- Intro splash video — plays full-screen on every load before the site
+     is revealed. Same H.264 MP4 + faststart (moov atom up front)
+     requirement as wallpaper.mp4 above, so it can start immediately. -->
+<link rel="preload" href="assets/intro.mp4" as="video" type="video/mp4" fetchpriority="high">
 <style>
   @font-face {
-    font-family: "W95FA";
-    src: url("assets/W95F.otf") format("opentype");
+    font-family: "PixelForge3D";
+    src: url("assets/PixelForge3D.otf") format("opentype");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -23,19 +27,20 @@
      DESIGN TOKENS
      ============================================================ */
   /* ============================================================
-     DESIGN TOKENS — dark mode only. The site no longer offers a
-     light-mode alternative, so the dark palette lives directly in
-     :root as the single, permanent theme.
+     DESIGN TOKENS — dark mode only, retro-terminal palette: navy
+     and teal surfaces (instead of flat blue-gray) with a phosphor-
+     green accent for terminal-style highlights, layered under the
+     warm amber brand accent used on CTAs/badges.
      ============================================================ */
   :root{
     color-scheme:dark;
-    --neutral-primary-soft:#181B1F;
-    --neutral-secondary-soft:#1E2227;
-    --neutral-secondary-medium:#262B31;
-    --neutral-tertiary-soft:#2C3137;
-    --neutral-tertiary-medium:#333A42;
-    --neutral-quaternary:#4A515B;
-    --gray:#9098A1;
+    --neutral-primary-soft:#0D1917;
+    --neutral-secondary-soft:#122622;
+    --neutral-secondary-medium:#1A332C;
+    --neutral-tertiary-soft:#1F3D35;
+    --neutral-tertiary-medium:#284A40;
+    --neutral-quaternary:#3D6B5C;
+    --gray:#7FA89C;
     --brand-softer:#FEF7ED;
     --brand-soft:#FCECD3;
     --brand:#F3A848;
@@ -51,22 +56,25 @@
     --danger-strong:#A30028;
     --warning-soft:#FFF7ED;
     --warning:#F97316;
-    --dark:#131A22;
-    --dark-strong:#0F1111;
+    --dark:#0A1815;
+    --dark-strong:#05100D;
     --disabled:#EAEDED;
-    --heading:#F2F3F4;
-    --body:#C7CBD2;
-    --body-subtle:#8E96A0;
+    --heading:#EAF6F1;
+    --body:#BFDCD3;
+    --body-subtle:#82A99C;
     --fg-brand:#D4882A;
     --fg-brand-strong:#B87320;
     --fg-disabled:#949494;
     --white:#FFFFFF;
+    --neon:#39FF9C;
+    --neon-dim:#1FB87E;
+    --neon-glow:rgba(57,255,156,0.35);
     --border-buffer:#FFFFFF;
-    --border-light:#262B31;
+    --border-light:#1A332C;
     --border-default-subtle:#D5D9D9;
-    --border-default:#353C44;
-    --border-default-medium:#353C44;
-    --border-default-strong:#4A525C;
+    --border-default:#2C4F44;
+    --border-default-medium:#2C4F44;
+    --border-default-strong:#3F6C5C;
     --border-danger-subtle:#FECDD3;
     --border-brand:#D4882A;
     --border-brand-subtle:#F8D4A0;
@@ -74,20 +82,20 @@
     --radius-default:4px;
     --radius-sm:2px;
     --radius-full:9999px;
-    --shadow-2xs:0 1px rgb(0 0 0 / 0.04);
-    --shadow-xs:0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --shadow-sm:0 1px 2px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
-    --shadow-md:0 2px 4px -1px rgb(0 0 0 / 0.06), 0 1px 3px -1px rgb(0 0 0 / 0.06);
-    --shadow-lg:0 6px 12px -3px rgb(0 0 0 / 0.08), 0 3px 5px -3px rgb(0 0 0 / 0.06);
-    --overlay-backdrop:rgba(6,8,14,0.55);
-    --overlay-modal:rgba(15,17,17,0.6);
-    --overlay-modal-strong:rgba(15,17,17,0.65);
+    --shadow-2xs:2px 2px 0 0 rgb(0 0 0 / 0.35);
+    --shadow-xs:2px 2px 0 0 rgb(0 0 0 / 0.4);
+    --shadow-sm:3px 3px 0 0 rgb(0 0 0 / 0.45);
+    --shadow-md:4px 4px 0 0 rgb(0 0 0 / 0.5);
+    --shadow-lg:6px 6px 0 0 rgb(0 0 0 / 0.55);
+    --overlay-backdrop:rgba(3,9,7,0.6);
+    --overlay-modal:rgba(5,14,11,0.62);
+    --overlay-modal-strong:rgba(5,14,11,0.7);
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
-    font-family:"W95FA", "Open Sans", sans-serif;
+    font-family:"PixelForge3D", "Open Sans", sans-serif;
     background:var(--neutral-primary-soft);
     color:var(--body);
     -webkit-font-smoothing:antialiased;
@@ -116,7 +124,7 @@
   /* ============================================================
      TYPOGRAPHY
      ============================================================ */
-  h1,h2,h3,h4,h5,h6{font-weight:600; color:var(--heading); font-family:"W95FA", sans-serif;}
+  h1,h2,h3,h4,h5,h6{font-weight:600; color:var(--heading); font-family:"PixelForge3D", sans-serif;}
   h1{font-size:24px; line-height:1.15; letter-spacing:-0.4px; margin-bottom:16px;}
   h2{font-size:20px; line-height:1.2;}
   h3{font-size:18px; line-height:1.25;}
@@ -270,7 +278,7 @@
     background:transparent;
     border:none;
     color:var(--white);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:14px;
     text-align:center;
     padding:0;
@@ -382,7 +390,7 @@
     border:1px solid var(--border-default);
     border-radius:var(--radius-base);
     color:var(--heading);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:13px; font-weight:500;
     padding:9px 12px;
     cursor:pointer;
@@ -396,7 +404,7 @@
   .count-bar-total{
     font-size:13px;
     color:var(--body-subtle);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     white-space:nowrap;
   }
 
@@ -473,7 +481,7 @@
     border:1px solid rgba(255,255,255,0.15);
     border-radius:var(--radius-base);
     color:var(--white);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:14px;
     padding:0 10px 0 34px;
   }
@@ -515,7 +523,7 @@
     background:rgba(255,255,255,0.06);
     border:1px solid rgba(255,255,255,0.1);
     color:rgba(255,255,255,0.7);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:14px; font-weight:500;
     padding:11px 14px;
     border-radius:var(--radius-base);
@@ -554,7 +562,7 @@
     background:rgba(255,255,255,0.04);
     border:1px solid rgba(255,255,255,0.08);
     color:rgba(255,255,255,0.55);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:13px; font-weight:500;
     padding:9px 14px;
     border-radius:var(--radius-base);
@@ -580,7 +588,7 @@
     background:rgba(37,211,102,0.12);
     border:1px solid rgba(37,211,102,0.4);
     color:var(--white);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:14px; font-weight:500;
     padding:11px 16px;
     border-radius:var(--radius-full);
@@ -658,7 +666,7 @@
     display:flex; align-items:center; justify-content:space-between;
     background:none; border:none;
     padding:16px 20px;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:15px; font-weight:600; color:var(--heading);
     cursor:pointer;
   }
@@ -727,7 +735,7 @@
     width:100%;
     border:none; outline:none;
     padding:10px 0;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:14px; color:var(--heading);
     background:transparent;
     -moz-appearance:textfield;
@@ -742,7 +750,7 @@
   }
   .price-clear-btn{
     background:none; border:none;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:13px; font-weight:500;
     color:var(--body);
     text-decoration:underline;
@@ -755,7 +763,7 @@
     color:var(--white);
     border:none;
     border-radius:var(--radius-default);
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:13px; font-weight:600;
     padding:10px 22px;
     cursor:pointer;
@@ -771,7 +779,7 @@
      ============================================================ */
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    font-family:"W95FA", sans-serif; font-weight:500;
+    font-family:"PixelForge3D", sans-serif; font-weight:500;
     border-radius:var(--radius-base);
     border:1px solid transparent;
     box-shadow:var(--shadow-xs);
@@ -855,13 +863,104 @@
   .hero-badges{display:flex; flex-wrap:wrap; gap:8px;}
 
   /* ============================================================
+     HERO CAROUSEL — cycles: intro copy, then 4 category slides.
+     Every 5s the active slide slides left + fades out, then the
+     next slide fades in. Stacked with position:absolute so slides
+     of different heights don't cause layout jump; min-height below
+     is sized to the tallest slide (the intro-copy one).
+     ============================================================ */
+  .hero-carousel{
+    position:relative;
+    min-height:440px;
+  }
+  @media(min-width:640px){ .hero-carousel{ min-height:400px; } }
+  @media(min-width:1024px){ .hero-carousel{ min-height:380px; } }
+
+  .hero-slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; justify-content:center;
+    opacity:0;
+    transform:translateX(48px);
+    transition:opacity 550ms cubic-bezier(0.215,0.61,0.355,1), transform 550ms cubic-bezier(0.215,0.61,0.355,1);
+    pointer-events:none;
+  }
+  .hero-slide.is-active{
+    opacity:1;
+    transform:translateX(0);
+    pointer-events:auto;
+  }
+  .hero-slide.is-exiting{
+    opacity:0;
+    transform:translateX(-48px);
+  }
+  @media(prefers-reduced-motion:reduce){
+    .hero-slide{ transition:opacity 250ms ease; transform:none !important; }
+  }
+
+  /* Category slide: framed pixel-art circle + CTA, centered */
+  .hero-slide-category{ align-items:center; text-align:center; padding:12px 0; }
+  .hero-cat-link{ display:flex; flex-direction:column; align-items:center; text-decoration:none; }
+
+  .hero-frame-wrap{
+    position:relative;
+    width:180px; height:180px;
+    margin-bottom:14px;
+  }
+  @media(min-width:768px){ .hero-frame-wrap{ width:220px; height:220px; } }
+
+  .hero-frame-img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+    z-index:2;
+    pointer-events:none;
+    filter:drop-shadow(0 8px 18px rgba(0,0,0,0.45));
+  }
+  .hero-category-img{
+    position:absolute;
+    top:var(--hole-y,50%); left:var(--hole-x,50%);
+    width:var(--hole-size,58%); height:var(--hole-size,58%);
+    transform:translate(-50%,-50%);
+    object-fit:cover;
+    border-radius:50%;
+    z-index:1;
+  }
+
+  .hero-shop-cta{
+    display:inline-block;
+    font-family:"PixelForge3D", sans-serif;
+    font-size:16px; letter-spacing:0.5px;
+    color:var(--white);
+    background:var(--fg-brand-strong);
+    padding:9px 22px;
+    border-radius:var(--radius-default);
+    box-shadow:var(--shadow-xs);
+    transition:transform 150ms ease, filter 150ms ease;
+  }
+  @media(min-width:768px){ .hero-shop-cta{ font-size:18px; padding:10px 26px; } }
+  .hero-cat-link:hover .hero-shop-cta{ transform:translateY(-2px); filter:brightness(1.08); }
+  .hero-cat-link:active .hero-shop-cta{ transform:translateY(0); }
+
+  .hero-dots{
+    position:absolute; left:50%; bottom:6px; transform:translateX(-50%);
+    display:flex; gap:6px; z-index:3;
+  }
+  .hero-dots button{
+    width:7px; height:7px; border-radius:50%;
+    background:rgba(255,255,255,0.3); border:none; padding:0; cursor:pointer;
+    transition:background 150ms ease, transform 150ms ease;
+  }
+  .hero-dots button.is-active{ background:var(--white); transform:scale(1.25); }
+
+  /* ============================================================
      BADGES
      ============================================================ */
   .badge{
     display:inline-flex; align-items:center; gap:4px;
     border:1px solid; border-radius:var(--radius-default);
     font-weight:500; white-space:nowrap;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
   }
   .badge-default{font-size:11px; padding:2px 6px;}
   .badge-lg{font-size:12px; padding:3px 8px;}
@@ -884,7 +983,7 @@
     padding:2px 8px;
     border-radius:var(--radius-full);
     border:1px solid;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     letter-spacing:0.2px;
     width:fit-content;
   }
@@ -967,7 +1066,7 @@
     .nav-contact-btn:hover{background:rgba(37,211,102,0.22); border-color:#25D366;}
     .filter-drawer-close-btn:hover{background:var(--neutral-tertiary-medium);}
     .price-clear-btn:hover{color:var(--heading);}
-    .price-apply-btn:hover{background:#2a2f36;}
+    .price-apply-btn:hover{background:#1F3D35;}
     .btn-brand:hover{background:var(--brand-strong); color:var(--white);}
     .btn-secondary:hover{background:var(--neutral-tertiary-medium); color:var(--heading);}
     .btn-tertiary:hover{background:var(--neutral-secondary-medium); color:var(--heading);}
@@ -1024,7 +1123,7 @@
   .card-sku{font-size:10px; color:var(--body-subtle); font-weight:500; letter-spacing:0.3px; display:none;}
   @media(min-width:640px){.card-sku{display:block;}}
   .card-title-link:hover .card-title{color:var(--fg-brand);}
-  .card-title{font-size:12px; font-weight:600; color:var(--heading); line-height:1.35; transition:color 150ms ease; font-family:"W95FA", sans-serif;}
+  .card-title{font-size:12px; font-weight:600; color:var(--heading); line-height:1.35; transition:color 150ms ease; font-family:"PixelForge3D", sans-serif;}
   @media(min-width:640px){.card-title{font-size:14px;}}
   .card-specs{display:flex; flex-wrap:wrap; gap:4px; margin:2px 0;}
   @media(min-width:640px){.card-specs{gap:5px;}}
@@ -1043,7 +1142,7 @@
     flex-wrap:wrap; gap:6px;
     margin-top:auto; padding-top:6px;
   }
-  .card-price{font-size:16px; font-weight:700; color:var(--heading); font-family:"W95FA", sans-serif;}
+  .card-price{font-size:16px; font-weight:700; color:var(--heading); font-family:"PixelForge3D", sans-serif;}
   @media(min-width:640px){.card-price{font-size:20px;}}
   .card-price .currency{font-size:11px; font-weight:600; margin-right:1px;}
   @media(min-width:640px){.card-price .currency{font-size:13px;}}
@@ -1072,7 +1171,7 @@
     font-size:13px; color:var(--heading);
     padding:8px 10px;
     transition:border-color 150ms ease, box-shadow 150ms ease;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
   }
   select.input{padding:6px 8px; font-size:12px;}
   .input::placeholder{color:var(--body);}
@@ -1111,10 +1210,10 @@
   .footer-col-right{display:flex; justify-content:flex-end;}
   footer p{font-size:12px; color:var(--gray);}
   .footer-logo{height:64px; width:auto; display:block; opacity:0.85;}
-  .admin-toggle{background:none; border:none; color:#3D4444; font-size:11px; cursor:pointer; padding:4px;}
+  .admin-toggle{background:none; border:none; color:#4A6960; font-size:11px; cursor:pointer; padding:4px;}
   
   .footer-slogan{
-    font-size:12px; font-weight:700; color:var(--gray); font-family:"W95FA",sans-serif;
+    font-size:12px; font-weight:700; color:var(--gray); font-family:"PixelForge3D",sans-serif;
     letter-spacing:0.4px; text-align:center;
   }
   @media(max-width:600px){
@@ -1126,7 +1225,7 @@
   .inquiry-wa-btn{
     display:inline-flex; align-items:center; gap:8px;
     background:#25D366; color:#0a2a14;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     font-size:13px; font-weight:600;
     padding:9px 16px; border-radius:var(--radius-base);
     border:none; cursor:pointer; text-decoration:none;
@@ -1169,7 +1268,7 @@
   .cart-line-name{font-weight:600; font-size:13px; color:var(--heading);}
   .cart-line-meta{color:var(--body-subtle); font-size:12px; margin-top:2px;}
   .cart-line-price{font-weight:600; font-size:13px; color:var(--heading); white-space:nowrap;}
-  .cart-line-remove{background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer; margin-top:6px; padding:0; font-weight:500; font-family:"W95FA", sans-serif;}
+  .cart-line-remove{background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer; margin-top:6px; padding:0; font-weight:500; font-family:"PixelForge3D", sans-serif;}
   
   .drawer-foot{border-top:1px solid var(--border-default); padding:16px 20px 20px;}
   .drawer-row{display:flex; justify-content:space-between; font-size:13px; color:var(--body); margin-bottom:8px;}
@@ -1209,7 +1308,7 @@
     border-radius:var(--radius-default); padding:16px; display:flex; justify-content:center; margin-bottom:16px;
   }
   .qr-box img{width:180px; height:180px;}
-  .modal-total{text-align:center; font-size:24px; font-weight:700; color:var(--fg-brand-strong); margin-bottom:18px; font-family:"W95FA", sans-serif;}
+  .modal-total{text-align:center; font-size:24px; font-weight:700; color:var(--fg-brand-strong); margin-bottom:18px; font-family:"PixelForge3D", sans-serif;}
   .steps{margin-bottom:18px;}
   .step{display:flex; gap:10px; margin-bottom:12px; align-items:flex-start;}
   .step-num{
@@ -1226,13 +1325,13 @@
     padding:12px; border-radius:var(--radius-base); border:1px solid transparent;
     cursor:pointer; font-size:14px; width:100%; box-shadow:var(--shadow-xs);
     transition:background-color 150ms ease, transform 120ms ease;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
   }
   
   .wa-btn:active{transform:scale(0.97);}
   .wa-btn img{height:20px; width:auto;}
   .modal-close-row{text-align:center; margin-top:12px;}
-  .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"W95FA", sans-serif;}
+  .modal-close-row button{background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; font-family:"PixelForge3D", sans-serif;}
   
 
   /* ============================================================
@@ -1272,7 +1371,7 @@
   .ctrl-no-thanks{
     width:100%; text-align:center; padding:10px;
     background:none; border:none; color:var(--body-subtle); font-size:13px; cursor:pointer; margin-top:4px;
-    font-family:"W95FA", sans-serif;
+    font-family:"PixelForge3D", sans-serif;
     transition:color 150ms ease;
   }
   
@@ -1290,7 +1389,7 @@
   }
   
   .game-addon-row input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--brand); cursor:pointer; flex-shrink:0; }
-  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"W95FA",sans-serif; }
+  .game-addon-label{ flex:1; font-size:13px; color:var(--heading); font-family:"PixelForge3D",sans-serif; }
   .game-addon-price{ font-size:12px; font-weight:600; color:var(--fg-brand-strong); white-space:nowrap; }
 
   /* ============================================================
@@ -1305,7 +1404,7 @@
   .admin-item-toggle{
     background:var(--neutral-primary-soft); border:1px solid var(--border-default-medium);
     color:var(--body); font-size:11px; font-weight:500; padding:5px 10px;
-    border-radius:var(--radius-default); cursor:pointer; font-family:"W95FA", sans-serif;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"PixelForge3D", sans-serif;
     transition:background 150ms ease, transform 120ms ease;
   }
   
@@ -1360,7 +1459,7 @@
   .admin-tab{
     padding:8px 4px 10px; font-size:14px; font-weight:600; color:var(--body-subtle);
     background:none; border:none; border-bottom:2px solid transparent;
-    cursor:pointer; font-family:"W95FA", sans-serif; margin-bottom:-1px;
+    cursor:pointer; font-family:"PixelForge3D", sans-serif; margin-bottom:-1px;
   }
   .admin-tab.active{ color:var(--fg-brand-strong); border-bottom-color:var(--brand); }
   .admin-field{ margin-bottom:12px; }
@@ -1370,7 +1469,7 @@
   .admin-field select,
   .admin-field textarea{
     width:100%; border:1px solid var(--border-default); border-radius:var(--radius-default);
-    padding:9px 10px; font-size:14px; font-family:"W95FA", sans-serif;
+    padding:9px 10px; font-size:14px; font-family:"PixelForge3D", sans-serif;
     background:var(--neutral-primary-soft); color:var(--heading);
   }
   .admin-field textarea{ resize:vertical; min-height:64px; }
@@ -1401,7 +1500,7 @@
   .admin-link-btn{
     background:none; border:none; padding:0; margin-top:6px;
     font-size:12px; font-weight:600; color:var(--fg-brand-strong);
-    cursor:pointer; font-family:"W95FA", sans-serif;
+    cursor:pointer; font-family:"PixelForge3D", sans-serif;
   }
   @media(hover:hover) and (pointer:fine){
     .admin-link-btn:hover{ text-decoration:underline; }
@@ -1418,7 +1517,7 @@
   .admin-toolbar-btn{
     background:var(--dark-strong); color:var(--white); border:none;
     font-size:11px; font-weight:600; padding:6px 12px;
-    border-radius:var(--radius-default); cursor:pointer; font-family:"W95FA", sans-serif;
+    border-radius:var(--radius-default); cursor:pointer; font-family:"PixelForge3D", sans-serif;
   }
   
 
@@ -1430,7 +1529,7 @@
   }
   .pay-method-tab{
     flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
-    font-family:"W95FA",sans-serif; font-size:13px; font-weight:500;
+    font-family:"PixelForge3D",sans-serif; font-size:13px; font-weight:500;
     padding:9px 10px;
     border-radius:var(--radius-base);
     border:1px solid var(--border-default);
@@ -1545,9 +1644,164 @@
   body.page-fade-fallback{ animation: page-fade-in-fallback 220ms ease both; }
   @keyframes page-fade-in-fallback{ from{ opacity:0; } to{ opacity:1; } }
 
+  /* ============================================================
+     RETRO PIXEL RESKIN — chunkier 2px borders on the UI chrome
+     (shadows are already hard-edged/no-blur via the --shadow-*
+     tokens above, so every box-shadow:var(--shadow-*) rule gets
+     the pixel-offset look for free). Panels that previously had
+     no border at all (admin panel, checkout modal, top bar) get
+     one added here so the whole app reads consistently "boxed."
+     ============================================================ */
+  .card,
+  .btn-base,
+  .badge,
+  .input,
+  select.input,
+  .ctrl-option,
+  .ctrl-modal,
+  .modal,
+  .drawer,
+  .nav-drawer,
+  .admin-panel,
+  .admin-field input,
+  .admin-field select,
+  .game-addon-row,
+  .pay-method-tab,
+  .admin-list-item,
+  .price-input-wrap,
+  .top-ticker,
+  .whish-logo-row{
+    border-width:2px !important;
+  }
+  .admin-panel{ border:2px solid var(--border-default); }
+  .modal{ border:2px solid var(--border-default); }
+  .topbar{ border-bottom:2px solid var(--border-light); }
+  .count-bar-outer{ border-bottom:2px solid var(--border-light); }
+  .hero-shop-cta{ border:2px solid var(--dark-strong); }
+  .cat-tab{ border-width:2px !important; }
+
+  /* ============================================================
+     CRT / SCANLINE OVERLAY — injected as a fixed full-viewport
+     layer by app.js's initCrtOverlay() (shared across index.html
+     and product.html). Rules live here since that's where every
+     other visual token for the retro-terminal theme lives.
+     ============================================================ */
+  .crt-overlay{
+    position:fixed; inset:0;
+    z-index:9999;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.16) 0px,
+        rgba(0,0,0,0.16) 1px,
+        rgba(0,0,0,0) 1px,
+        rgba(0,0,0,0) 3px
+      ),
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
+    mix-blend-mode:overlay;
+    animation:crt-flicker 6s linear infinite;
+  }
+  @keyframes crt-flicker{
+    0%, 100%{ opacity:0.92; }
+    50%{ opacity:1; }
+    52%{ opacity:0.85; }
+    54%{ opacity:1; }
+  }
+  @media(prefers-reduced-motion:reduce){
+    .crt-overlay{ animation:none; opacity:0.95; }
+  }
+
+  /* ============================================================
+     INTRO SPLASH — full-screen video shown on every load, before
+     the site is revealed. Sits above everything (crt-overlay,
+     modals, drawers) via z-index. Markup + control script sit
+     right at the top of <body> so it paints first regardless of
+     what else is on the page. See #introSplash below.
+     ============================================================ */
+  body.intro-active{ overflow:hidden; }
+  #introSplash{
+    position:fixed; inset:0;
+    z-index:100000;
+    background:var(--dark-strong);
+    display:flex; align-items:center; justify-content:center;
+    opacity:1;
+    transition:opacity 450ms ease;
+  }
+  #introSplash.is-hidden{ opacity:0; pointer-events:none; }
+  #introSplash video{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  #introSkipBtn{
+    position:absolute; right:16px; bottom:16px;
+    z-index:2;
+    font-family:"PixelForge3D", sans-serif;
+    font-size:12px; letter-spacing:0.5px;
+    color:var(--heading);
+    background:rgba(13,25,23,0.75);
+    border:2px solid var(--border-default-strong);
+    border-radius:var(--radius-default);
+    padding:7px 14px;
+    cursor:pointer;
+  }
+  @media(min-width:768px){ #introSkipBtn{ font-size:13px; padding:8px 16px; } }
+
 </style>
 </head>
 <body>
+<!-- INTRO SPLASH — plays on every load, first thing in the DOM so it
+     covers the page immediately. Put your intro video at
+     assets/intro.mp4 (H.264 MP4, faststart/"moov atom" up front so it
+     can start playing before fully downloaded — same requirement as
+     the wallpaper background video). -->
+<div id="introSplash">
+  <video id="introVideo" autoplay muted playsinline webkit-playsinline>
+    <source src="assets/intro.mp4" type="video/mp4">
+  </video>
+  <button id="introSkipBtn" type="button">Skip ▶</button>
+</div>
+<script>
+  // Runs synchronously, before app.js loads, so the splash is fully
+  // wired up regardless of how long the rest of the page takes to parse.
+  (function(){
+    var splash = document.getElementById("introSplash");
+    if (!splash) return;
+    document.body.classList.add("intro-active");
+    var video = document.getElementById("introVideo");
+    var done = false;
+
+    function endIntro(){
+      if (done) return;
+      done = true;
+      splash.classList.add("is-hidden");
+      document.body.classList.remove("intro-active");
+      window.setTimeout(function(){ splash.remove(); }, 500);
+    }
+
+    if (video) {
+      video.addEventListener("ended", endIntro);
+      video.addEventListener("error", endIntro);
+      var playPromise = video.play();
+      // Autoplay can be blocked (e.g. browser policy) even with muted
+      // video in rare cases — don't leave the site stuck behind a
+      // frozen splash if that happens.
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(endIntro);
+      }
+    } else {
+      endIntro();
+    }
+
+    // Safety net: never block the site for more than 10s even if the
+    // video is missing/corrupt and never fires 'ended' or 'error'.
+    window.setTimeout(endIntro, 10000);
+
+    var skipBtn = document.getElementById("introSkipBtn");
+    if (skipBtn) skipBtn.addEventListener("click", endIntro);
+  })();
+</script>
 <script>
   // Apply pre-product class immediately (before any paint) if URL has ?id=
   // This prevents the grid from flashing before the product view takes over.
@@ -1694,23 +1948,75 @@
 <div class="hero-band">
   <div class="hero-band-overlay"></div>
   <div class="container" style="position:relative;z-index:2;">
-    <div class="hero hero-animate">
-      <h1>Used consoles &amp; handhelds, checked by hand</h1>
-      <p class="lead">Modded Switches, handheld PCs, and last-gen consoles — every listing is the actual unit in its actual condition, hand-checked before it ships.</p>
-      <div class="hero-badges">
-        <span class="badge badge-lg badge-brand">
-          💵 Cash on Delivery
-        </span>
-        <span class="badge badge-lg badge-brand">
-          <img class="badge-logo-whish" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
-          Whish Money
-        </span>
-        <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">
-          <img class="badge-logo-whatsapp" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
-          Orders confirmed on WhatsApp
-        </span>
-        <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $5 — all of Lebanon</span>
+    <div class="hero-carousel" id="heroCarousel">
+
+      <!-- Slide 0: intro copy -->
+      <div class="hero-slide hero-slide-text is-active" data-slide-index="0">
+        <div class="hero hero-animate">
+          <h1>Used consoles &amp; handhelds, checked by hand</h1>
+          <p class="lead">Modded Switches, handheld PCs, and last-gen consoles — every listing is the actual unit in its actual condition, hand-checked before it ships.</p>
+          <div class="hero-badges">
+            <span class="badge badge-lg badge-brand">
+              💵 Cash on Delivery
+            </span>
+            <span class="badge badge-lg badge-brand">
+              <img class="badge-logo-whish" src="assets/whish-logo.png" alt="Whish" onerror="this.style.display='none'">
+              Whish Money
+            </span>
+            <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">
+              <img class="badge-logo-whatsapp" src="assets/whatsapp-logo.png" alt="WhatsApp" onerror="this.style.display='none'">
+              Orders confirmed on WhatsApp
+            </span>
+            <span class="badge badge-lg badge-neutral" style="color:var(--white); background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);">Delivery $5 — all of Lebanon</span>
+          </div>
+        </div>
       </div>
+
+      <!-- Slide 1: Nintendo Switch -->
+      <div class="hero-slide hero-slide-category" data-slide-index="1" data-category="nintendo-switch">
+        <a class="hero-cat-link" href="#" data-filter-category="switches">
+          <div class="hero-frame-wrap" style="--hole-size:62%; --hole-x:50%; --hole-y:50%;">
+            <img class="hero-frame-img" src="assets/frame-nintendo-switch.png" alt="">
+            <img class="hero-category-img" src="assets/category-nintendo-switch.png" alt="Nintendo Switch" onerror="this.style.visibility='hidden'">
+          </div>
+          <span class="hero-shop-cta">Shop Now</span>
+        </a>
+      </div>
+
+      <!-- Slide 2: Handhelds & Consoles -->
+      <div class="hero-slide hero-slide-category" data-slide-index="2" data-category="handhelds-consoles">
+        <a class="hero-cat-link" href="#" data-filter-category="consoles">
+          <div class="hero-frame-wrap" style="--hole-size:59%; --hole-x:50%; --hole-y:50.5%;">
+            <img class="hero-frame-img" src="assets/frame-handhelds-consoles.png" alt="">
+            <img class="hero-category-img" src="assets/category-handhelds-consoles.png" alt="Handhelds &amp; Consoles" onerror="this.style.visibility='hidden'">
+          </div>
+          <span class="hero-shop-cta">Browse Now</span>
+        </a>
+      </div>
+
+      <!-- Slide 3: Laptops -->
+      <div class="hero-slide hero-slide-category" data-slide-index="3" data-category="laptops">
+        <a class="hero-cat-link" href="#" data-filter-category="laptops">
+          <div class="hero-frame-wrap" style="--hole-size:47%; --hole-x:50%; --hole-y:50.5%;">
+            <img class="hero-frame-img" src="assets/frame-laptops.png" alt="">
+            <img class="hero-category-img" src="assets/category-laptops.png" alt="Laptops" onerror="this.style.visibility='hidden'">
+          </div>
+          <span class="hero-shop-cta">Explore Now</span>
+        </a>
+      </div>
+
+      <!-- Slide 4: Phones -->
+      <div class="hero-slide hero-slide-category" data-slide-index="4" data-category="phones">
+        <a class="hero-cat-link" href="#" data-filter-category="phones">
+          <div class="hero-frame-wrap" style="--hole-size:57%; --hole-x:50%; --hole-y:49%;">
+            <img class="hero-frame-img" src="assets/frame-phones.png" alt="">
+            <img class="hero-category-img" src="assets/category-phones.png" alt="Phones" onerror="this.style.visibility='hidden'">
+          </div>
+          <span class="hero-shop-cta">Grab Yours</span>
+        </a>
+      </div>
+
+      <div class="hero-dots" id="heroDots"></div>
     </div>
   </div>
 </div>
