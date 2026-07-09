@@ -268,16 +268,10 @@
   .header-search-wrap:focus-within{
     background:var(--dark-strong);
     border-color:var(--brand);
-    /* Grow to take up the free space in the topbar while typing, instead
-       of staying pinned to the tiny default width — overlays above
-       whatever's beside it so nothing else needs to reflow. */
-    position:absolute;
-    left:56px; right:52px;
-    flex:none;
-    max-width:none;
-    z-index:20;
+    /* Just highlight on focus — no longer expands into an absolutely
+       positioned overlay, since that used to sit on top of (and hide)
+       the logo. The box keeps its normal place in the layout. */
   }
-  .header-search-wrap:focus-within .header-search-input{ width:100%; }
   .header-search-wrap svg{
     width:15px; height:15px; color:rgba(255,255,255,0.5); pointer-events:none; flex-shrink:0;
   }
@@ -571,6 +565,47 @@
     flex-shrink:0;
   }
   .nav-btn.open .chevron{transform:rotate(180deg);}
+
+  /* Per-category colouring — each category button gets its own dark-
+     tinted background + accent border/icon/text colour (using the same
+     --cat-* hues as the hero glow) instead of every button sharing one
+     flat grey. "All listings" stays neutral since it isn't a single
+     category. Kept dark/muted (not full-brightness) so it still reads
+     as a dark UI, just with distinct per-category identity. */
+  .nav-btn[data-cat="switches"], .nav-sub-btn[data-cat="games"]{
+    background:color-mix(in srgb, var(--cat-switch) 16%, var(--neutral-secondary-soft));
+    border-color:color-mix(in srgb, var(--cat-switch) 45%, transparent);
+    color:var(--cat-switch);
+  }
+  .nav-btn[data-cat="consoles"]{
+    background:color-mix(in srgb, var(--cat-consoles) 16%, var(--neutral-secondary-soft));
+    border-color:color-mix(in srgb, var(--cat-consoles) 45%, transparent);
+    color:var(--cat-consoles);
+  }
+  .nav-btn[data-cat="laptops"]{
+    background:color-mix(in srgb, var(--cat-laptops) 16%, var(--neutral-secondary-soft));
+    border-color:color-mix(in srgb, var(--cat-laptops) 45%, transparent);
+    color:var(--cat-laptops);
+  }
+  .nav-btn[data-cat="phones"]{
+    background:color-mix(in srgb, var(--cat-phones) 16%, var(--neutral-secondary-soft));
+    border-color:color-mix(in srgb, var(--cat-phones) 45%, transparent);
+    color:var(--cat-phones);
+  }
+  /* Active state keeps that same category colour, just brighter/filled,
+     instead of switching to the generic brand orange for every category. */
+  .nav-btn[data-cat="switches"].active, .nav-sub-btn[data-cat="games"].active{
+    background:var(--cat-switch); border-color:var(--cat-switch); color:var(--dark-strong);
+  }
+  .nav-btn[data-cat="consoles"].active{
+    background:var(--cat-consoles); border-color:var(--cat-consoles); color:var(--dark-strong);
+  }
+  .nav-btn[data-cat="laptops"].active{
+    background:var(--cat-laptops); border-color:var(--cat-laptops); color:var(--dark-strong);
+  }
+  .nav-btn[data-cat="phones"].active{
+    background:var(--cat-phones); border-color:var(--cat-phones); color:var(--dark-strong);
+  }
 
   /* Sub-items */
   .nav-sub{
